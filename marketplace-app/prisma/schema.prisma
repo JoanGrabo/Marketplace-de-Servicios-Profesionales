@@ -1,0 +1,41 @@
+// Prisma schema para CONNECTIA - PostgreSQL
+// https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Profile {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  role      String   @default("cliente") // "cliente" | "profesional"
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  services Service[]
+
+  @@map("profiles")
+}
+
+model Service {
+  id           String   @id @default(cuid())
+  profileId    String   @map("profile_id")
+  title        String
+  slug         String   @unique
+  description  String?
+  priceCents   Int      @map("price_cents") // precio en céntimos
+  deliveryDays Int      @map("delivery_days") @default(7)
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@map("services")
+}

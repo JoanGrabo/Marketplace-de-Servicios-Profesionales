@@ -16,6 +16,7 @@ ssh ubuntu@51.254.133.49
 
 ```bash
 cd /home/ubuntu
+rm -rf marketplace
 git clone https://github.com/JoanGrabo/Marketplace-de-Servicios-Profesionales.git marketplace
 ```
 

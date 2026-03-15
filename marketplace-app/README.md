@@ -1,36 +1,58 @@
-# Marketplace de Servicios Profesionales
+# CONNECTIA — Marketplace de Servicios Profesionales
 
-App Next.js (App Router) + Tailwind. Base de datos opcional al inicio (Supabase u otra después).
+App Next.js (App Router) + Tailwind + **PostgreSQL** (Prisma).
 
 ## Desarrollar en local
 
-1. Copia las variables de entorno:
+1. Copia las variables de entorno y rellena `DATABASE_URL` (PostgreSQL):
    ```bash
    cp .env.example .env.local
    ```
-2. **Sin base de datos:** puedes dejar `.env.local` como está (valores placeholder); la app arranca y la página de inicio funciona.
-3. **Con Supabase:** crea un proyecto en [Supabase](https://supabase.com), Settings → API, y rellena en `.env.local`:
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-4. Instala y arranca:
+   En `.env.local` pon algo como:
+   ```
+   DATABASE_URL="postgresql://connectia:TU_PASSWORD@localhost:5432/connectia"
+   ```
+2. Instala dependencias y genera el cliente Prisma:
    ```bash
    npm install
+   npx prisma generate
+   ```
+3. Si la base de datos está vacía, aplica las migraciones:
+   ```bash
+   npx prisma migrate deploy
+   ```
+4. Arranca el servidor:
+   ```bash
    npm run dev
    ```
-5. Abre [http://localhost:3000](http://localhost:3000).
+5. Abre [http://localhost:3000](http://localhost:3000). Prueba la API de salud: [http://localhost:3000/api/health](http://localhost:3000/api/health).
 
-## Desplegar sin base de datos
+## PostgreSQL en el VPS
 
-En el VPS, en `.env.local` puedes usar los mismos placeholders de `.env.example`. La app sirve la web sin BD. Cuando añadas login, perfiles o servicios, podrás elegir Supabase o una BD local (p. ej. PostgreSQL en el mismo VPS o SQLite).
+Ver **`docs/POSTGRES_VPS.md`** para instalar Postgres en el VPS, crear usuario y base de datos, y configurar `DATABASE_URL` en `.env.local` del servidor. Luego en el VPS:
+
+```bash
+cd marketplace-app
+npm ci
+npx prisma generate
+npx prisma migrate deploy
+npm run build
+pm2 restart marketplace
+```
 
 ## Scripts
 
 - `npm run dev` — servidor de desarrollo
-- `npm run build` — build para producción
+- `npm run build` — genera Prisma client y build de Next.js
 - `npm run start` — servir build (para el VPS con PM2)
 - `npm run lint` — ESLint
+- `npm run db:generate` — genera cliente Prisma
+- `npm run db:migrate` — aplica migraciones (producción)
+- `npm run db:migrate:dev` — crea y aplica migraciones (desarrollo)
+- `npm run db:studio` — abre Prisma Studio (visor de BD)
 
 ## Estructura
 
-- `app/` — páginas y layout (App Router)
-- `lib/` — cliente Supabase y utilidades
+- `app/` — páginas y API (App Router)
+- `lib/` — Prisma (`db.ts`), Supabase (opcional)
+- `prisma/` — schema y migraciones

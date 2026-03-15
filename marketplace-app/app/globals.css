@@ -1,3 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* CONNECTIA brand */
+:root {
+  --connectia-gray: #2d2d2d;
+  --connectia-gold: #b8860b;
+  --connectia-gold-light: #d4a84b;
+}
