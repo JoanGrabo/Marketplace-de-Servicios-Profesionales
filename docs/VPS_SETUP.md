@@ -149,18 +149,29 @@ pm2 save
 
 **Opción A – Con Git (recomendado)**
 
-1. En tu PC: crea un repo (GitHub, GitLab, etc.), sube solo el código (sin `node_modules`, sin `.next`; el `.gitignore` ya los excluye).
-2. En el VPS:
+1. En tu PC: el código ya está en GitHub (sin `node_modules`, sin `.next`; el `.gitignore` ya los excluye).
+2. **En el VPS:** conéctate y clona el repo:
    ```bash
+   ssh ubuntu@TU_IP_DEL_VPS
    cd /home/ubuntu
-   git clone https://github.com/TU_USUARIO/marketplace-app.git marketplace
+   git clone https://github.com/JoanGrabo/Marketplace-de-Servicios-Profesionales.git marketplace
    cd marketplace
    ```
-3. Crea `.env.local` en el VPS con las mismas variables que en tu PC (Supabase, etc.):
+3. **La app Next.js está en la subcarpeta `marketplace-app`.** Entra en ella:
+   ```bash
+   cd marketplace-app
+   ```
+4. Crea `.env.local` en esta carpeta con las mismas variables que en tu PC (Supabase, etc.):
    ```bash
    nano .env.local
    ```
-4. Sigue con “Al desplegar la app más adelante” (npm install, build, PM2).
+   Pega algo como (con tus valores reales):
+   ```
+   NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
+   ```
+   Guarda: `Ctrl+O`, Enter, `Ctrl+X`.
+5. Sigue con “Al desplegar la app más adelante” (npm install, build, PM2).
 
 ---
 
@@ -188,30 +199,85 @@ pm2 save
 
 ### Al desplegar la app más adelante
 
-Cuando el código esté en el VPS (por ejemplo en `/home/ubuntu/marketplace`), en esa carpeta:
+Cuando el código esté en el VPS, entra en la carpeta de la app (donde está `package.json`):
 
 ```bash
-cd /home/ubuntu/marketplace   # o la ruta donde esté el proyecto
-npm ci --omit=dev
+cd /home/ubuntu/marketplace/marketplace-app
+npm ci
 npm run build
 pm2 start npm --name "marketplace" -- start
 pm2 save
 pm2 startup
 ```
 
+**Importante:** usa `npm ci` **sin** `--omit=dev`, porque Tailwind y otras herramientas de build están en devDependencies y hacen falta para compilar. Luego `next start` solo usa la carpeta `.next` ya generada.
+
 (Responde las preguntas de `pm2 startup` si las hace.)
 
 ---
 
-## 9. Preparar Nginx para tu app (plantilla)
+## 9. Preparar Nginx para tu app
 
-Cuando la app esté en el servidor y escuchando en un puerto (por ejemplo 3000), crearás un sitio en Nginx. Por ahora puedes dejar un archivo de ejemplo:
+**Si la web no cambia** y sigues viendo "Welcome to nginx", es porque Nginx sigue usando el sitio por defecto. Hay que crear el sitio de la app y desactivar el default.
+
+### 9.1 Crear el sitio (sin dominio, por IP)
 
 ```bash
 sudo nano /etc/nginx/sites-available/marketplace
 ```
 
-Contenido (sustituye `tudominio.com` y el puerto si cambia):
+Pega este contenido (para servir por IP en el puerto 80):
+
+```nginx
+server {
+    listen 80;
+    server_name _;
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+```
+
+Guarda: `Ctrl+O`, Enter, `Ctrl+X`.
+
+### 9.2 Activar tu sitio y quitar el de Nginx por defecto
+
+```bash
+sudo ln -sf /etc/nginx/sites-available/marketplace /etc/nginx/sites-enabled/
+sudo rm -f /etc/nginx/sites-enabled/default
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+### 9.3 Comprobar que la app está en marcha
+
+```bash
+pm2 list
+```
+
+Debe aparecer `marketplace` en estado **online**. Si no está o está stopped:
+
+```bash
+cd /home/ubuntu/marketplace/marketplace-app
+pm2 start npm --name "marketplace" -- start
+pm2 save
+```
+
+Luego abre en el navegador **http://TU_IP_DEL_VPS**. Deberías ver "Marketplace de Servicios Profesionales".
+
+---
+
+### Con dominio y HTTPS (más adelante)
+
+Cuando tengas dominio apuntando a la IP, usa Certbot y cambia el sitio a algo como:
 
 ```nginx
 server {
@@ -223,7 +289,6 @@ server {
 server {
     listen 443 ssl;
     server_name tudominio.com www.tudominio.com;
-
     ssl_certificate /etc/letsencrypt/live/tudominio.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/tudominio.com/privkey.pem;
 
@@ -240,16 +305,6 @@ server {
     }
 }
 ```
-
-Activar sitio y comprobar:
-
-```bash
-sudo ln -s /etc/nginx/sites-available/marketplace /etc/nginx/sites-enabled/
-sudo nginx -t
-sudo systemctl reload nginx
-```
-
-**Nota:** Este paso 9 lo harás cuando tengas dominio y la app desplegada. Si aún no tienes dominio, puedes usar solo la IP y servir la app en el puerto 80 con una configuración más simple; si quieres, en el siguiente despliegue te paso esa variante.
 
 ---
 
