@@ -46,12 +46,28 @@ echo ">>> Instalando dependencias (npm ci)..."
 cd "$APP_DIR"
 npm ci
 
+# --- Cargar DATABASE_URL para Prisma (desde .env.local o .env) ---
+DATABASE_URL=""
+if [ -f ".env.local" ]; then
+  DATABASE_URL=$(grep -E '^DATABASE_URL=' .env.local | sed 's/^DATABASE_URL=//' | tr -d '"' | tr -d "'" | tr -d '\r')
+  echo ">>> DATABASE_URL cargada desde .env.local"
+fi
+if [ -z "$DATABASE_URL" ] && [ -f ".env" ]; then
+  DATABASE_URL=$(grep -E '^DATABASE_URL=' .env | sed 's/^DATABASE_URL=//' | tr -d '"' | tr -d "'" | tr -d '\r')
+  echo ">>> DATABASE_URL cargada desde .env"
+fi
+export DATABASE_URL
+
 # --- Prisma: generar cliente y aplicar migraciones ---
 if [ -f "prisma/schema.prisma" ]; then
   echo ">>> Prisma: generate..."
   npx prisma generate
-  echo ">>> Prisma: migrate deploy..."
-  npx prisma migrate deploy
+  if [ -n "$DATABASE_URL" ]; then
+    echo ">>> Prisma: migrate deploy..."
+    npx prisma migrate deploy
+  else
+    echo ">>> Se omite prisma migrate deploy (falta DATABASE_URL en .env.local)."
+  fi
 else
   echo ">>> No hay Prisma en este proyecto, se omite."
 fi
