@@ -23,6 +23,7 @@
     "@supabase/supabase-js": "^2.45.0"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.2",
     "prisma": "^5.22.0",
     "@types/node": "^20",
     "@types/react": "^18",
