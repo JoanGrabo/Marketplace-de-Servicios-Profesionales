@@ -14,12 +14,17 @@ export default async function MiPerfilPage() {
 
   async function updateProfile(formData: FormData) {
     "use server";
+    const current = await getCurrentUser();
+    if (!current) {
+      redirect("/auth/login");
+    }
+
     const displayName = String(formData.get("displayName") ?? "").trim();
     const bio = String(formData.get("bio") ?? "").trim();
     const avatarUrl = String(formData.get("avatarUrl") ?? "").trim();
 
     await prisma.profile.update({
-      where: { id: user.id },
+      where: { id: current.id },
       data: {
         displayName: displayName || null,
         bio: bio || null,
