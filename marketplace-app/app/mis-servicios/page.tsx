@@ -158,22 +158,30 @@ export default async function MisServiciosPage() {
                     </div>
                   </div>
                 </div>
-                <form
-                  action={async () => {
-                    "use server";
-                    await prisma.service.deleteMany({
-                      where: { id: s.id, profileId: user.id },
-                    });
-                    redirect("/mis-servicios");
-                  }}
-                >
-                  <button
-                    type="submit"
-                    className="rounded-lg border border-red-200 bg-red-50 px-3 py-1 text-xs font-medium text-red-700 transition hover:bg-red-100"
+                <div className="flex flex-col items-end gap-1">
+                  <a
+                    href={`/mis-servicios/editar/${s.id}`}
+                    className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-1 text-xs font-medium text-gray-700 transition hover:bg-gray-100"
                   >
-                    Borrar
-                  </button>
-                </form>
+                    Editar
+                  </a>
+                  <form
+                    action={async () => {
+                      "use server";
+                      await prisma.service.deleteMany({
+                        where: { id: s.id, profileId: user.id },
+                      });
+                      redirect("/mis-servicios");
+                    }}
+                  >
+                    <button
+                      type="submit"
+                      className="rounded-lg border border-red-200 bg-red-50 px-3 py-1 text-xs font-medium text-red-700 transition hover:bg-red-100"
+                    >
+                      Borrar
+                    </button>
+                  </form>
+                </div>
               </div>
             </li>
           ))}
