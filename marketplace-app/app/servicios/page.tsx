@@ -8,6 +8,9 @@ export const metadata: Metadata = {
     "Servicios profesionales: arquitectura, renders, planos, asesoría y próximamente servicios legales.",
 };
 
+// Obliga a que la página sea dinámica y consulte la BD en cada petición
+export const dynamic = "force-dynamic";
+
 export default async function ServiciosPage() {
   const servicios = await prisma.service.findMany({
     where: { active: true },
