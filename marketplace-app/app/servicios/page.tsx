@@ -15,6 +15,7 @@ export default async function ServiciosPage() {
   const servicios = await prisma.service.findMany({
     where: { active: true },
     orderBy: { createdAt: "desc" },
+    include: { profile: true },
   });
 
   return (
@@ -54,9 +55,14 @@ export default async function ServiciosPage() {
                     maximumFractionDigits: 0,
                   }).format(s.priceCents / 100)}
                 </div>
-                <div className="text-gray-500">
-                  Entrega estimada: {s.deliveryDays}{" "}
-                  {s.deliveryDays === 1 ? "día" : "días"}
+                <div className="text-right text-xs text-gray-500">
+                  <div>
+                    {s.profile.displayName || s.profile.email}
+                  </div>
+                  <div>
+                    Entrega estimada: {s.deliveryDays}{" "}
+                    {s.deliveryDays === 1 ? "día" : "días"}
+                  </div>
                 </div>
               </div>
             </li>

@@ -15,6 +15,9 @@ model Profile {
   email     String   @unique
   name      String?
   passwordHash String? @map("password_hash")
+  displayName String? @map("display_name")
+  bio       String?
+  avatarUrl String? @map("avatar_url")
   role      String   @default("cliente") // "cliente" | "profesional"
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
