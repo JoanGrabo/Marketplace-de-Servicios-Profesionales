@@ -47,6 +47,9 @@ export default function RootLayout({
               <Link href="/contacto" className="text-gray-600 transition hover:text-[var(--connectia-gold)]">
                 Contacto
               </Link>
+              <Link href="/auth/login" className="text-gray-600 transition hover:text-[var(--connectia-gold)]">
+                Entrar
+              </Link>
             </nav>
           </div>
         </header>
