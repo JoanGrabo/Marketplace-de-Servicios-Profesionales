@@ -30,6 +30,13 @@ export default async function EditarServicioPage({ params }: Params) {
     const current = await getCurrentUser();
     if (!current) redirect("/auth/login");
 
+    const existing = await prisma.service.findFirst({
+      where: { id: servicio.id, profileId: current.id },
+    });
+    if (!existing) {
+      redirect("/mis-servicios");
+    }
+
     const title = String(formData.get("title") ?? "").trim();
     const description = String(formData.get("description") ?? "").trim();
     const priceEuros = Number(formData.get("priceEuros") ?? 0);
@@ -40,7 +47,7 @@ export default async function EditarServicioPage({ params }: Params) {
     }
 
     await prisma.service.updateMany({
-      where: { id: servicio.id, profileId: current.id },
+      where: { id: existing.id, profileId: current.id },
       data: {
         title,
         description: description || null,
