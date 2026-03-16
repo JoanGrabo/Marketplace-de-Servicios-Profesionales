@@ -41,6 +41,9 @@ export default function RootLayout({
               <Link href="/servicios" className="text-gray-600 transition hover:text-[var(--connectia-gold)]">
                 Servicios
               </Link>
+              <Link href="/mis-servicios" className="text-gray-600 transition hover:text-[var(--connectia-gold)]">
+                Mis servicios
+              </Link>
               <Link href="/quienes-somos" className="text-gray-600 transition hover:text-[var(--connectia-gold)]">
                 Quiénes somos
               </Link>
