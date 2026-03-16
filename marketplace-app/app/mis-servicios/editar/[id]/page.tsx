@@ -25,13 +25,15 @@ export default async function EditarServicioPage({ params }: Params) {
     redirect("/mis-servicios");
   }
 
+  const serviceId = servicio.id;
+
   async function updateService(formData: FormData) {
     "use server";
     const current = await getCurrentUser();
     if (!current) redirect("/auth/login");
 
     const existing = await prisma.service.findFirst({
-      where: { id: servicio.id, profileId: current.id },
+      where: { id: serviceId, profileId: current.id },
     });
     if (!existing) {
       redirect("/mis-servicios");
