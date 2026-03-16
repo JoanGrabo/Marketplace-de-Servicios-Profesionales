@@ -66,6 +66,12 @@ export default async function RootLayout({
                   >
                     Mi perfil
                   </Link>
+                  <Link
+                    href="/auth/logout"
+                    className="text-gray-600 transition hover:text-[var(--connectia-gold)]"
+                  >
+                    Salir
+                  </Link>
                 </>
               )}
               <Link

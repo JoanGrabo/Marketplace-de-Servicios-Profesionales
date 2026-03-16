@@ -53,3 +53,28 @@ export async function POST(req: Request) {
   return NextResponse.json({ ok: true });
 }
 
+export async function DELETE(req: Request) {
+  const user = await getCurrentUser();
+  if (!user) {
+    return NextResponse.json({ ok: false, message: "No autenticado" }, { status: 401 });
+  }
+
+  const { searchParams } = new URL(req.url);
+  const id = searchParams.get("id");
+
+  if (!id) {
+    return NextResponse.json({ ok: false, message: "Falta id" }, { status: 400 });
+  }
+
+  // Solo permite borrar servicios del propio usuario
+  await prisma.service.deleteMany({
+    where: {
+      id,
+      profileId: user.id,
+    },
+  });
+
+  return NextResponse.json({ ok: true });
+}
+
+
