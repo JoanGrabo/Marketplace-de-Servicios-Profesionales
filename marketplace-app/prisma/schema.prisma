@@ -16,8 +16,14 @@ model Profile {
   name      String?
   passwordHash String? @map("password_hash")
   displayName String? @map("display_name")
+  headline String?
   bio       String?
   avatarUrl String? @map("avatar_url")
+  phone String?
+  websiteUrl String? @map("website_url")
+  city String?
+  languages String?
+  yearsExperience Int? @map("years_experience")
   emailVerifiedAt DateTime? @map("email_verified_at")
   authProvider String @default("credentials") @map("auth_provider")
   role      String   @default("cliente") // "cliente" | "profesional"

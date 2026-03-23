@@ -102,18 +102,22 @@ export default async function RootLayout({
                     </Link>
                   </>
                 )}
-                <Link
-                  href="/quienes-somos"
-                  className="text-gray-600 transition hover:text-[var(--connectia-gold)]"
-                >
-                  Quiénes somos
-                </Link>
-                <Link
-                  href="/contacto"
-                  className="text-gray-600 transition hover:text-[var(--connectia-gold)]"
-                >
-                  Contacto
-                </Link>
+                {!user && (
+                  <>
+                    <Link
+                      href="/quienes-somos"
+                      className="text-gray-600 transition hover:text-[var(--connectia-gold)]"
+                    >
+                      Quiénes somos
+                    </Link>
+                    <Link
+                      href="/contacto"
+                      className="text-gray-600 transition hover:text-[var(--connectia-gold)]"
+                    >
+                      Contacto
+                    </Link>
+                  </>
+                )}
                 {!user && (
                   <Link
                     href="/auth/login"
