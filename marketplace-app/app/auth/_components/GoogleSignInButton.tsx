@@ -82,7 +82,8 @@ export default function GoogleSignInButton({
             setError(data.message ?? "No se pudo iniciar sesión con Google.");
             return;
           }
-          router.push(redirectTo);
+          router.replace(redirectTo);
+          router.refresh();
         },
       });
       window.google.accounts.id.renderButton(containerRef.current, {

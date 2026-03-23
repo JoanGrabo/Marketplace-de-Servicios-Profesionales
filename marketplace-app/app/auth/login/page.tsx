@@ -36,7 +36,8 @@ export default function LoginPage() {
         setLoading(false);
         return;
       }
-      router.push(nextPath);
+      router.replace(nextPath);
+      router.refresh();
     } catch {
       setError("Error inesperado al iniciar sesión.");
       setLoading(false);
