@@ -18,8 +18,10 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const user = await getCurrentUser();
-  const unreadCount = user
-    ? await prisma.message.count({
+  let unreadCount = 0;
+  if (user) {
+    try {
+      unreadCount = await prisma.message.count({
         where: {
           readAt: null,
           senderId: { not: user.id },
@@ -27,8 +29,12 @@ export default async function RootLayout({
             OR: [{ clientId: user.id }, { professionalId: user.id }],
           },
         },
-      })
-    : 0;
+      });
+    } catch {
+      // Si la BD aún no tiene las tablas de mensajería, no romper el layout global.
+      unreadCount = 0;
+    }
+  }
 
   return (
     <html lang="es">
