@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { prisma } from "@/lib/db";
+import { getPublicProfileName, truncateText } from "@/lib/publicProfile";
 
 export const metadata: Metadata = {
   title: "Servicios — CONNECTIA",
@@ -34,7 +35,7 @@ export default async function ServiciosPage({ searchParams }: ServiciosPageProps
             OR: [
               { title: { contains: q, mode: "insensitive" } },
               { description: { contains: q, mode: "insensitive" } },
-              { profile: { email: { contains: q, mode: "insensitive" } } },
+              { profile: { displayName: { contains: q, mode: "insensitive" } } },
             ],
           }
         : {}),
@@ -56,7 +57,8 @@ export default async function ServiciosPage({ searchParams }: ServiciosPageProps
     include: {
       profile: {
         select: {
-          email: true,
+          id: true,
+          displayName: true,
         },
       },
     },
@@ -113,32 +115,38 @@ export default async function ServiciosPage({ searchParams }: ServiciosPageProps
           {servicios.map((s) => (
             <li
               key={s.id}
-              className="flex flex-col justify-between rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition hover:shadow-md"
+              className="relative flex flex-col justify-between rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition hover:shadow-md"
             >
+              <Link href={`/servicios/${s.slug}`} className="absolute inset-0 z-0 rounded-xl" aria-label={`Ver servicio ${s.title}`} />
               <div>
                 <h2 className="text-xl font-semibold text-[var(--connectia-gray)]">
-                  <Link href={`/servicios/${s.slug}`} className="hover:underline">
-                    {s.title}
-                  </Link>
+                  {s.title}
                 </h2>
                 {s.description && (
-                  <p className="mt-2 text-gray-600 line-clamp-4">{s.description}</p>
+                  <p className="mt-2 text-gray-600">{truncateText(s.description, 130)}</p>
                 )}
               </div>
-              <div className="mt-4 flex items-center justify-between text-sm">
-                <div className="font-semibold text-[var(--connectia-gold)]">
-                  {Intl.NumberFormat("es-ES", {
-                    style: "currency",
-                    currency: "EUR",
-                    maximumFractionDigits: 0,
-                  }).format(s.priceCents / 100)}
+              <div className="relative z-10 mt-4 flex items-end justify-between gap-3 text-sm">
+                <div>
+                  <div className="font-semibold text-[var(--connectia-gold)]">
+                    {Intl.NumberFormat("es-ES", {
+                      style: "currency",
+                      currency: "EUR",
+                      maximumFractionDigits: 0,
+                    }).format(s.priceCents / 100)}
+                  </div>
+                  <div className="mt-1 text-xs text-gray-500">
+                    Entrega estimada: {s.deliveryDays} {s.deliveryDays === 1 ? "día" : "días"}
+                  </div>
                 </div>
                 <div className="text-right text-xs text-gray-500">
-                  <div>{s.profile.email}</div>
-                  <div>
-                    Entrega estimada: {s.deliveryDays}{" "}
-                    {s.deliveryDays === 1 ? "día" : "días"}
-                  </div>
+                  <div className="font-medium text-gray-700">{getPublicProfileName(s.profile)}</div>
+                  <Link
+                    href={`/servicios/${s.slug}/contactar`}
+                    className="mt-2 inline-flex rounded-lg border border-[var(--connectia-gold)] px-3 py-1.5 text-xs font-semibold text-[var(--connectia-gold)] transition hover:bg-[var(--connectia-gold)]/10"
+                  >
+                    Enviar mensaje
+                  </Link>
                 </div>
               </div>
             </li>

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { validateServiceInput } from "@/lib/validation";
+import { getPublicProfileName } from "@/lib/publicProfile";
 
 export const dynamic = "force-dynamic";
 
@@ -16,7 +17,8 @@ export default async function MisServiciosPage() {
     include: {
       profile: {
         select: {
-          email: true,
+          id: true,
+          displayName: true,
         },
       },
     },
@@ -168,7 +170,7 @@ export default async function MisServiciosPage() {
                     }).format(s.priceCents / 100)}
                   </div>
                   <div className="text-xs text-gray-500">
-                    <div>{s.profile.email}</div>
+                    <div>{getPublicProfileName(s.profile)}</div>
                     <div>
                       {s.deliveryDays} {s.deliveryDays === 1 ? "día" : "días"}
                     </div>

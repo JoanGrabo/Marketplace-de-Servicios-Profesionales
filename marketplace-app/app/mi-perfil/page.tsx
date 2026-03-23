@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
+import AvatarUploader from "./AvatarUploader";
 
 export const dynamic = "force-dynamic";
 
@@ -23,7 +24,6 @@ export default async function MiPerfilPage() {
     const displayName = String(formData.get("displayName") ?? "").trim();
     const headline = String(formData.get("headline") ?? "").trim();
     const bio = String(formData.get("bio") ?? "").trim();
-    const avatarUrl = String(formData.get("avatarUrl") ?? "").trim();
     const phone = String(formData.get("phone") ?? "").trim();
     const websiteUrl = String(formData.get("websiteUrl") ?? "").trim();
     const city = String(formData.get("city") ?? "").trim();
@@ -41,7 +41,6 @@ export default async function MiPerfilPage() {
         displayName: displayName || null,
         headline: headline || null,
         bio: bio || null,
-        avatarUrl: avatarUrl || null,
         phone: phone || null,
         websiteUrl: websiteUrl || null,
         city: city || null,
@@ -210,18 +209,7 @@ export default async function MiPerfilPage() {
             />
           </div>
 
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">URL del avatar (opcional)</label>
-            <input
-              name="avatarUrl"
-              defaultValue={profile?.avatarUrl ?? ""}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-[var(--connectia-gold)] focus:outline-none focus:ring-1 focus:ring-[var(--connectia-gold)]"
-              placeholder="https://ejemplo.com/mi-foto.jpg"
-            />
-            <p className="mt-1 text-xs text-gray-500">
-              Por ahora usa una URL externa; más adelante añadiremos subida directa de imágenes.
-            </p>
-          </div>
+          <AvatarUploader initialAvatarUrl={profile?.avatarUrl ?? ""} />
 
           <button
             type="submit"

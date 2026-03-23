@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
+import { getPublicProfileName } from "@/lib/publicProfile";
 
 type ServicioDetalleProps = {
   params: {
@@ -16,7 +17,8 @@ export default async function ServicioDetallePage({ params }: ServicioDetallePro
     include: {
       profile: {
         select: {
-          email: true,
+          id: true,
+          displayName: true,
         },
       },
     },
@@ -39,7 +41,7 @@ export default async function ServicioDetallePage({ params }: ServicioDetallePro
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-y border-gray-100 py-4">
           <div className="text-sm text-gray-600">
             <div className="font-medium text-gray-700">Profesional</div>
-            <div>{servicio.profile.email}</div>
+            <div>{getPublicProfileName(servicio.profile)}</div>
           </div>
           <div className="text-right">
             <div className="text-xs text-gray-500">Precio</div>
