@@ -24,7 +24,24 @@ export type SessionPayload = {
   role: string;
 };
 
-export function createSessionToken(user: Profile): string {
+function getSessionDays(remember: boolean): number {
+  const fallback = remember ? 30 : 7;
+  const raw = remember
+    ? process.env.SESSION_DAYS_REMEMBER
+    : process.env.SESSION_DAYS_DEFAULT;
+  const parsed = Number(raw ?? "");
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    return fallback;
+  }
+  return Math.floor(parsed);
+}
+
+export function getSessionMaxAgeSeconds(remember = false): number {
+  return getSessionDays(remember) * 24 * 60 * 60;
+}
+
+export function createSessionToken(user: Profile, options?: { remember?: boolean }): string {
+  const remember = options?.remember ?? false;
   const payload: SessionPayload = {
     userId: user.id,
     email: user.email,
@@ -32,7 +49,7 @@ export function createSessionToken(user: Profile): string {
   };
 
   return jwt.sign(payload, getJwtSecret(), {
-    expiresIn: "7d",
+    expiresIn: `${getSessionDays(remember)}d`,
   });
 }
 

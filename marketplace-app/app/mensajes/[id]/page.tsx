@@ -63,6 +63,16 @@ export default async function ConversationPage({ params }: Params) {
   }
 
   const otherUser = conversation.client.id === user.id ? conversation.professional : conversation.client;
+  const otherUserId = conversation.client.id === user.id ? conversation.professional.id : conversation.client.id;
+
+  await prisma.message.updateMany({
+    where: {
+      conversationId: conversation.id,
+      senderId: otherUserId,
+      readAt: null,
+    },
+    data: { readAt: new Date() },
+  });
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-10 sm:px-6">

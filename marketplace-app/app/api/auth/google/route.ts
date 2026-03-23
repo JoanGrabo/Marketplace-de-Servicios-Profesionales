@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import { OAuth2Client } from "google-auth-library";
 import { prisma } from "@/lib/db";
-import { COOKIE_NAME, createSessionToken } from "@/lib/auth";
+import { COOKIE_NAME, createSessionToken, getSessionMaxAgeSeconds } from "@/lib/auth";
 import { parseRole } from "@/lib/validation";
 
 type GooglePayload = {
   credential?: string;
   role?: string;
+  remember?: boolean;
 };
 
 function getGoogleClientId(): string {
@@ -41,6 +42,7 @@ export async function POST(req: Request) {
     }
 
     const role = parseRole(body.role ?? "cliente") ?? "cliente";
+    const remember = Boolean(body.remember);
 
     const user = await prisma.profile.upsert({
       where: { email: payload.email.toLowerCase() },
@@ -59,14 +61,14 @@ export async function POST(req: Request) {
       },
     });
 
-    const token = createSessionToken(user);
+    const token = createSessionToken(user, { remember });
     const res = NextResponse.json({ ok: true });
     res.cookies.set(COOKIE_NAME, token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      maxAge: 7 * 24 * 60 * 60,
+      maxAge: getSessionMaxAgeSeconds(remember),
     });
     return res;
   } catch (e) {

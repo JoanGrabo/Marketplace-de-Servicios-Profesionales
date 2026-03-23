@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import "./globals.css";
 import { getCurrentUser } from "@/lib/auth";
+import { prisma } from "@/lib/db";
 
 export const metadata: Metadata = {
   title: "CONNECTIA — Conecta • Aprende • Crece",
@@ -17,6 +18,17 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const user = await getCurrentUser();
+  const unreadCount = user
+    ? await prisma.message.count({
+        where: {
+          readAt: null,
+          senderId: { not: user.id },
+          conversation: {
+            OR: [{ clientId: user.id }, { professionalId: user.id }],
+          },
+        },
+      })
+    : 0;
 
   return (
     <html lang="es">
@@ -75,6 +87,11 @@ export default async function RootLayout({
                       className="text-gray-600 transition hover:text-[var(--connectia-gold)]"
                     >
                       Mensajes
+                      {unreadCount > 0 && (
+                        <span className="ml-1 inline-flex min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 py-0.5 text-[10px] font-semibold leading-none text-white">
+                          {unreadCount > 99 ? "99+" : unreadCount}
+                        </span>
+                      )}
                     </Link>
                   </>
                 )}

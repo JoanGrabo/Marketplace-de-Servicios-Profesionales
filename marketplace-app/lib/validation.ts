@@ -15,6 +15,14 @@ export const MESSAGE_LIMITS = {
   max: 2000,
 };
 
+export function getMessageCooldownSeconds(): number {
+  const parsed = Number(process.env.MESSAGE_COOLDOWN_SECONDS ?? "");
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    return 20;
+  }
+  return Math.floor(parsed);
+}
+
 type ServiceInput = {
   title: string;
   description?: string;

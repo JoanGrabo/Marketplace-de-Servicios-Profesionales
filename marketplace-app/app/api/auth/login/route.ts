@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { COOKIE_NAME, createSessionToken } from "@/lib/auth";
+import { COOKIE_NAME, createSessionToken, getSessionMaxAgeSeconds } from "@/lib/auth";
 import { isValidEmail, normalizeEmail } from "@/lib/validation";
 import bcrypt from "bcryptjs";
 
@@ -9,6 +9,7 @@ export async function POST(req: Request) {
     const body = await req.json();
     const email = normalizeEmail(body.email);
     const password = body.password as string | undefined;
+    const remember = Boolean(body.remember);
 
     if (!email || !password || !isValidEmail(email)) {
       return NextResponse.json(
@@ -39,14 +40,14 @@ export async function POST(req: Request) {
       );
     }
 
-    const token = createSessionToken(user);
+    const token = createSessionToken(user, { remember });
     const res = NextResponse.json({ ok: true });
     res.cookies.set(COOKIE_NAME, token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      maxAge: 7 * 24 * 60 * 60,
+      maxAge: getSessionMaxAgeSeconds(remember),
     });
     return res;
   } catch (e) {

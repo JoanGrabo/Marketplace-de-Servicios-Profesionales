@@ -33,8 +33,10 @@ Para el flujo completo de auth (Google + verificación por email) configura en `
 
 - `AUTH_SECRET`
 - `APP_BASE_URL` (ej. `http://localhost:3000` en local)
+- `SESSION_DAYS_DEFAULT` y `SESSION_DAYS_REMEMBER` (duración de sesión)
 - `GOOGLE_CLIENT_ID` y `NEXT_PUBLIC_GOOGLE_CLIENT_ID`
 - `GMAIL_USER`, `GMAIL_APP_PASSWORD`, `MAIL_FROM`
+- `MESSAGE_COOLDOWN_SECONDS` (cooldown anti-spam entre mensajes)
 
 ## Mensajería interna (MVP)
 

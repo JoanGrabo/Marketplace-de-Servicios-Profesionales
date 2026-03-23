@@ -32,9 +32,15 @@ type Props = {
   mode: "login" | "register";
   role?: "cliente" | "profesional";
   redirectTo?: string;
+  remember?: boolean;
 };
 
-export default function GoogleSignInButton({ mode, role, redirectTo = "/" }: Props) {
+export default function GoogleSignInButton({
+  mode,
+  role,
+  redirectTo = "/",
+  remember = false,
+}: Props) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
@@ -69,7 +75,7 @@ export default function GoogleSignInButton({ mode, role, redirectTo = "/" }: Pro
           const res = await fetch("/api/auth/google", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ credential, role }),
+            body: JSON.stringify({ credential, role, remember }),
           });
           const data = await res.json();
           if (!res.ok || !data.ok) {
@@ -77,7 +83,6 @@ export default function GoogleSignInButton({ mode, role, redirectTo = "/" }: Pro
             return;
           }
           router.push(redirectTo);
-          router.refresh();
         },
       });
       window.google.accounts.id.renderButton(containerRef.current, {
@@ -88,7 +93,7 @@ export default function GoogleSignInButton({ mode, role, redirectTo = "/" }: Pro
         width: 320,
       });
     }
-  }, [mode, role, router]);
+  }, [mode, redirectTo, remember, role, router]);
 
   return (
     <div className="space-y-2">

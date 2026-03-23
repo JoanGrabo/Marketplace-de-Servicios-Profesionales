@@ -11,6 +11,7 @@ export default function LoginPage() {
   const nextPath = nextRaw.startsWith("/") ? nextRaw : "/";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [remember, setRemember] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const verifiedStatus = searchParams.get("verified");
@@ -27,7 +28,7 @@ export default function LoginPage() {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, remember }),
       });
       const data = await res.json();
       if (!res.ok || !data.ok) {
@@ -36,7 +37,6 @@ export default function LoginPage() {
         return;
       }
       router.push(nextPath);
-      router.refresh();
     } catch {
       setError("Error inesperado al iniciar sesión.");
       setLoading(false);
@@ -55,7 +55,7 @@ export default function LoginPage() {
         {successMessage && <p className="rounded-md bg-green-50 p-3 text-sm text-green-700">{successMessage}</p>}
         <div className="space-y-2">
           <p className="text-sm font-medium text-gray-700">Entrar con Google</p>
-          <GoogleSignInButton mode="login" redirectTo={nextPath} />
+          <GoogleSignInButton mode="login" redirectTo={nextPath} remember={remember} />
         </div>
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
@@ -93,6 +93,15 @@ export default function LoginPage() {
             placeholder="Tu contraseña"
           />
         </div>
+        <label className="flex items-center gap-2 text-sm text-gray-600">
+          <input
+            type="checkbox"
+            checked={remember}
+            onChange={(e) => setRemember(e.target.checked)}
+            className="h-4 w-4 rounded border-gray-300 text-[var(--connectia-gold)] focus:ring-[var(--connectia-gold)]"
+          />
+          Mantener sesión iniciada
+        </label>
         {error && <p className="text-sm text-red-600">{error}</p>}
         <button
           type="submit"
