@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { COOKIE_NAME, createSessionToken, getSessionMaxAgeSeconds } from "@/lib/auth";
+import {
+  COOKIE_NAME,
+  createSessionToken,
+  getSessionMaxAgeSeconds,
+  shouldUseSecureCookies,
+} from "@/lib/auth";
 import { consumeVerificationToken } from "@/lib/emailVerification";
 import { getAppBaseUrl } from "@/lib/mailer";
 
@@ -34,7 +39,7 @@ export async function GET(req: Request) {
   const res = NextResponse.redirect(new URL("/?verified=ok", appBaseUrl));
   res.cookies.set(COOKIE_NAME, sessionToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: shouldUseSecureCookies(),
     sameSite: "lax",
     path: "/",
     maxAge: getSessionMaxAgeSeconds(false),

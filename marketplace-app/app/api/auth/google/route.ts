@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
 import { OAuth2Client } from "google-auth-library";
 import { prisma } from "@/lib/db";
-import { COOKIE_NAME, createSessionToken, getSessionMaxAgeSeconds } from "@/lib/auth";
+import {
+  COOKIE_NAME,
+  createSessionToken,
+  getSessionMaxAgeSeconds,
+  shouldUseSecureCookies,
+} from "@/lib/auth";
 import { parseRole } from "@/lib/validation";
 
 type GooglePayload = {
@@ -65,7 +70,7 @@ export async function POST(req: Request) {
     const res = NextResponse.json({ ok: true });
     res.cookies.set(COOKIE_NAME, token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: shouldUseSecureCookies(),
       sameSite: "lax",
       path: "/",
       maxAge: getSessionMaxAgeSeconds(remember),

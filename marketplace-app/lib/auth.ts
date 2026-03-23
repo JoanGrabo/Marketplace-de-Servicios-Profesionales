@@ -5,6 +5,14 @@ import type { Profile } from "@prisma/client";
 
 export const COOKIE_NAME = "connectia_session";
 
+export function shouldUseSecureCookies(): boolean {
+  const baseUrl = process.env.APP_BASE_URL ?? "";
+  if (baseUrl.toLowerCase().startsWith("https://")) {
+    return true;
+  }
+  return false;
+}
+
 function getJwtSecret(): string {
   const secret = process.env.AUTH_SECRET;
   if (!secret) {

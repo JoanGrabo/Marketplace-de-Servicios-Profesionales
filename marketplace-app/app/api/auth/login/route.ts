@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { COOKIE_NAME, createSessionToken, getSessionMaxAgeSeconds } from "@/lib/auth";
+import {
+  COOKIE_NAME,
+  createSessionToken,
+  getSessionMaxAgeSeconds,
+  shouldUseSecureCookies,
+} from "@/lib/auth";
 import { isValidEmail, normalizeEmail } from "@/lib/validation";
 import bcrypt from "bcryptjs";
 
@@ -44,7 +49,7 @@ export async function POST(req: Request) {
     const res = NextResponse.json({ ok: true });
     res.cookies.set(COOKIE_NAME, token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: shouldUseSecureCookies(),
       sameSite: "lax",
       path: "/",
       maxAge: getSessionMaxAgeSeconds(remember),
