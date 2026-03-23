@@ -52,7 +52,13 @@ export default async function ServiciosPage({ searchParams }: ServiciosPageProps
       ...(Number.isFinite(maxDays) && maxDays > 0 ? { deliveryDays: { lte: maxDays } } : {}),
     },
     orderBy: { createdAt: "desc" },
-    include: { profile: true },
+    include: {
+      profile: {
+        select: {
+          email: true,
+        },
+      },
+    },
   });
 
   return (

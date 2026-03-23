@@ -31,9 +31,10 @@ declare global {
 type Props = {
   mode: "login" | "register";
   role?: "cliente" | "profesional";
+  redirectTo?: string;
 };
 
-export default function GoogleSignInButton({ mode, role }: Props) {
+export default function GoogleSignInButton({ mode, role, redirectTo = "/" }: Props) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
@@ -75,7 +76,7 @@ export default function GoogleSignInButton({ mode, role }: Props) {
             setError(data.message ?? "No se pudo iniciar sesión con Google.");
             return;
           }
-          router.push("/");
+          router.push(redirectTo);
           router.refresh();
         },
       });

@@ -13,7 +13,13 @@ export const dynamic = "force-dynamic";
 export default async function ServicioDetallePage({ params }: ServicioDetalleProps) {
   const servicio = await prisma.service.findUnique({
     where: { slug: params.slug },
-    include: { profile: true },
+    include: {
+      profile: {
+        select: {
+          email: true,
+        },
+      },
+    },
   });
 
   if (!servicio || !servicio.active) {
@@ -62,7 +68,7 @@ export default async function ServicioDetallePage({ params }: ServicioDetallePro
         </section>
         <div className="mt-8 flex flex-wrap gap-3">
           <Link
-            href="/contacto"
+            href={`/servicios/${servicio.slug}/contactar`}
             className="rounded-lg bg-[var(--connectia-gold)] px-5 py-2 text-sm font-semibold text-white transition hover:opacity-90"
           >
             Contactar para contratar

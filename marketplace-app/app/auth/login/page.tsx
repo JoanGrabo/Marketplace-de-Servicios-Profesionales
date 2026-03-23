@@ -7,6 +7,8 @@ import GoogleSignInButton from "@/app/auth/_components/GoogleSignInButton";
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const nextRaw = searchParams.get("next") ?? "/";
+  const nextPath = nextRaw.startsWith("/") ? nextRaw : "/";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -33,7 +35,7 @@ export default function LoginPage() {
         setLoading(false);
         return;
       }
-      router.push("/");
+      router.push(nextPath);
       router.refresh();
     } catch {
       setError("Error inesperado al iniciar sesión.");
@@ -53,7 +55,7 @@ export default function LoginPage() {
         {successMessage && <p className="rounded-md bg-green-50 p-3 text-sm text-green-700">{successMessage}</p>}
         <div className="space-y-2">
           <p className="text-sm font-medium text-gray-700">Entrar con Google</p>
-          <GoogleSignInButton mode="login" />
+          <GoogleSignInButton mode="login" redirectTo={nextPath} />
         </div>
         <div className="relative">
           <div className="absolute inset-0 flex items-center">

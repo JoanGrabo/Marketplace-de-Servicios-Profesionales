@@ -13,7 +13,13 @@ export default async function MisServiciosPage() {
   const services = await prisma.service.findMany({
     where: { profileId: user.id },
     orderBy: { createdAt: "desc" },
-    include: { profile: true },
+    include: {
+      profile: {
+        select: {
+          email: true,
+        },
+      },
+    },
   });
 
   return (
