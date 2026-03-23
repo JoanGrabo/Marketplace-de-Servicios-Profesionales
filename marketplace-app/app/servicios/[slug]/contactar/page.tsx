@@ -2,25 +2,31 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
+import { resolveRouteParams, safeDecodeURIComponent } from "@/lib/routeParams";
 import ContactarServicioForm from "./ContactarServicioForm";
 
 type ContactarPageProps = {
   params: {
     slug: string;
-  };
+  } | Promise<{
+    slug: string;
+  }>;
 };
 
 export const dynamic = "force-dynamic";
 
 export default async function ContactarServicioPage({ params }: ContactarPageProps) {
+  const { slug: rawSlug } = await resolveRouteParams(params);
+  const slug = safeDecodeURIComponent(String(rawSlug ?? ""));
+
   const user = await getCurrentUser();
-  const pagePath = `/servicios/${params.slug}/contactar`;
+  const pagePath = `/servicios/${encodeURIComponent(slug)}/contactar`;
   if (!user) {
     redirect(`/auth/login?next=${encodeURIComponent(pagePath)}`);
   }
 
   const servicio = await prisma.service.findUnique({
-    where: { slug: params.slug },
+    where: { slug },
     include: {
       profile: {
         select: {

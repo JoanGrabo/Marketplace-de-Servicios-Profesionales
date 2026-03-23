@@ -2,18 +2,26 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { getPublicProfileName } from "@/lib/publicProfile";
+import { getCurrentUser } from "@/lib/auth";
+import { resolveRouteParams, safeDecodeURIComponent } from "@/lib/routeParams";
 
 type ServicioDetalleProps = {
   params: {
     slug: string;
-  };
+  } | Promise<{
+    slug: string;
+  }>;
 };
 
 export const dynamic = "force-dynamic";
 
 export default async function ServicioDetallePage({ params }: ServicioDetalleProps) {
-  const servicio = await prisma.service.findUnique({
-    where: { slug: params.slug },
+  const { slug: rawSlug } = await resolveRouteParams(params);
+  const slug = safeDecodeURIComponent(String(rawSlug ?? ""));
+
+  const [servicio, user] = await Promise.all([
+    prisma.service.findUnique({
+    where: { slug },
     include: {
       profile: {
         select: {
@@ -22,11 +30,15 @@ export default async function ServicioDetallePage({ params }: ServicioDetallePro
         },
       },
     },
-  });
+  }),
+    getCurrentUser(),
+  ]);
 
   if (!servicio || !servicio.active) {
     notFound();
   }
+
+  const isOwner = Boolean(user && user.id === servicio.profile.id);
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
@@ -69,12 +81,29 @@ export default async function ServicioDetallePage({ params }: ServicioDetallePro
           </div>
         </section>
         <div className="mt-8 flex flex-wrap gap-3">
-          <Link
-            href={`/servicios/${servicio.slug}/contactar`}
-            className="rounded-lg bg-[var(--connectia-gold)] px-5 py-2 text-sm font-semibold text-white transition hover:opacity-90"
-          >
-            Contactar para contratar
-          </Link>
+          {isOwner ? (
+            <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+              <p className="font-medium">Este es tu servicio publicado.</p>
+              <p className="mt-1 text-amber-800/90">
+                Los clientes podrán contactarte desde aquí. Revisa tus{" "}
+                <Link href="/mensajes" className="font-semibold underline hover:no-underline">
+                  mensajes
+                </Link>{" "}
+                o gestiona el anuncio en{" "}
+                <Link href="/mis-servicios" className="font-semibold underline hover:no-underline">
+                  Mis servicios
+                </Link>
+                .
+              </p>
+            </div>
+          ) : (
+            <Link
+              href={`/servicios/${encodeURIComponent(servicio.slug)}/contactar`}
+              className="rounded-lg bg-[var(--connectia-gold)] px-5 py-2 text-sm font-semibold text-white transition hover:opacity-90"
+            >
+              Contactar para contratar
+            </Link>
+          )}
           <Link
             href="/servicios"
             className="rounded-lg border border-gray-300 px-5 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"

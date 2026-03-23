@@ -20,12 +20,26 @@ export default function ContactarServicioForm({ slug }: Props) {
     setSuccess(null);
     setSending(true);
     try {
-      const res = await fetch(`/api/servicios/${slug}/contactar`, {
+      const encodedSlug = encodeURIComponent(slug);
+      const res = await fetch(`/api/servicios/${encodedSlug}/contactar`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ message }),
       });
-      const data = await res.json();
+      let data: { ok?: boolean; message?: string; conversationId?: string } = {};
+      const raw = await res.text();
+      try {
+        data = raw ? JSON.parse(raw) : {};
+      } catch {
+        setError(
+          res.status >= 500
+            ? "Error del servidor al enviar el mensaje. Inténtalo más tarde."
+            : "Respuesta inesperada del servidor.",
+        );
+        setSending(false);
+        return;
+      }
       if (!res.ok || !data.ok) {
         setError(data.message ?? "No se pudo enviar el mensaje.");
         setSending(false);

@@ -117,7 +117,11 @@ export default async function ServiciosPage({ searchParams }: ServiciosPageProps
               key={s.id}
               className="relative flex flex-col justify-between rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition hover:shadow-md"
             >
-              <Link href={`/servicios/${s.slug}`} className="absolute inset-0 z-0 rounded-xl" aria-label={`Ver servicio ${s.title}`} />
+              <Link
+                href={`/servicios/${encodeURIComponent(s.slug)}`}
+                className="absolute inset-0 z-0 rounded-xl"
+                aria-label={`Ver servicio ${s.title}`}
+              />
               <div>
                 <h2 className="text-xl font-semibold text-[var(--connectia-gray)]">
                   {s.title}
@@ -142,7 +146,7 @@ export default async function ServiciosPage({ searchParams }: ServiciosPageProps
                 <div className="text-right text-xs text-gray-500">
                   <div className="font-medium text-gray-700">{getPublicProfileName(s.profile)}</div>
                   <Link
-                    href={`/servicios/${s.slug}/contactar`}
+                    href={`/servicios/${encodeURIComponent(s.slug)}/contactar`}
                     className="mt-2 inline-flex rounded-lg border border-[var(--connectia-gold)] px-3 py-1.5 text-xs font-semibold text-[var(--connectia-gold)] transition hover:bg-[var(--connectia-gold)]/10"
                   >
                     Enviar mensaje
