@@ -2,11 +2,11 @@ import { NextResponse } from "next/server";
 import { OAuth2Client } from "google-auth-library";
 import { prisma } from "@/lib/db";
 import {
-  COOKIE_NAME,
   createSessionToken,
   getSessionMaxAgeSeconds,
 } from "@/lib/auth";
 import { parseRole } from "@/lib/validation";
+import { buildSessionSetCookie } from "@/lib/sessionCookie";
 
 type GooglePayload = {
   credential?: string;
@@ -66,14 +66,9 @@ export async function POST(req: Request) {
     });
 
     const token = createSessionToken(user, { remember });
+    const maxAge = getSessionMaxAgeSeconds(remember);
     const res = NextResponse.json({ ok: true });
-    res.cookies.set(COOKIE_NAME, token, {
-      httpOnly: true,
-      secure: false,
-      sameSite: "lax",
-      path: "/",
-      maxAge: getSessionMaxAgeSeconds(remember),
-    });
+    res.headers.append("Set-Cookie", buildSessionSetCookie(token, maxAge));
     return res;
   } catch (e) {
     console.error("Google auth error:", e);

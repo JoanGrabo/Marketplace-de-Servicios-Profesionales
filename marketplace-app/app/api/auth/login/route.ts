@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import {
-  COOKIE_NAME,
   createSessionToken,
   getSessionMaxAgeSeconds,
 } from "@/lib/auth";
 import { isValidEmail, normalizeEmail } from "@/lib/validation";
+import { buildSessionClearCookie, buildSessionSetCookie } from "@/lib/sessionCookie";
 import bcrypt from "bcryptjs";
 
 export async function POST(req: Request) {
@@ -45,14 +45,9 @@ export async function POST(req: Request) {
     }
 
     const token = createSessionToken(user, { remember });
+    const maxAge = getSessionMaxAgeSeconds(remember);
     const res = NextResponse.json({ ok: true });
-    res.cookies.set(COOKIE_NAME, token, {
-      httpOnly: true,
-      secure: false,
-      sameSite: "lax",
-      path: "/",
-      maxAge: getSessionMaxAgeSeconds(remember),
-    });
+    res.headers.append("Set-Cookie", buildSessionSetCookie(token, maxAge));
     return res;
   } catch (e) {
     // eslint-disable-next-line no-console
@@ -66,7 +61,7 @@ export async function POST(req: Request) {
 
 export async function DELETE() {
   const res = NextResponse.json({ ok: true });
-  res.cookies.delete(COOKIE_NAME);
+  res.headers.append("Set-Cookie", buildSessionClearCookie());
   return res;
 }
 

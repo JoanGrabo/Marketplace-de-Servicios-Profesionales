@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import {
-  COOKIE_NAME,
   createSessionToken,
   getSessionMaxAgeSeconds,
 } from "@/lib/auth";
 import { consumeVerificationToken } from "@/lib/emailVerification";
 import { getAppBaseUrl } from "@/lib/mailer";
+import { buildSessionSetCookie } from "@/lib/sessionCookie";
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -36,12 +36,6 @@ export async function GET(req: Request) {
 
   const sessionToken = createSessionToken(user);
   const res = NextResponse.redirect(new URL("/?verified=ok", appBaseUrl));
-  res.cookies.set(COOKIE_NAME, sessionToken, {
-    httpOnly: true,
-    secure: false,
-    sameSite: "lax",
-    path: "/",
-    maxAge: getSessionMaxAgeSeconds(false),
-  });
+  res.headers.append("Set-Cookie", buildSessionSetCookie(sessionToken, getSessionMaxAgeSeconds(false)));
   return res;
 }
