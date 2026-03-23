@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
+import { validateServiceInput } from "@/lib/validation";
 
 export async function GET() {
   const user = await getCurrentUser();
@@ -23,29 +24,39 @@ export async function POST(req: Request) {
   }
 
   const body = await req.json();
-  const title = (body.title as string | undefined)?.trim();
-  const description = (body.description as string | undefined)?.trim();
+  const title = String(body.title ?? "");
+  const description = String(body.description ?? "");
   const priceEuros = Number(body.priceEuros);
   const deliveryDays = Number(body.deliveryDays ?? 7);
 
-  if (!title || !priceEuros || isNaN(priceEuros)) {
+  const validation = validateServiceInput({
+    title,
+    description,
+    priceEuros,
+    deliveryDays,
+  });
+  if (!validation.ok || !validation.data) {
     return NextResponse.json(
-      { ok: false, message: "Título y precio son obligatorios." },
+      { ok: false, message: validation.message ?? "Datos no válidos." },
       { status: 400 },
     );
   }
+  const safe = validation.data;
 
-  const slugBase = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+  const slugBase = safe.title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
   const slug = `${slugBase}-${Date.now().toString(36)}`;
 
   await prisma.service.create({
     data: {
       profileId: user.id,
-      title,
+      title: safe.title,
       slug,
-      description,
-      priceCents: Math.round(priceEuros * 100),
-      deliveryDays: isNaN(deliveryDays) ? 7 : deliveryDays,
+      description: safe.description,
+      priceCents: safe.priceCents,
+      deliveryDays: safe.deliveryDays,
       active: true,
     },
   });

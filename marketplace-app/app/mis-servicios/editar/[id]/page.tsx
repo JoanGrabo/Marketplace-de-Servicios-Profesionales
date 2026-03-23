@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
+import { validateServiceInput } from "@/lib/validation";
 
 type Params = {
   params: {
@@ -39,22 +40,29 @@ export default async function EditarServicioPage({ params }: Params) {
       redirect("/mis-servicios");
     }
 
-    const title = String(formData.get("title") ?? "").trim();
-    const description = String(formData.get("description") ?? "").trim();
+    const title = String(formData.get("title") ?? "");
+    const description = String(formData.get("description") ?? "");
     const priceEuros = Number(formData.get("priceEuros") ?? 0);
     const deliveryDays = Number(formData.get("deliveryDays") ?? 7);
 
-    if (!title || !priceEuros || Number.isNaN(priceEuros)) {
+    const validation = validateServiceInput({
+      title,
+      description,
+      priceEuros,
+      deliveryDays,
+    });
+    if (!validation.ok || !validation.data) {
       return;
     }
+    const safe = validation.data;
 
     await prisma.service.updateMany({
       where: { id: existing.id, profileId: current.id },
       data: {
-        title,
-        description: description || null,
-        priceCents: Math.round(priceEuros * 100),
-        deliveryDays: Number.isNaN(deliveryDays) ? 7 : deliveryDays,
+        title: safe.title,
+        description: safe.description,
+        priceCents: safe.priceCents,
+        deliveryDays: safe.deliveryDays,
       },
     });
 

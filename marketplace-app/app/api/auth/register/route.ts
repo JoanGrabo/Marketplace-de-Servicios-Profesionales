@@ -1,27 +1,71 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { COOKIE_NAME, createSessionToken } from "@/lib/auth";
+import { canSendMail } from "@/lib/mailer";
+import { createEmailVerificationToken, sendVerificationEmail } from "@/lib/emailVerification";
+import { isValidEmail, normalizeEmail, parseRole } from "@/lib/validation";
 import bcrypt from "bcryptjs";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const email = (body.email as string | undefined)?.toLowerCase().trim();
+    const email = normalizeEmail(body.email);
     const password = body.password as string | undefined;
-    const role = (body.role as string | undefined) ?? "cliente";
+    const role = parseRole(body.role ?? "cliente");
 
-    if (!email || !password || password.length < 6) {
+    if (!email || !isValidEmail(email) || !password || password.length < 6) {
       return NextResponse.json(
-        { ok: false, message: "Email y contraseña (mín. 6 caracteres) son obligatorios." },
+        {
+          ok: false,
+          message: "Email válido y contraseña (mín. 6 caracteres) son obligatorios.",
+        },
+        { status: 400 },
+      );
+    }
+    if (!role) {
+      return NextResponse.json(
+        { ok: false, message: "Rol no válido." },
         { status: 400 },
       );
     }
 
     const existing = await prisma.profile.findUnique({ where: { email } });
     if (existing) {
+      if (existing.emailVerifiedAt) {
+        return NextResponse.json(
+          { ok: false, message: "Ya existe un usuario con ese email." },
+          { status: 409 },
+        );
+      }
+
+      if (!canSendMail()) {
+        return NextResponse.json(
+          { ok: false, message: "No se puede reenviar la verificación. Contacta con soporte." },
+          { status: 500 },
+        );
+      }
+      const updatedPasswordHash = await bcrypt.hash(password, 10);
+      await prisma.profile.update({
+        where: { id: existing.id },
+        data: {
+          passwordHash: updatedPasswordHash,
+          role,
+          authProvider: "credentials",
+        },
+      });
+      const rawToken = await createEmailVerificationToken(existing.id);
+      await sendVerificationEmail(existing.email, rawToken);
       return NextResponse.json(
-        { ok: false, message: "Ya existe un usuario con ese email." },
-        { status: 409 },
+        { ok: true, message: "Te hemos reenviado el enlace de verificación." },
+      );
+    }
+
+    if (!canSendMail()) {
+      return NextResponse.json(
+        {
+          ok: false,
+          message: "Registro temporalmente no disponible: falta configurar el envío de correos.",
+        },
+        { status: 500 },
       );
     }
 
@@ -32,20 +76,17 @@ export async function POST(req: Request) {
         email,
         role,
         passwordHash,
+        authProvider: "credentials",
       },
     });
 
-    const token = createSessionToken(user);
-    const res = NextResponse.json({ ok: true });
-    res.cookies.set(COOKIE_NAME, token, {
-      httpOnly: true,
-      // Estamos en HTTP (sin HTTPS) en el VPS, por eso NO marcamos secure.
-      secure: false,
-      sameSite: "lax",
-      path: "/",
-      maxAge: 7 * 24 * 60 * 60,
+    const rawToken = await createEmailVerificationToken(user.id);
+    await sendVerificationEmail(user.email, rawToken);
+
+    return NextResponse.json({
+      ok: true,
+      message: "Te hemos enviado un email para verificar tu cuenta antes de entrar.",
     });
-    return res;
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);

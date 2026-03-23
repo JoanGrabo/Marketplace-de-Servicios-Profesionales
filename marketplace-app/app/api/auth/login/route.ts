@@ -1,17 +1,18 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { COOKIE_NAME, createSessionToken } from "@/lib/auth";
+import { isValidEmail, normalizeEmail } from "@/lib/validation";
 import bcrypt from "bcryptjs";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const email = (body.email as string | undefined)?.toLowerCase().trim();
+    const email = normalizeEmail(body.email);
     const password = body.password as string | undefined;
 
-    if (!email || !password) {
+    if (!email || !password || !isValidEmail(email)) {
       return NextResponse.json(
-        { ok: false, message: "Email y contraseña son obligatorios." },
+        { ok: false, message: "Email válido y contraseña son obligatorios." },
         { status: 400 },
       );
     }
@@ -21,6 +22,12 @@ export async function POST(req: Request) {
       return NextResponse.json(
         { ok: false, message: "Credenciales incorrectas." },
         { status: 401 },
+      );
+    }
+    if (!user.emailVerifiedAt) {
+      return NextResponse.json(
+        { ok: false, message: "Debes verificar tu correo antes de iniciar sesión." },
+        { status: 403 },
       );
     }
 
@@ -36,8 +43,7 @@ export async function POST(req: Request) {
     const res = NextResponse.json({ ok: true });
     res.cookies.set(COOKIE_NAME, token, {
       httpOnly: true,
-      // Estamos en HTTP (sin HTTPS) en el VPS, por eso NO marcamos secure.
-      secure: false,
+      secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
       maxAge: 7 * 24 * 60 * 60,

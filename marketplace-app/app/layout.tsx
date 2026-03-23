@@ -42,56 +42,63 @@ export default async function RootLayout({
                 <p className="text-xs font-normal text-gray-500">Conecta • Aprende • Crece</p>
               </div>
             </Link>
-            <nav className="flex items-center gap-6 text-sm font-medium">
-              <Link href="/" className="text-gray-600 transition hover:text-[var(--connectia-gold)]">
-                Inicio
-              </Link>
-              <Link
-                href="/servicios"
-                className="text-gray-600 transition hover:text-[var(--connectia-gold)]"
-              >
-                Servicios
-              </Link>
-              {user && (
-                <>
-                  <Link
-                    href="/mis-servicios"
-                    className="text-gray-600 transition hover:text-[var(--connectia-gold)]"
-                  >
-                    Mis servicios
-                  </Link>
-                  <Link
-                    href="/mi-perfil"
-                    className="text-gray-600 transition hover:text-[var(--connectia-gold)]"
-                  >
-                    Mi perfil
-                  </Link>
-                  <Link
-                    href="/auth/logout"
-                    className="text-gray-600 transition hover:text-[var(--connectia-gold)]"
-                  >
-                    Salir
-                  </Link>
-                </>
-              )}
-              <Link
-                href="/quienes-somos"
-                className="text-gray-600 transition hover:text-[var(--connectia-gold)]"
-              >
-                Quiénes somos
-              </Link>
-              <Link
-                href="/contacto"
-                className="text-gray-600 transition hover:text-[var(--connectia-gold)]"
-              >
-                Contacto
-              </Link>
-              {!user && (
+            <nav className="flex flex-1 items-center justify-end gap-4 text-sm font-medium">
+              <div className="flex items-center gap-4">
                 <Link
-                  href="/auth/login"
+                  href="/"
                   className="text-gray-600 transition hover:text-[var(--connectia-gold)]"
                 >
-                  Entrar
+                  Inicio
+                </Link>
+                <Link
+                  href="/servicios"
+                  className="text-gray-600 transition hover:text-[var(--connectia-gold)]"
+                >
+                  Servicios
+                </Link>
+                {user && (
+                  <>
+                    <Link
+                      href="/mis-servicios"
+                      className="text-gray-600 transition hover:text-[var(--connectia-gold)]"
+                    >
+                      Mis servicios
+                    </Link>
+                    <Link
+                      href="/mi-perfil"
+                      className="text-gray-600 transition hover:text-[var(--connectia-gold)]"
+                    >
+                      Mi perfil
+                    </Link>
+                  </>
+                )}
+                <Link
+                  href="/quienes-somos"
+                  className="text-gray-600 transition hover:text-[var(--connectia-gold)]"
+                >
+                  Quiénes somos
+                </Link>
+                <Link
+                  href="/contacto"
+                  className="text-gray-600 transition hover:text-[var(--connectia-gold)]"
+                >
+                  Contacto
+                </Link>
+                {!user && (
+                  <Link
+                    href="/auth/login"
+                    className="rounded-lg border border-[var(--connectia-gold)] px-3 py-1 text-xs font-semibold text-[var(--connectia-gold)] transition hover:bg-[var(--connectia-gold)] hover:text-white"
+                  >
+                    Entrar
+                  </Link>
+                )}
+              </div>
+              {user && (
+                <Link
+                  href="/auth/logout"
+                  className="rounded-lg bg-red-50 px-3 py-1 text-xs font-semibold text-red-700 ring-1 ring-red-200 transition hover:bg-red-100"
+                >
+                  Salir
                 </Link>
               )}
             </nav>

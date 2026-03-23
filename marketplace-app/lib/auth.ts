@@ -8,8 +8,12 @@ export const COOKIE_NAME = "connectia_session";
 function getJwtSecret(): string {
   const secret = process.env.AUTH_SECRET;
   if (!secret) {
-    // Fallback para evitar que la app reviente si falta la variable.
-    return "connectia_dev_fallback_secret_change_me";
+    if (process.env.NODE_ENV !== "production") {
+      return "connectia_dev_only_secret_change_me";
+    }
+    throw new Error(
+      "AUTH_SECRET no está configurado. Define esta variable para habilitar autenticación segura."
+    );
   }
   return secret;
 }

@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
+import { validateServiceInput } from "@/lib/validation";
 
 export const dynamic = "force-dynamic";
 
@@ -27,16 +28,23 @@ export default async function MisServiciosPage() {
       <form
         action={async (formData: FormData) => {
           "use server";
-          const title = String(formData.get("title") ?? "").trim();
-          const description = String(formData.get("description") ?? "").trim();
+          const title = String(formData.get("title") ?? "");
+          const description = String(formData.get("description") ?? "");
           const priceEuros = Number(formData.get("priceEuros") ?? 0);
           const deliveryDays = Number(formData.get("deliveryDays") ?? 7);
 
-          if (!title || !priceEuros || Number.isNaN(priceEuros)) {
+          const validation = validateServiceInput({
+            title,
+            description,
+            priceEuros,
+            deliveryDays,
+          });
+          if (!validation.ok || !validation.data) {
             return;
           }
+          const safe = validation.data;
 
-          const slugBase = title
+          const slugBase = safe.title
             .toLowerCase()
             .replace(/[^a-z0-9]+/g, "-")
             .replace(/(^-|-$)/g, "");
@@ -45,11 +53,11 @@ export default async function MisServiciosPage() {
           await prisma.service.create({
             data: {
               profileId: user.id,
-              title,
+              title: safe.title,
               slug,
-              description,
-              priceCents: Math.round(priceEuros * 100),
-              deliveryDays: Number.isNaN(deliveryDays) ? 7 : deliveryDays,
+              description: safe.description,
+              priceCents: safe.priceCents,
+              deliveryDays: safe.deliveryDays,
               active: true,
             },
           });
@@ -134,7 +142,9 @@ export default async function MisServiciosPage() {
             >
               <div className="min-w-0">
                 <h3 className="font-semibold text-[var(--connectia-gray)]">
-                  {s.title}
+                  <Link href={`/servicios/${s.slug}`} className="hover:underline">
+                    {s.title}
+                  </Link>
                 </h3>
                 {s.description && (
                   <p className="text-sm text-gray-600 line-clamp-2">
@@ -152,7 +162,7 @@ export default async function MisServiciosPage() {
                     }).format(s.priceCents / 100)}
                   </div>
                   <div className="text-xs text-gray-500">
-                    <div>{s.profile.displayName || s.profile.email}</div>
+                    <div>{s.profile.email}</div>
                     <div>
                       {s.deliveryDays} {s.deliveryDays === 1 ? "día" : "días"}
                     </div>

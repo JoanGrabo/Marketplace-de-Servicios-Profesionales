@@ -1,14 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import GoogleSignInButton from "@/app/auth/_components/GoogleSignInButton";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const verifiedStatus = searchParams.get("verified");
+  const successMessage =
+    verifiedStatus === "ok"
+      ? "Correo verificado correctamente. Ya has iniciado sesión."
+      : null;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -43,6 +50,19 @@ export default function LoginPage() {
         Accede a tu cuenta para contratar servicios o gestionarlos como profesional.
       </p>
       <form onSubmit={handleSubmit} className="space-y-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+        {successMessage && <p className="rounded-md bg-green-50 p-3 text-sm text-green-700">{successMessage}</p>}
+        <div className="space-y-2">
+          <p className="text-sm font-medium text-gray-700">Entrar con Google</p>
+          <GoogleSignInButton mode="login" />
+        </div>
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t border-gray-200" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-white px-2 text-gray-500">o con email</span>
+          </div>
+        </div>
         <div>
           <label htmlFor="email" className="mb-1 block text-sm font-medium text-gray-700">
             Email

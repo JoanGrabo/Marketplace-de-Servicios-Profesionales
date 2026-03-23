@@ -18,13 +18,30 @@ model Profile {
   displayName String? @map("display_name")
   bio       String?
   avatarUrl String? @map("avatar_url")
+  emailVerifiedAt DateTime? @map("email_verified_at")
+  authProvider String @default("credentials") @map("auth_provider")
   role      String   @default("cliente") // "cliente" | "profesional"
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
   services Service[]
+  emailVerificationTokens EmailVerificationToken[]
 
   @@map("profiles")
+}
+
+model EmailVerificationToken {
+  id         String   @id @default(cuid())
+  profileId  String   @map("profile_id")
+  tokenHash  String   @unique @map("token_hash")
+  expiresAt  DateTime @map("expires_at")
+  consumedAt DateTime? @map("consumed_at")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId])
+  @@map("email_verification_tokens")
 }
 
 model Service {

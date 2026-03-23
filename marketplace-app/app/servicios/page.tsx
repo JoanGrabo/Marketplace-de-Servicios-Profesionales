@@ -11,9 +11,46 @@ export const metadata: Metadata = {
 // Obliga a que la página sea dinámica y consulte la BD en cada petición
 export const dynamic = "force-dynamic";
 
-export default async function ServiciosPage() {
+type ServiciosPageProps = {
+  searchParams?: {
+    q?: string;
+    min?: string;
+    max?: string;
+    maxDays?: string;
+  };
+};
+
+export default async function ServiciosPage({ searchParams }: ServiciosPageProps) {
+  const q = String(searchParams?.q ?? "").trim();
+  const min = Number(searchParams?.min ?? "");
+  const max = Number(searchParams?.max ?? "");
+  const maxDays = Number(searchParams?.maxDays ?? "");
+
   const servicios = await prisma.service.findMany({
-    where: { active: true },
+    where: {
+      active: true,
+      ...(q
+        ? {
+            OR: [
+              { title: { contains: q, mode: "insensitive" } },
+              { description: { contains: q, mode: "insensitive" } },
+              { profile: { email: { contains: q, mode: "insensitive" } } },
+            ],
+          }
+        : {}),
+      ...(Number.isFinite(min) && min >= 0
+        ? { priceCents: { gte: Math.round(min * 100) } }
+        : {}),
+      ...(Number.isFinite(max) && max > 0
+        ? {
+            priceCents: {
+              ...(Number.isFinite(min) && min >= 0 ? { gte: Math.round(min * 100) } : {}),
+              lte: Math.round(max * 100),
+            },
+          }
+        : {}),
+      ...(Number.isFinite(maxDays) && maxDays > 0 ? { deliveryDays: { lte: maxDays } } : {}),
+    },
     orderBy: { createdAt: "desc" },
     include: { profile: true },
   });
@@ -27,6 +64,47 @@ export default async function ServiciosPage() {
         Conectamos profesionales con clientes. Estos son los servicios que ya están
         disponibles en CONNECTIA.
       </p>
+      <form className="mb-8 grid gap-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:grid-cols-4">
+        <input
+          name="q"
+          defaultValue={q}
+          placeholder="Buscar por título, descripción o autor"
+          className="rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-[var(--connectia-gold)] focus:outline-none focus:ring-1 focus:ring-[var(--connectia-gold)] sm:col-span-4"
+        />
+        <input
+          name="min"
+          type="number"
+          min={0}
+          step={1}
+          defaultValue={Number.isFinite(min) ? min : ""}
+          placeholder="Precio mínimo (EUR)"
+          className="rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-[var(--connectia-gold)] focus:outline-none focus:ring-1 focus:ring-[var(--connectia-gold)]"
+        />
+        <input
+          name="max"
+          type="number"
+          min={0}
+          step={1}
+          defaultValue={Number.isFinite(max) ? max : ""}
+          placeholder="Precio máximo (EUR)"
+          className="rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-[var(--connectia-gold)] focus:outline-none focus:ring-1 focus:ring-[var(--connectia-gold)]"
+        />
+        <input
+          name="maxDays"
+          type="number"
+          min={1}
+          step={1}
+          defaultValue={Number.isFinite(maxDays) ? maxDays : ""}
+          placeholder="Máx. días de entrega"
+          className="rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-[var(--connectia-gold)] focus:outline-none focus:ring-1 focus:ring-[var(--connectia-gold)]"
+        />
+        <button
+          type="submit"
+          className="rounded-lg bg-[var(--connectia-gold)] px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90"
+        >
+          Filtrar
+        </button>
+      </form>
 
       {servicios.length === 0 ? (
         <p className="text-gray-500">
@@ -41,7 +119,9 @@ export default async function ServiciosPage() {
             >
               <div>
                 <h2 className="text-xl font-semibold text-[var(--connectia-gray)]">
-                  {s.title}
+                  <Link href={`/servicios/${s.slug}`} className="hover:underline">
+                    {s.title}
+                  </Link>
                 </h2>
                 {s.description && (
                   <p className="mt-2 text-gray-600 line-clamp-4">{s.description}</p>
@@ -56,9 +136,7 @@ export default async function ServiciosPage() {
                   }).format(s.priceCents / 100)}
                 </div>
                 <div className="text-right text-xs text-gray-500">
-                  <div>
-                    {s.profile.displayName || s.profile.email}
-                  </div>
+                  <div>{s.profile.email}</div>
                   <div>
                     Entrega estimada: {s.deliveryDays}{" "}
                     {s.deliveryDays === 1 ? "día" : "días"}

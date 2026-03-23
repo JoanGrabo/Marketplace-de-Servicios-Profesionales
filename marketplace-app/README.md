@@ -27,6 +27,15 @@ App Next.js (App Router) + Tailwind + **PostgreSQL** (Prisma).
    ```
 5. Abre [http://localhost:3000](http://localhost:3000). Prueba la API de salud: [http://localhost:3000/api/health](http://localhost:3000/api/health).
 
+### Variables para autenticación
+
+Para el flujo completo de auth (Google + verificación por email) configura en `.env.local`:
+
+- `AUTH_SECRET`
+- `APP_BASE_URL` (ej. `http://localhost:3000` en local)
+- `GOOGLE_CLIENT_ID` y `NEXT_PUBLIC_GOOGLE_CLIENT_ID`
+- `GMAIL_USER`, `GMAIL_APP_PASSWORD`, `MAIL_FROM`
+
 ## PostgreSQL en el VPS
 
 Ver **`docs/POSTGRES_VPS.md`** para instalar Postgres en el VPS, crear usuario y base de datos, y configurar `DATABASE_URL` en `.env.local` del servidor. Luego en el VPS:
