@@ -35,7 +35,7 @@ export default function ContactarServicioForm({ slug }: Props) {
       setMessage("");
       setSending(false);
       setTimeout(() => {
-        router.push(`/servicios/${slug}`);
+        router.push(data.conversationId ? `/mensajes/${data.conversationId}` : `/servicios/${slug}`);
         router.refresh();
       }, 900);
     } catch {

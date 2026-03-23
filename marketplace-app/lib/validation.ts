@@ -10,6 +10,11 @@ export const SERVICE_LIMITS = {
   maxDeliveryDays: 365,
 };
 
+export const MESSAGE_LIMITS = {
+  min: 10,
+  max: 2000,
+};
+
 type ServiceInput = {
   title: string;
   description?: string;
@@ -97,4 +102,19 @@ export function validateServiceInput(input: ServiceInput): {
       deliveryDays,
     },
   };
+}
+
+export function validateMessageBody(raw: unknown): {
+  ok: boolean;
+  message?: string;
+  body?: string;
+} {
+  const body = String(raw ?? "").trim();
+  if (body.length < MESSAGE_LIMITS.min || body.length > MESSAGE_LIMITS.max) {
+    return {
+      ok: false,
+      message: `El mensaje debe tener entre ${MESSAGE_LIMITS.min} y ${MESSAGE_LIMITS.max} caracteres.`,
+    };
+  }
+  return { ok: true, body };
 }

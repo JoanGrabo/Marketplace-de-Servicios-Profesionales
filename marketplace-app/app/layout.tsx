@@ -70,6 +70,12 @@ export default async function RootLayout({
                     >
                       Mi perfil
                     </Link>
+                    <Link
+                      href="/mensajes"
+                      className="text-gray-600 transition hover:text-[var(--connectia-gold)]"
+                    >
+                      Mensajes
+                    </Link>
                   </>
                 )}
                 <Link

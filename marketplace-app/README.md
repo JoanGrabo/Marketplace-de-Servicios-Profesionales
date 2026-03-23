@@ -36,6 +36,21 @@ Para el flujo completo de auth (Google + verificación por email) configura en `
 - `GOOGLE_CLIENT_ID` y `NEXT_PUBLIC_GOOGLE_CLIENT_ID`
 - `GMAIL_USER`, `GMAIL_APP_PASSWORD`, `MAIL_FROM`
 
+## Mensajería interna (MVP)
+
+- Vista pública de servicios y detalle.
+- Botón de contactar que obliga login si el usuario no está autenticado.
+- Bandeja en `/mensajes` y conversación en `/mensajes/[id]`.
+- Persistencia de conversaciones y mensajes en base de datos.
+
+Tras actualizar el esquema Prisma, ejecuta:
+
+```bash
+cd marketplace-app
+npx prisma migrate deploy
+npx prisma generate
+```
+
 ## PostgreSQL en el VPS
 
 Ver **`docs/POSTGRES_VPS.md`** para instalar Postgres en el VPS, crear usuario y base de datos, y configurar `DATABASE_URL` en `.env.local` del servidor. Luego en el VPS:

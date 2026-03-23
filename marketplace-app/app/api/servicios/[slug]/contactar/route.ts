@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { canSendMail, sendMail } from "@/lib/mailer";
+import { validateMessageBody } from "@/lib/validation";
 
 type Params = {
   params: {
@@ -39,40 +40,67 @@ export async function POST(req: Request, { params }: Params) {
   }
 
   const body = await req.json();
-  const message = String(body.message ?? "").trim();
-  if (message.length < 10 || message.length > 2000) {
+  const validation = validateMessageBody(body.message);
+  if (!validation.ok || !validation.body) {
     return NextResponse.json(
-      { ok: false, message: "El mensaje debe tener entre 10 y 2000 caracteres." },
+      { ok: false, message: validation.message ?? "Mensaje no válido." },
       { status: 400 },
     );
   }
+  const message = validation.body;
 
-  if (!canSendMail()) {
-    return NextResponse.json(
-      {
-        ok: false,
-        message: "Mensajería aún no configurada en servidor. Inténtalo de nuevo más tarde.",
+  const conversation = await prisma.conversation.upsert({
+    where: {
+      serviceId_clientId_professionalId: {
+        serviceId: servicio.id,
+        clientId: user.id,
+        professionalId: servicio.profile.id,
       },
-      { status: 503 },
-    );
-  }
-
-  await sendMail({
-    to: servicio.profile.email,
-    subject: `Nuevo contacto por tu servicio: ${servicio.title}`,
-    text:
-      `Has recibido un nuevo mensaje en CONNECTIA.\n\n` +
-      `Servicio: ${servicio.title}\n` +
-      `De: ${user.email}\n\n` +
-      `Mensaje:\n${message}\n`,
-    html: `
-      <p>Has recibido un nuevo mensaje en <strong>CONNECTIA</strong>.</p>
-      <p><strong>Servicio:</strong> ${servicio.title}</p>
-      <p><strong>De:</strong> ${user.email}</p>
-      <p><strong>Mensaje:</strong></p>
-      <p style="white-space: pre-wrap">${message}</p>
-    `,
+    },
+    create: {
+      serviceId: servicio.id,
+      clientId: user.id,
+      professionalId: servicio.profile.id,
+      messages: {
+        create: {
+          senderId: user.id,
+          body: message,
+        },
+      },
+    },
+    update: {
+      messages: {
+        create: {
+          senderId: user.id,
+          body: message,
+        },
+      },
+    },
+    select: {
+      id: true,
+    },
   });
 
-  return NextResponse.json({ ok: true });
+  if (canSendMail()) {
+    await sendMail({
+      to: servicio.profile.email,
+      subject: `Nuevo mensaje por tu servicio: ${servicio.title}`,
+      text:
+        `Has recibido un nuevo mensaje en CONNECTIA.\n\n` +
+        `Servicio: ${servicio.title}\n` +
+        `De: ${user.email}\n\n` +
+        `Mensaje:\n${message}\n`,
+      html: `
+        <p>Has recibido un nuevo mensaje en <strong>CONNECTIA</strong>.</p>
+        <p><strong>Servicio:</strong> ${servicio.title}</p>
+        <p><strong>De:</strong> ${user.email}</p>
+        <p><strong>Mensaje:</strong></p>
+        <p style="white-space: pre-wrap">${message}</p>
+      `,
+    }).catch(() => {
+      // El email es opcional; la conversación ya se ha guardado en la app.
+    });
+  }
+
+  return NextResponse.json({ ok: true, conversationId: conversation.id });
 }

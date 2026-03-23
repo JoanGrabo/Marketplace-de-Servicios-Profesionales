@@ -16,15 +16,15 @@ type ServiciosPageProps = {
     q?: string;
     min?: string;
     max?: string;
-    maxDays?: string;
   };
 };
 
 export default async function ServiciosPage({ searchParams }: ServiciosPageProps) {
   const q = String(searchParams?.q ?? "").trim();
-  const min = Number(searchParams?.min ?? "");
-  const max = Number(searchParams?.max ?? "");
-  const maxDays = Number(searchParams?.maxDays ?? "");
+  const minRaw = String(searchParams?.min ?? "").trim();
+  const maxRaw = String(searchParams?.max ?? "").trim();
+  const min = minRaw === "" ? null : Number(minRaw);
+  const max = maxRaw === "" ? null : Number(maxRaw);
 
   const servicios = await prisma.service.findMany({
     where: {
@@ -38,18 +38,19 @@ export default async function ServiciosPage({ searchParams }: ServiciosPageProps
             ],
           }
         : {}),
-      ...(Number.isFinite(min) && min >= 0
+      ...(typeof min === "number" && Number.isFinite(min) && min >= 0
         ? { priceCents: { gte: Math.round(min * 100) } }
         : {}),
-      ...(Number.isFinite(max) && max > 0
+      ...(typeof max === "number" && Number.isFinite(max) && max > 0
         ? {
             priceCents: {
-              ...(Number.isFinite(min) && min >= 0 ? { gte: Math.round(min * 100) } : {}),
+              ...(typeof min === "number" && Number.isFinite(min) && min >= 0
+                ? { gte: Math.round(min * 100) }
+                : {}),
               lte: Math.round(max * 100),
             },
           }
         : {}),
-      ...(Number.isFinite(maxDays) && maxDays > 0 ? { deliveryDays: { lte: maxDays } } : {}),
     },
     orderBy: { createdAt: "desc" },
     include: {
@@ -70,19 +71,19 @@ export default async function ServiciosPage({ searchParams }: ServiciosPageProps
         Conectamos profesionales con clientes. Estos son los servicios que ya están
         disponibles en CONNECTIA.
       </p>
-      <form className="mb-8 grid gap-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:grid-cols-4">
+      <form className="mb-8 grid gap-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:grid-cols-3">
         <input
           name="q"
           defaultValue={q}
           placeholder="Buscar por título, descripción o autor"
-          className="rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-[var(--connectia-gold)] focus:outline-none focus:ring-1 focus:ring-[var(--connectia-gold)] sm:col-span-4"
+          className="rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-[var(--connectia-gold)] focus:outline-none focus:ring-1 focus:ring-[var(--connectia-gold)] sm:col-span-3"
         />
         <input
           name="min"
           type="number"
           min={0}
           step={1}
-          defaultValue={Number.isFinite(min) ? min : ""}
+          defaultValue={minRaw}
           placeholder="Precio mínimo (EUR)"
           className="rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-[var(--connectia-gold)] focus:outline-none focus:ring-1 focus:ring-[var(--connectia-gold)]"
         />
@@ -91,17 +92,8 @@ export default async function ServiciosPage({ searchParams }: ServiciosPageProps
           type="number"
           min={0}
           step={1}
-          defaultValue={Number.isFinite(max) ? max : ""}
+          defaultValue={maxRaw}
           placeholder="Precio máximo (EUR)"
-          className="rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-[var(--connectia-gold)] focus:outline-none focus:ring-1 focus:ring-[var(--connectia-gold)]"
-        />
-        <input
-          name="maxDays"
-          type="number"
-          min={1}
-          step={1}
-          defaultValue={Number.isFinite(maxDays) ? maxDays : ""}
-          placeholder="Máx. días de entrega"
           className="rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-[var(--connectia-gold)] focus:outline-none focus:ring-1 focus:ring-[var(--connectia-gold)]"
         />
         <button
