@@ -4,7 +4,6 @@ import {
   COOKIE_NAME,
   createSessionToken,
   getSessionMaxAgeSeconds,
-  shouldUseSecureCookies,
 } from "@/lib/auth";
 import { consumeVerificationToken } from "@/lib/emailVerification";
 import { getAppBaseUrl } from "@/lib/mailer";
@@ -39,7 +38,7 @@ export async function GET(req: Request) {
   const res = NextResponse.redirect(new URL("/?verified=ok", appBaseUrl));
   res.cookies.set(COOKIE_NAME, sessionToken, {
     httpOnly: true,
-    secure: shouldUseSecureCookies(),
+    secure: false,
     sameSite: "lax",
     path: "/",
     maxAge: getSessionMaxAgeSeconds(false),

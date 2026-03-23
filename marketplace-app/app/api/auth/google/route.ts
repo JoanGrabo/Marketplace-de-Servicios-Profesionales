@@ -5,7 +5,6 @@ import {
   COOKIE_NAME,
   createSessionToken,
   getSessionMaxAgeSeconds,
-  shouldUseSecureCookies,
 } from "@/lib/auth";
 import { parseRole } from "@/lib/validation";
 
@@ -70,7 +69,7 @@ export async function POST(req: Request) {
     const res = NextResponse.json({ ok: true });
     res.cookies.set(COOKIE_NAME, token, {
       httpOnly: true,
-      secure: shouldUseSecureCookies(),
+      secure: false,
       sameSite: "lax",
       path: "/",
       maxAge: getSessionMaxAgeSeconds(remember),

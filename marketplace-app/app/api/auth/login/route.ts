@@ -4,7 +4,6 @@ import {
   COOKIE_NAME,
   createSessionToken,
   getSessionMaxAgeSeconds,
-  shouldUseSecureCookies,
 } from "@/lib/auth";
 import { isValidEmail, normalizeEmail } from "@/lib/validation";
 import bcrypt from "bcryptjs";
@@ -49,7 +48,7 @@ export async function POST(req: Request) {
     const res = NextResponse.json({ ok: true });
     res.cookies.set(COOKIE_NAME, token, {
       httpOnly: true,
-      secure: shouldUseSecureCookies(),
+      secure: false,
       sameSite: "lax",
       path: "/",
       maxAge: getSessionMaxAgeSeconds(remember),
