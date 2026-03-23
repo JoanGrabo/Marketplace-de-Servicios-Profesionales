@@ -53,6 +53,12 @@ npx prisma migrate deploy
 npx prisma generate
 ```
 
+## Recuperación de contraseña
+
+- Solicitud de enlace: `/auth/forgot-password`
+- Restablecer contraseña: `/auth/reset-password?token=...`
+- Requiere SMTP configurado (`GMAIL_USER`, `GMAIL_APP_PASSWORD`, `MAIL_FROM`).
+
 ## PostgreSQL en el VPS
 
 Ver **`docs/POSTGRES_VPS.md`** para instalar Postgres en el VPS, crear usuario y base de datos, y configurar `DATABASE_URL` en `.env.local` del servidor. Luego en el VPS:

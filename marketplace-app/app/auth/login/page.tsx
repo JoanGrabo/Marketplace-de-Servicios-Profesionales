@@ -92,6 +92,14 @@ export default function LoginPage() {
             className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-[var(--connectia-gold)] focus:outline-none focus:ring-1 focus:ring-[var(--connectia-gold)]"
             placeholder="Tu contraseña"
           />
+          <div className="mt-2 text-right">
+            <a
+              href="/auth/forgot-password"
+              className="text-xs font-medium text-[var(--connectia-gold)] hover:underline"
+            >
+              He olvidado mi contraseña
+            </a>
+          </div>
         </div>
         <label className="flex items-center gap-2 text-sm text-gray-600">
           <input
