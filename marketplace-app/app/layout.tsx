@@ -18,6 +18,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const user = await getCurrentUser();
+  const authDebugEnabled = process.env.AUTH_DEBUG === "1";
   let unreadCount = 0;
   if (user) {
     try {
@@ -132,6 +133,21 @@ export default async function RootLayout({
               )}
             </nav>
           </div>
+          {authDebugEnabled && (
+            <div className="mx-auto max-w-6xl px-4 pb-3 sm:px-6">
+              <div
+                className={`rounded-md px-3 py-2 text-xs ${
+                  user
+                    ? "bg-green-50 text-green-700 ring-1 ring-green-200"
+                    : "bg-amber-50 text-amber-700 ring-1 ring-amber-200"
+                }`}
+              >
+                {user
+                  ? `AUTH DEBUG: logueado como ${user.email} (${user.role}).`
+                  : "AUTH DEBUG: no hay sesión activa en el servidor."}
+              </div>
+            </div>
+          )}
         </header>
         {children}
       </body>
