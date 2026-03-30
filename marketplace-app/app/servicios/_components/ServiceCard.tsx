@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getPublicProfileName, truncateText } from "@/lib/publicProfile";
+import { resolveServiceThumbnailSrc } from "@/lib/serviceMedia";
 
 type Seller = {
   id: string;
@@ -47,15 +48,16 @@ export default function ServiceCard({ service, stats }: Props) {
   const primaryHref = `/servicios/${encodeURIComponent(service.slug)}`;
   const contactHref = `/servicios/${encodeURIComponent(service.slug)}/contactar`;
   const cacheBuster = service.updatedAt ? `?v=${service.updatedAt.getTime()}` : "";
+  const thumbnailSrc = resolveServiceThumbnailSrc(service.thumbnailUrl);
 
   return (
     <article className="group overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
       <Link href={primaryHref} className="block">
         <div className="relative aspect-[16/10] w-full bg-gradient-to-br from-gray-50 to-gray-100">
-          {service.thumbnailUrl ? (
+          {thumbnailSrc ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              src={`${service.thumbnailUrl}${cacheBuster}`}
+              src={`${thumbnailSrc}${cacheBuster}`}
               alt={service.title}
               className="absolute inset-0 h-full w-full object-cover"
               loading="lazy"

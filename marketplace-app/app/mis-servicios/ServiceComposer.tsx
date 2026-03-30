@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { SERVICE_CATEGORIES, SERVICE_SUBCATEGORIES, SERVICE_LIMITS } from "@/lib/validation";
+import { resolveServiceThumbnailSrc } from "@/lib/serviceMedia";
 
 type Category = (typeof SERVICE_CATEGORIES)[number];
 
@@ -41,10 +42,7 @@ export default function ServiceComposer({ sellerName, action, defaultCategory, i
   const [includesText, setIncludesText] = useState(initial?.includesText ?? "");
   const [requirementsText, setRequirementsText] = useState(initial?.requirementsText ?? "");
   const [thumbnailUrl, setThumbnailUrl] = useState(initial?.thumbnailUrl ?? "");
-  const initialServeUrl =
-    initial?.thumbnailUrl && initial.thumbnailUrl.startsWith("/uploads/services/")
-      ? `/api/uploads/services/${initial.thumbnailUrl.split("/").pop() ?? ""}`
-      : initial?.thumbnailUrl ?? "";
+  const initialServeUrl = resolveServiceThumbnailSrc(initial?.thumbnailUrl) ?? "";
   const [thumbnailPreviewUrl, setThumbnailPreviewUrl] = useState(
     initialServeUrl ? `${initialServeUrl}?v=${Date.now()}` : "",
   );
