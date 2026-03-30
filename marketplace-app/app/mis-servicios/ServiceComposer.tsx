@@ -96,7 +96,8 @@ export default function ServiceComposer({ sellerName, action, defaultCategory, i
         setThumbnailUploading(false);
         return;
       }
-      setThumbnailUrl(String(data.url ?? ""));
+      const nextUrl = String(data.url ?? "");
+      setThumbnailUrl(nextUrl);
       setThumbnailUploading(false);
     } catch {
       setThumbnailError("Error inesperado al subir la imagen.");
@@ -342,6 +343,14 @@ export default function ServiceComposer({ sellerName, action, defaultCategory, i
             </div>
             {thumbnailError && <p className="text-xs text-red-600">{thumbnailError}</p>}
             <input type="hidden" name="thumbnailUrl" value={thumbnailUrl} />
+            {thumbnailUrl ? (
+              <p className="break-all text-[11px] text-gray-500">
+                URL guardada:{" "}
+                <a href={thumbnailUrl} target="_blank" rel="noreferrer" className="font-medium text-[var(--connectia-gold)] hover:underline">
+                  {thumbnailUrl}
+                </a>
+              </p>
+            ) : null}
           </div>
         </section>
 
@@ -388,6 +397,7 @@ export default function ServiceComposer({ sellerName, action, defaultCategory, i
                     alt="Portada del servicio"
                     className="absolute inset-0 h-full w-full object-cover"
                     loading="lazy"
+                    onError={() => setThumbnailError("La imagen no se puede cargar. Revisa que el servidor sirva la URL de /uploads/services/.")}
                   />
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center text-sm text-gray-500">
