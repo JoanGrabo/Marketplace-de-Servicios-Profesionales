@@ -6,7 +6,6 @@ type Seller = {
   id: string;
   displayName: string | null;
   avatarUrl: string | null;
-  sellerLevel?: string | null;
 };
 
 type Props = {
@@ -17,25 +16,18 @@ type Props = {
     description: string | null;
     category?: string | null;
     thumbnailUrl?: string | null;
+    shortDescription?: string | null;
+    isPromoted?: boolean | null;
     priceCents: number;
     deliveryDays: number;
     profile: Seller;
   };
   stats?: {
-    avgRating: number | null;
-    reviewCount: number;
+    avgRating?: number | null;
+    reviewCount?: number;
     conversationCount?: number;
   };
 };
-
-function Stars({ value }: { value: number }) {
-  const clamped = Math.max(0, Math.min(5, value));
-  const full = Math.floor(clamped);
-  const half = clamped - full >= 0.5 ? 1 : 0;
-  const empty = 5 - full - half;
-  const stars = "★".repeat(full) + (half ? "☆" : "") + "☆".repeat(empty);
-  return <span aria-label={`${clamped.toFixed(1)} de 5`}>{stars}</span>;
-}
 
 function formatFromEuros(priceCents: number) {
   const euros = Math.max(0, Math.round(priceCents / 100));
@@ -43,16 +35,14 @@ function formatFromEuros(priceCents: number) {
 }
 
 export default function ServiceCard({ service, stats }: Props) {
-  const avg = stats?.avgRating ?? null;
-  const reviewCount = stats?.reviewCount ?? 0;
   const convoCount = stats?.conversationCount ?? 0;
 
   const title = service.title.length > 60 ? `${service.title.slice(0, 57)}...` : service.title;
   const sellerName = getPublicProfileName(service.profile as any);
 
   const isFast = service.deliveryDays <= 3;
-  const isTopSeller = (service.profile.sellerLevel ?? "") === "top" || (avg !== null && avg >= 4.8 && reviewCount >= 5);
   const isBestSeller = convoCount >= 3;
+  const isPromoted = Boolean(service.isPromoted);
 
   const primaryHref = `/servicios/${encodeURIComponent(service.slug)}`;
   const contactHref = `/servicios/${encodeURIComponent(service.slug)}/contactar`;
@@ -78,9 +68,9 @@ export default function ServiceCard({ service, stats }: Props) {
           )}
 
           <div className="absolute left-3 top-3 flex flex-wrap gap-2">
-            {isTopSeller && (
+            {isPromoted && (
               <span className="rounded-full bg-[var(--connectia-gold)]/15 px-2 py-1 text-[11px] font-semibold text-[var(--connectia-gold)] ring-1 ring-[var(--connectia-gold)]/20">
-                Top vendedor
+                Destacado
               </span>
             )}
             {isBestSeller && (
@@ -105,9 +95,13 @@ export default function ServiceCard({ service, stats }: Props) {
                 {title}
               </h3>
             </Link>
-            {service.category && (
-              <p className="mt-1 text-xs font-medium text-gray-500">{service.category}</p>
-            )}
+            {service.category ? (
+              <div className="mt-2">
+                <span className="inline-flex rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-[11px] font-semibold text-gray-700">
+                  {service.category}
+                </span>
+              </div>
+            ) : null}
           </div>
           <div className="shrink-0 text-right">
             <p className="text-xs text-gray-500">Desde</p>
@@ -115,7 +109,9 @@ export default function ServiceCard({ service, stats }: Props) {
           </div>
         </div>
 
-        {service.description ? (
+        {service.shortDescription ? (
+          <p className="text-sm text-gray-600">{truncateText(service.shortDescription, 120)}</p>
+        ) : service.description ? (
           <p className="text-sm text-gray-600">{truncateText(service.description, 90)}</p>
         ) : null}
 
@@ -133,16 +129,6 @@ export default function ServiceCard({ service, stats }: Props) {
             <div className="min-w-0">
               <p className="truncate text-xs font-semibold text-gray-800">{sellerName}</p>
               <p className="text-[11px] text-gray-500">Entrega en {service.deliveryDays} {service.deliveryDays === 1 ? "día" : "días"}</p>
-            </div>
-          </div>
-
-          <div className="text-right text-xs text-gray-600">
-            <div className="flex items-center justify-end gap-1 text-[var(--connectia-gold)]">
-              <Stars value={avg ?? 0} />
-              <span className="text-gray-700">{avg !== null ? avg.toFixed(1) : "—"}</span>
-            </div>
-            <div className="text-[11px] text-gray-500">
-              {reviewCount > 0 ? `${reviewCount} reseñas` : "Sin reseñas"}
             </div>
           </div>
         </div>
