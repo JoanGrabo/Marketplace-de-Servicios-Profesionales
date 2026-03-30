@@ -25,15 +25,36 @@ export async function POST(req: Request) {
 
   const body = await req.json();
   const title = String(body.title ?? "");
+  const category = String(body.category ?? "");
+  const subcategory = String(body.subcategory ?? "");
+  const shortDescription = String(body.shortDescription ?? "");
   const description = String(body.description ?? "");
+  const includesText = String(body.includesText ?? "");
+  const requirementsText = String(body.requirementsText ?? "");
+  const thumbnailUrl = String(body.thumbnailUrl ?? "");
   const priceEuros = Number(body.priceEuros);
   const deliveryDays = Number(body.deliveryDays ?? 7);
+  const fastDeliveryEnabled = Boolean(body.fastDeliveryEnabled);
+  const fastDeliveryExtraEuros =
+    body.fastDeliveryExtraEuros == null || body.fastDeliveryExtraEuros === ""
+      ? undefined
+      : Number(body.fastDeliveryExtraEuros);
+  const isPromoted = Boolean(body.isPromoted);
 
   const validation = validateServiceInput({
     title,
+    category,
+    subcategory,
+    shortDescription,
     description,
+    includesText,
+    requirementsText,
+    thumbnailUrl,
     priceEuros,
     deliveryDays,
+    fastDeliveryEnabled,
+    fastDeliveryExtraEuros,
+    isPromoted,
   });
   if (!validation.ok || !validation.data) {
     return NextResponse.json(
@@ -54,9 +75,18 @@ export async function POST(req: Request) {
       profileId: user.id,
       title: safe.title,
       slug,
+      category: safe.category,
+      subcategory: safe.subcategory,
+      shortDescription: safe.shortDescription,
       description: safe.description,
+      includesText: safe.includesText,
+      requirementsText: safe.requirementsText,
+      thumbnailUrl: safe.thumbnailUrl,
       priceCents: safe.priceCents,
       deliveryDays: safe.deliveryDays,
+      fastDeliveryEnabled: safe.fastDeliveryEnabled,
+      fastDeliveryExtraCents: safe.fastDeliveryExtraCents,
+      isPromoted: safe.isPromoted,
       active: true,
     },
   });

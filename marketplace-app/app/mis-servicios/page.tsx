@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { validateServiceInput } from "@/lib/validation";
 import { getPublicProfileName } from "@/lib/publicProfile";
+import ServiceComposer from "@/app/mis-servicios/ServiceComposer";
 
 export const dynamic = "force-dynamic";
 
@@ -24,6 +25,79 @@ export default async function MisServiciosPage() {
     },
   });
 
+  async function createService(formData: FormData) {
+    "use server";
+    const current = await getCurrentUser();
+    if (!current) redirect("/auth/login");
+
+    const title = String(formData.get("title") ?? "");
+    const category = String(formData.get("category") ?? "");
+    const subcategory = String(formData.get("subcategory") ?? "");
+    const shortDescription = String(formData.get("shortDescription") ?? "");
+    const description = String(formData.get("description") ?? "");
+    const includesText = String(formData.get("includesText") ?? "");
+    const requirementsText = String(formData.get("requirementsText") ?? "");
+    const thumbnailUrl = String(formData.get("thumbnailUrl") ?? "");
+    const priceEuros = Number(formData.get("priceEuros") ?? 0);
+    const deliveryDays = Number(formData.get("deliveryDays") ?? 7);
+    const fastDeliveryEnabled = formData.get("fastDeliveryEnabled") === "on";
+    const fastDeliveryExtraEurosRaw = formData.get("fastDeliveryExtraEuros");
+    const fastDeliveryExtraEuros =
+      fastDeliveryExtraEurosRaw == null || fastDeliveryExtraEurosRaw === ""
+        ? null
+        : Number(fastDeliveryExtraEurosRaw);
+    const isPromoted = formData.get("isPromoted") === "on";
+
+    const validation = validateServiceInput({
+      title,
+      category,
+      subcategory,
+      shortDescription,
+      description,
+      includesText,
+      requirementsText,
+      thumbnailUrl,
+      priceEuros,
+      deliveryDays,
+      fastDeliveryEnabled,
+      fastDeliveryExtraEuros: fastDeliveryExtraEuros ?? undefined,
+      isPromoted,
+    });
+    if (!validation.ok || !validation.data) {
+      return;
+    }
+    const safe = validation.data;
+
+    const slugBase = safe.title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
+    const slug = `${slugBase}-${Date.now().toString(36)}`;
+
+    await prisma.service.create({
+      data: {
+        profileId: current.id,
+        title: safe.title,
+        slug,
+        category: safe.category,
+        subcategory: safe.subcategory,
+        shortDescription: safe.shortDescription,
+        description: safe.description,
+        includesText: safe.includesText,
+        requirementsText: safe.requirementsText,
+        thumbnailUrl: safe.thumbnailUrl,
+        priceCents: safe.priceCents,
+        deliveryDays: safe.deliveryDays,
+        fastDeliveryEnabled: safe.fastDeliveryEnabled,
+        fastDeliveryExtraCents: safe.fastDeliveryExtraCents,
+        isPromoted: safe.isPromoted,
+        active: true,
+      },
+    });
+
+    redirect("/mis-servicios");
+  }
+
   return (
     <main className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
       <h1 className="mb-2 text-3xl font-bold text-[var(--connectia-gray)]">
@@ -33,108 +107,9 @@ export default async function MisServiciosPage() {
         Crea y gestiona los servicios que ofreces en CONNECTIA.
       </p>
 
-      <form
-        action={async (formData: FormData) => {
-          "use server";
-          const title = String(formData.get("title") ?? "");
-          const description = String(formData.get("description") ?? "");
-          const priceEuros = Number(formData.get("priceEuros") ?? 0);
-          const deliveryDays = Number(formData.get("deliveryDays") ?? 7);
-
-          const validation = validateServiceInput({
-            title,
-            description,
-            priceEuros,
-            deliveryDays,
-          });
-          if (!validation.ok || !validation.data) {
-            return;
-          }
-          const safe = validation.data;
-
-          const slugBase = safe.title
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, "-")
-            .replace(/(^-|-$)/g, "");
-          const slug = `${slugBase}-${Date.now().toString(36)}`;
-
-          await prisma.service.create({
-            data: {
-              profileId: user.id,
-              title: safe.title,
-              slug,
-              description: safe.description,
-              priceCents: safe.priceCents,
-              deliveryDays: safe.deliveryDays,
-              active: true,
-            },
-          });
-
-          redirect("/mis-servicios");
-        }}
-        className="mb-10 space-y-4 rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
-      >
-        <h2 className="text-lg font-semibold text-[var(--connectia-gray)]">
-          Crear nuevo servicio
-        </h2>
-        <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">
-            Título
-          </label>
-          <input
-            name="title"
-            required
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-[var(--connectia-gold)] focus:outline-none focus:ring-1 focus:ring-[var(--connectia-gold)]"
-            placeholder="Ej. Proyecto básico de vivienda"
-          />
-        </div>
-        <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">
-            Descripción
-          </label>
-          <textarea
-            name="description"
-            rows={3}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-[var(--connectia-gold)] focus:outline-none focus:ring-1 focus:ring-[var(--connectia-gold)]"
-            placeholder="Cuenta qué incluye el servicio..."
-          />
-        </div>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
-              Precio (EUR)
-            </label>
-            <input
-              name="priceEuros"
-              type="number"
-              min={1}
-              step={1}
-              required
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-[var(--connectia-gold)] focus:outline-none focus:ring-1 focus:ring-[var(--connectia-gold)]"
-              placeholder="100"
-            />
-          </div>
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
-              Días de entrega
-            </label>
-            <input
-              name="deliveryDays"
-              type="number"
-              min={1}
-              step={1}
-              defaultValue={7}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-[var(--connectia-gold)] focus:outline-none focus:ring-1 focus:ring-[var(--connectia-gold)]"
-            />
-          </div>
-        </div>
-        <button
-          type="submit"
-          className="rounded-lg bg-[var(--connectia-gold)] px-6 py-2 font-medium text-white transition hover:opacity-90"
-        >
-          Guardar servicio
-        </button>
-      </form>
+      <div className="mb-10">
+        <ServiceComposer sellerName={getPublicProfileName(user)} action={createService} />
+      </div>
 
       <h2 className="mb-4 text-lg font-semibold text-[var(--connectia-gray)]">
         Servicios publicados por ti
