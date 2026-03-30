@@ -4,11 +4,12 @@ import Link from "next/link";
 import "./globals.css";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import SiteFooter from "@/components/site/SiteFooter";
 
 export const metadata: Metadata = {
-  title: "CONNECTIA — Conecta • Aprende • Crece",
+  title: "Mapahub — Arquitectura y legal",
   description:
-    "Marketplace de servicios profesionales. Arquitectura, renders, planos, asesoría y próximamente servicios legales.",
+    "Marketplace especializado: servicios profesionales de arquitectura y asesoría legal. Contrata o publica con claridad.",
   icons: { icon: "/connectia-logo.png" },
 };
 
@@ -45,20 +46,16 @@ export default async function RootLayout({
             <Link href="/" className="flex shrink-0 items-center gap-3">
               <Image
                 src="/connectia-logo.png"
-                alt="CONNECTIA"
+                alt="Mapahub"
                 width={120}
                 height={48}
                 className="h-10 w-auto object-contain sm:h-12"
                 priority
               />
               <div className="hidden sm:block">
-                <span className="font-semibold tracking-tight text-[var(--connectia-gray)]">
-                  CONNECT
-                </span>
-                <span className="font-semibold tracking-tight text-[var(--connectia-gold)]">
-                  IA
-                </span>
-                <p className="text-xs font-normal text-gray-500">Conecta • Aprende • Crece</p>
+                <span className="font-semibold tracking-tight text-[var(--connectia-gray)]">Mapa</span>
+                <span className="font-semibold tracking-tight text-[var(--connectia-gold)]">hub</span>
+                <p className="text-xs font-normal text-gray-500">Arquitectura y legal</p>
               </div>
             </Link>
             <nav className="flex flex-1 items-center justify-end gap-4 text-sm font-medium">
@@ -154,6 +151,7 @@ export default async function RootLayout({
           )}
         </header>
         {children}
+        <SiteFooter user={user} />
       </body>
     </html>
   );

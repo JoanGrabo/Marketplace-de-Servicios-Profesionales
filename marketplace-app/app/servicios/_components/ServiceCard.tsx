@@ -9,6 +9,8 @@ type Seller = {
 };
 
 type Props = {
+  /** En home u otras vistas se puede ocultar el acceso rápido a mensaje. */
+  showMessageButton?: boolean;
   service: {
     id: string;
     slug: string;
@@ -35,7 +37,7 @@ function formatFromEuros(priceCents: number) {
   return Intl.NumberFormat("es-ES").format(euros);
 }
 
-export default function ServiceCard({ service, stats }: Props) {
+export default function ServiceCard({ service, stats, showMessageButton = true }: Props) {
   const convoCount = stats?.conversationCount ?? 0;
 
   const title = service.title.length > 60 ? `${service.title.slice(0, 57)}...` : service.title;
@@ -137,19 +139,21 @@ export default function ServiceCard({ service, stats }: Props) {
           </div>
         </div>
 
-        <div className="flex items-center gap-2 pt-1">
+        <div className={`flex gap-2 pt-1 ${showMessageButton ? "" : "w-full"}`}>
           <Link
             href={primaryHref}
-            className="inline-flex flex-1 items-center justify-center rounded-lg bg-[var(--connectia-gold)] px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90"
+            className={`inline-flex items-center justify-center rounded-lg bg-[var(--connectia-gold)] px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90 ${showMessageButton ? "flex-1" : "w-full"}`}
           >
             Ver servicio
           </Link>
-          <Link
-            href={contactHref}
-            className="inline-flex items-center justify-center rounded-lg border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
-          >
-            Mensaje
-          </Link>
+          {showMessageButton ? (
+            <Link
+              href={contactHref}
+              className="inline-flex items-center justify-center rounded-lg border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+            >
+              Mensaje
+            </Link>
+          ) : null}
         </div>
       </div>
     </article>
