@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CONNECTIA — Documentación general</title>
+  <style>
+    @page { margin: 2cm; }
+    body {
+      font-family: "Segoe UI", Calibri, Arial, sans-serif;
+      line-height: 1.45;
+      color: #222;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 24px;
+      font-size: 11pt;
+    }
+    h1 { font-size: 22pt; color: #1a1a1a; border-bottom: 2px solid #c9a227; padding-bottom: 8px; }
+    h2 { font-size: 14pt; color: #333; margin-top: 1.4em; }
+    h3 { font-size: 12pt; color: #444; margin-top: 1em; }
+    p, li { margin: 0.5em 0; }
+    ul { padding-left: 1.4em; }
+    table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 10pt; }
+    th, td { border: 1px solid #ccc; padding: 8px 10px; text-align: left; vertical-align: top; }
+    th { background: #f5f5f5; }
+    .meta { color: #666; font-size: 10pt; margin-bottom: 24px; }
+    .box { background: #faf8f3; border-left: 4px solid #c9a227; padding: 12px 16px; margin: 16px 0; }
+    @media print {
+      body { padding: 0; }
+      a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 9pt; color: #666; }
+    }
+  </style>
+</head>
+<body>
+
+  <p class="meta"><strong>CONNECTIA</strong> — Documentación general del proyecto · Versión 1.0 (marzo 2026)</p>
+
+  <h1>CONNECTIA — Documentación general</h1>
+
+  <div class="box">
+    <strong>Exportar a PDF:</strong> en el navegador, pulsa <kbd>Ctrl+P</kbd> y elige <strong>Guardar como PDF</strong>.<br />
+    <strong>Abrir en Word:</strong> Archivo → Abrir → selecciona este archivo HTML, o copia el contenido.
+  </div>
+
+  <h2>1. Qué es CONNECTIA</h2>
+  <p><strong>CONNECTIA</strong> es una plataforma web (marketplace) que <strong>conecta a personas que necesitan servicios profesionales</strong> con <strong>profesionales que ofrecen esos servicios</strong>. El enfoque inicial está en ámbitos como <strong>arquitectura, visualización (renders), planificación/planos y asesoría técnica</strong>, con posibilidad de ampliar a otras áreas (por ejemplo legal) de forma progresiva.</p>
+  <p>En esencia, CONNECTIA se inspira en el modelo de <strong>marketplaces de servicios</strong> (como Fiverr u otras plataformas similares): catálogo de ofertas, ficha de servicio, contacto entre usuarios y comunicación para cerrar el encargo — adaptado al mercado hispanohablante y a proyectos reales de construcción, diseño y asesoría.</p>
+
+  <h2>2. En qué se basa (modelo y propuesta de valor)</h2>
+  <ul>
+    <li><strong>Modelo de negocio:</strong> intermediación entre oferta y demanda de servicios profesionales, con presencia digital clara (precio orientativo, plazos, descripción).</li>
+    <li><strong>Propuesta central:</strong> reducir fricción entre cliente y profesional: <strong>menos pasos</strong>, <strong>mensajes claros</strong> y <strong>contacto directo</strong> dentro de la propia plataforma.</li>
+    <li><strong>Diferenciadores:</strong> especialización técnica; mensajería integrada; claridad en la oferta; evolución continua del producto.</li>
+  </ul>
+
+  <h2>3. Misión, visión y lema</h2>
+  <h3>Misión</h3>
+  <p>Conectar clientes y profesionales de forma <strong>transparente</strong> para <strong>acelerar decisiones</strong> y <strong>ejecutar mejor</strong> cada proyecto.</p>
+  <h3>Visión</h3>
+  <p>Ser la plataforma de <strong>referencia</strong> para servicios técnicos y profesionales especializados en el <strong>mercado hispanohablante</strong>.</p>
+  <h3>Lema</h3>
+  <p><strong>Conecta • Aprende • Crece</strong> — Conecta con las personas adecuadas, aprende del proceso y haz crecer tu negocio o proyecto.</p>
+
+  <h2>4. Qué queremos hacer (objetivos del producto)</h2>
+  <ol>
+    <li>Facilitar el <strong>descubrimiento</strong> de servicios (búsqueda, filtros, fichas).</li>
+    <li>Permitir que un mismo usuario pueda <strong>contratar</strong> y <strong>publicar</strong> servicios según necesidad.</li>
+    <li><strong>Centralizar la comunicación</strong> en conversaciones y mensajes dentro de la app.</li>
+    <li><strong>Generar confianza</strong>: verificación de correo, acceso seguro, recuperación de contraseña.</li>
+    <li>Mejorar el <strong>perfil profesional</strong> y, a futuro, reseñas, pagos u otros módulos de confianza.</li>
+  </ol>
+
+  <h2>5. Cómo actúa la página web (usuario)</h2>
+  <h3>Público (sin sesión)</h3>
+  <ul>
+    <li>Inicio, listado y detalle de servicios, páginas institucionales (Quiénes somos, Contacto).</li>
+    <li>El botón de contactar puede pedir <strong>inicio de sesión</strong> y devolver al usuario al mismo servicio tras loguearse.</li>
+  </ul>
+  <h3>Registro e identidad</h3>
+  <ul>
+    <li>Registro con email; verificación de correo; login con Google opcional; recuperación de contraseña.</li>
+  </ul>
+  <h3>Usuario registrado</h3>
+  <ul>
+    <li><strong>Mi perfil</strong> — datos y avatar.</li>
+    <li><strong>Mis servicios</strong> — crear y gestionar anuncios.</li>
+    <li><strong>Contactar</strong> — primer mensaje que abre o continúa una conversación.</li>
+    <li><strong>Mensajes</strong> — bandeja y chat por conversación.</li>
+  </ul>
+
+  <h2>6. Resumen técnico</h2>
+  <table>
+    <thead>
+      <tr><th>Aspecto</th><th>Descripción</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Stack</td><td>Next.js (App Router), Tailwind, PostgreSQL, Prisma</td></tr>
+      <tr><td>Auth</td><td>JWT en cookie, bcrypt, Google OAuth opcional</td></tr>
+      <tr><td>Correo</td><td>SMTP (verificación, reset de contraseña)</td></tr>
+      <tr><td>Despliegue</td><td>Node + PM2 en VPS, variables de entorno</td></tr>
+    </tbody>
+  </table>
+
+  <h2>7. Roadmap orientativo</h2>
+  <p>Valoraciones, pagos, perfil público tipo vitrina, moderación, SEO avanzado por servicio.</p>
+
+  <h2>8. Cierre</h2>
+  <p>CONNECTIA busca ser el <strong>punto de encuentro</strong> entre <strong>talento profesional</strong> y <strong>proyectos reales</strong>, con un producto que escucha al mercado, prioriza experiencias simples y mejora de forma continua.</p>
+
+  <p class="meta" style="margin-top: 2em;">Documento para uso interno y comunicación con colaboradores. Actualizar cuando cambien funcionalidades o posicionamiento.</p>
+
+</body>
+</html>
