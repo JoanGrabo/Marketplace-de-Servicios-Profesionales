@@ -41,8 +41,12 @@ export default function ServiceComposer({ sellerName, action, defaultCategory, i
   const [includesText, setIncludesText] = useState(initial?.includesText ?? "");
   const [requirementsText, setRequirementsText] = useState(initial?.requirementsText ?? "");
   const [thumbnailUrl, setThumbnailUrl] = useState(initial?.thumbnailUrl ?? "");
+  const initialServeUrl =
+    initial?.thumbnailUrl && initial.thumbnailUrl.startsWith("/uploads/services/")
+      ? `/api/uploads/services/${initial.thumbnailUrl.split("/").pop() ?? ""}`
+      : initial?.thumbnailUrl ?? "";
   const [thumbnailPreviewUrl, setThumbnailPreviewUrl] = useState(
-    initial?.thumbnailUrl ? `${initial.thumbnailUrl}?v=${Date.now()}` : "",
+    initialServeUrl ? `${initialServeUrl}?v=${Date.now()}` : "",
   );
   const [thumbnailUploading, setThumbnailUploading] = useState(false);
   const [thumbnailError, setThumbnailError] = useState<string | null>(null);
@@ -100,8 +104,10 @@ export default function ServiceComposer({ sellerName, action, defaultCategory, i
         return;
       }
       const nextUrl = String(data.url ?? "");
+      const serveUrl = String(data.serveUrl ?? "");
       setThumbnailUrl(nextUrl);
-      setThumbnailPreviewUrl(nextUrl ? `${nextUrl}?v=${Date.now()}` : "");
+      // Para preview usamos el endpoint /api (sin cache) y así se ve al instante.
+      setThumbnailPreviewUrl(serveUrl ? `${serveUrl}?v=${Date.now()}` : nextUrl ? `${nextUrl}?v=${Date.now()}` : "");
       setThumbnailUploading(false);
     } catch {
       setThumbnailError("Error inesperado al subir la imagen.");

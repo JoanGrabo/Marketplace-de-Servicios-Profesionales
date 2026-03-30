@@ -3,61 +3,62 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-type Props = {
+export default function MessageComposer({
+  conversationId,
+}: {
   conversationId: string;
-};
-
-export default function MessageComposer({ conversationId }: Props) {
+}) {
   const router = useRouter();
-  const [message, setMessage] = useState("");
-  const [sending, setSending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [content, setContent] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  async function onSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setError(null);
-    setSending(true);
+    const trimmed = content.trim();
+    if (!trimmed || loading) return;
+    setLoading(true);
     try {
       const res = await fetch(`/api/conversaciones/${conversationId}/mensajes`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message }),
+        credentials: "include",
+        body: JSON.stringify({ message: trimmed }),
       });
-      const data = await res.json();
-      if (!res.ok || !data.ok) {
-        setError(data.message ?? "No se pudo enviar el mensaje.");
-        setSending(false);
-        return;
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(
+          typeof err.message === "string" ? err.message : "Error al enviar",
+        );
       }
-      setMessage("");
-      setSending(false);
+      setContent("");
       router.refresh();
-    } catch {
-      setError("Error inesperado al enviar el mensaje.");
-      setSending(false);
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Error al enviar el mensaje");
+    } finally {
+      setLoading(false);
     }
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-2 sm:flex-row sm:items-end">
+      <label className="sr-only" htmlFor="msg-content">
+        Escribe un mensaje
+      </label>
       <textarea
-        name="message"
-        rows={4}
-        required
-        minLength={10}
-        maxLength={2000}
-        value={message}
-        onChange={(e) => setMessage(e.target.value)}
-        placeholder="Escribe tu mensaje..."
-        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-[var(--connectia-gold)] focus:outline-none focus:ring-1 focus:ring-[var(--connectia-gold)]"
+        id="msg-content"
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+        rows={2}
+        placeholder="Escribe un mensaje…"
+        className="min-h-[3rem] flex-1 resize-y rounded-xl border border-gray-200 bg-gray-50/80 px-4 py-3 text-sm text-[var(--connectia-gray)] shadow-inner outline-none transition placeholder:text-gray-400 focus:border-[var(--connectia-gold)] focus:bg-white focus:ring-2 focus:ring-[var(--connectia-gold)]/20"
+        disabled={loading}
       />
-      {error && <p className="text-sm text-red-600">{error}</p>}
       <button
         type="submit"
-        disabled={sending}
-        className="rounded-lg bg-[var(--connectia-gold)] px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-60"
+        disabled={loading || !content.trim()}
+        className="shrink-0 rounded-xl bg-[var(--connectia-gold)] px-6 py-3 text-sm font-semibold text-[var(--connectia-gray)] shadow-sm transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
       >
-        {sending ? "Enviando..." : "Enviar"}
+        {loading ? "Enviando…" : "Enviar"}
       </button>
     </form>
   );

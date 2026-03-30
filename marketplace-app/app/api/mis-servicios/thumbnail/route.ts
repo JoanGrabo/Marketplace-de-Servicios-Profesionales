@@ -49,6 +49,7 @@ export async function POST(req: Request) {
   await fs.writeFile(fullPath, buffer);
 
   const url = `${relativeDir}/${filename}`;
-  return NextResponse.json({ ok: true, url });
+  const serveUrl = `/api/uploads/services/${filename}`;
+  return NextResponse.json({ ok: true, url, serveUrl, filename });
 }
 

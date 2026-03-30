@@ -1,14 +1,14 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
-
-export const dynamic = "force-dynamic";
+import { prisma } from "@/lib/db";
+import { getPublicProfileName } from "@/lib/publicProfile";
+import ProfileAvatar from "./_components/ProfileAvatar";
 
 export default async function MensajesPage() {
   const user = await getCurrentUser();
   if (!user) {
-    redirect("/auth/login?next=/mensajes");
+    redirect("/auth/login");
   }
 
   const conversations = await prisma.conversation.findMany({
@@ -16,80 +16,100 @@ export default async function MensajesPage() {
       OR: [{ clientId: user.id }, { professionalId: user.id }],
     },
     include: {
-      service: {
-        select: {
-          slug: true,
-          title: true,
-        },
-      },
+      service: { select: { id: true, title: true, slug: true } },
       client: {
-        select: {
-          id: true,
-          email: true,
-        },
+        select: { id: true, displayName: true, avatarUrl: true },
       },
       professional: {
-        select: {
-          id: true,
-          email: true,
-        },
+        select: { id: true, displayName: true, avatarUrl: true },
       },
       messages: {
         orderBy: { createdAt: "desc" },
         take: 1,
-        select: {
-          body: true,
-          createdAt: true,
-          senderId: true,
-        },
+        select: { body: true, createdAt: true },
       },
     },
     orderBy: { updatedAt: "desc" },
   });
 
   return (
-    <main className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
-      <h1 className="mb-2 text-3xl font-bold text-[var(--connectia-gray)]">Mensajes</h1>
-      <p className="mb-8 text-gray-600">Gestiona tus conversaciones con clientes y profesionales.</p>
+    <div className="min-h-screen bg-[var(--connectia-bg)]">
+      <div className="mx-auto max-w-3xl px-4 py-8 sm:py-10">
+        <header className="mb-8">
+          <h1 className="text-2xl font-bold text-[var(--connectia-gray)] sm:text-3xl">
+            Mensajes
+          </h1>
+          <p className="mt-1 text-sm text-gray-600">
+            Tus conversaciones sobre servicios
+          </p>
+        </header>
 
-      {conversations.length === 0 ? (
-        <p className="text-gray-500">
-          Aún no tienes conversaciones. Desde cualquier servicio puedes pulsar en contactar.
-        </p>
-      ) : (
-        <ul className="space-y-3">
-          {conversations.map((c) => {
-            const otherUser = c.client.id === user.id ? c.professional : c.client;
-            const lastMessage = c.messages[0];
-            return (
-              <li key={c.id} className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-                <Link href={`/mensajes/${c.id}`} className="block">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <p className="text-sm text-gray-500">Servicio</p>
-                      <p className="font-semibold text-[var(--connectia-gray)]">{c.service.title}</p>
-                      <p className="mt-1 text-sm text-gray-600">Con: {otherUser.email}</p>
-                      {lastMessage && (
-                        <p className="mt-2 line-clamp-1 text-sm text-gray-500">{lastMessage.body}</p>
-                      )}
+        {conversations.length === 0 ? (
+          <div className="rounded-2xl border border-gray-200/80 bg-white p-10 text-center shadow-sm">
+            <p className="text-gray-600">
+              Aún no tienes conversaciones. Contacta a un profesional desde un
+              servicio para empezar.
+            </p>
+            <Link
+              href="/servicios"
+              className="mt-4 inline-block rounded-lg bg-[var(--connectia-gold)] px-5 py-2.5 text-sm font-semibold text-[var(--connectia-gray)] transition hover:opacity-90"
+            >
+              Ver servicios
+            </Link>
+          </div>
+        ) : (
+          <ul className="space-y-2">
+            {conversations.map((c) => {
+              const isClient = c.clientId === user.id;
+              const otherProfile = isClient ? c.professional : c.client;
+              const partnerName = getPublicProfileName(otherProfile);
+              const last = c.messages[0];
+              const preview = last?.body
+                ? last.body.length > 72
+                  ? `${last.body.slice(0, 70)}…`
+                  : last.body
+                : "Sin mensajes aún";
+
+              return (
+                <li key={c.id}>
+                  <Link
+                    href={`/mensajes/${c.id}`}
+                    className="group flex gap-4 rounded-2xl border border-gray-200/80 bg-white p-4 shadow-sm transition hover:border-[var(--connectia-gold)]/40 hover:shadow-md"
+                  >
+                    <ProfileAvatar profile={otherProfile} size="lg" />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className="font-semibold text-[var(--connectia-gray)] group-hover:text-[var(--connectia-gold)]">
+                            {partnerName}
+                          </p>
+                          <p className="mt-0.5 truncate text-xs font-medium text-gray-500">
+                            {c.service.title}
+                          </p>
+                        </div>
+                        {last && (
+                          <time
+                            className="shrink-0 text-xs text-gray-400"
+                            dateTime={last.createdAt.toISOString()}
+                          >
+                            {last.createdAt.toLocaleDateString("es-ES", {
+                              day: "numeric",
+                              month: "short",
+                            })}
+                          </time>
+                        )}
+                      </div>
+                      <p className="mt-2 line-clamp-2 text-sm text-gray-600">
+                        {preview}
+                      </p>
                     </div>
-                    <span className="text-xs text-gray-500">
-                      {lastMessage
-                        ? new Intl.DateTimeFormat("es-ES", {
-                            day: "2-digit",
-                            month: "2-digit",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          }).format(lastMessage.createdAt)
-                        : ""}
-                    </span>
-                  </div>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      )}
-    </main>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </div>
+    </div>
   );
 }
