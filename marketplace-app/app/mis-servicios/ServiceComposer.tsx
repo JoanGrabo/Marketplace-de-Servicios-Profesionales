@@ -41,6 +41,9 @@ export default function ServiceComposer({ sellerName, action, defaultCategory, i
   const [includesText, setIncludesText] = useState(initial?.includesText ?? "");
   const [requirementsText, setRequirementsText] = useState(initial?.requirementsText ?? "");
   const [thumbnailUrl, setThumbnailUrl] = useState(initial?.thumbnailUrl ?? "");
+  const [thumbnailPreviewUrl, setThumbnailPreviewUrl] = useState(
+    initial?.thumbnailUrl ? `${initial.thumbnailUrl}?v=${Date.now()}` : "",
+  );
   const [thumbnailUploading, setThumbnailUploading] = useState(false);
   const [thumbnailError, setThumbnailError] = useState<string | null>(null);
   const [priceEuros, setPriceEuros] = useState<number | "">(initial?.priceEuros ?? "");
@@ -98,6 +101,7 @@ export default function ServiceComposer({ sellerName, action, defaultCategory, i
       }
       const nextUrl = String(data.url ?? "");
       setThumbnailUrl(nextUrl);
+      setThumbnailPreviewUrl(nextUrl ? `${nextUrl}?v=${Date.now()}` : "");
       setThumbnailUploading(false);
     } catch {
       setThumbnailError("Error inesperado al subir la imagen.");
@@ -390,10 +394,10 @@ export default function ServiceComposer({ sellerName, action, defaultCategory, i
             <p className="text-xs font-semibold uppercase tracking-widest text-gray-500">Vista previa</p>
             <div className="mt-3 overflow-hidden rounded-xl border border-gray-200 bg-gray-50">
               <div className="relative aspect-[16/10] w-full">
-                {thumbnailUrl ? (
+                {thumbnailPreviewUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
-                    src={thumbnailUrl}
+                    src={thumbnailPreviewUrl}
                     alt="Portada del servicio"
                     className="absolute inset-0 h-full w-full object-cover"
                     loading="lazy"

@@ -77,13 +77,20 @@ export default async function ServiciosPage({ searchParams }: ServiciosPageProps
       { promoExpiresAt: "desc" },
       { createdAt: "desc" },
     ],
-    include: {
+    select: {
+      id: true,
+      slug: true,
+      title: true,
+      description: true,
+      shortDescription: true,
+      category: true,
+      thumbnailUrl: true,
+      isPromoted: true,
+      priceCents: true,
+      deliveryDays: true,
+      updatedAt: true,
       profile: {
-        select: {
-          id: true,
-          displayName: true,
-          avatarUrl: true,
-        },
+        select: { id: true, displayName: true, avatarUrl: true },
       },
     },
   });

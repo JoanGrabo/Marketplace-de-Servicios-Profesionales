@@ -17,6 +17,7 @@ type Props = {
     thumbnailUrl?: string | null;
     shortDescription?: string | null;
     isPromoted?: boolean | null;
+    updatedAt?: Date;
     priceCents: number;
     deliveryDays: number;
     profile: Seller;
@@ -45,6 +46,7 @@ export default function ServiceCard({ service, stats }: Props) {
 
   const primaryHref = `/servicios/${encodeURIComponent(service.slug)}`;
   const contactHref = `/servicios/${encodeURIComponent(service.slug)}/contactar`;
+  const cacheBuster = service.updatedAt ? `?v=${service.updatedAt.getTime()}` : "";
 
   return (
     <article className="group overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
@@ -53,7 +55,7 @@ export default function ServiceCard({ service, stats }: Props) {
           {service.thumbnailUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              src={service.thumbnailUrl}
+              src={`${service.thumbnailUrl}${cacheBuster}`}
               alt={service.title}
               className="absolute inset-0 h-full w-full object-cover"
               loading="lazy"
