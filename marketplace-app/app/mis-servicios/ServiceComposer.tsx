@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Image from "next/image";
 import { SERVICE_CATEGORIES, SERVICE_SUBCATEGORIES, SERVICE_LIMITS } from "@/lib/validation";
 
 type Category = (typeof SERVICE_CATEGORIES)[number];
@@ -10,28 +9,45 @@ type Props = {
   sellerName: string;
   action: (formData: FormData) => void;
   defaultCategory?: Category;
+  initial?: {
+    category?: Category | null;
+    subcategory?: string | null;
+    title?: string | null;
+    shortDescription?: string | null;
+    description?: string | null;
+    includesText?: string | null;
+    requirementsText?: string | null;
+    thumbnailUrl?: string | null;
+    priceEuros?: number | null;
+    deliveryDays?: number | null;
+    fastDeliveryEnabled?: boolean | null;
+    fastDeliveryExtraEuros?: number | null;
+    isPromoted?: boolean | null;
+  };
 };
 
 function clampText(text: string, max: number) {
   return text.length > max ? text.slice(0, max) : text;
 }
 
-export default function ServiceComposer({ sellerName, action, defaultCategory }: Props) {
-  const [category, setCategory] = useState<Category>(defaultCategory ?? "Arquitectura");
-  const [subcategory, setSubcategory] = useState<string>("");
-  const [title, setTitle] = useState("");
-  const [shortDescription, setShortDescription] = useState("");
-  const [description, setDescription] = useState("");
-  const [includesText, setIncludesText] = useState("");
-  const [requirementsText, setRequirementsText] = useState("");
-  const [thumbnailUrl, setThumbnailUrl] = useState("");
+export default function ServiceComposer({ sellerName, action, defaultCategory, initial }: Props) {
+  const [category, setCategory] = useState<Category>(
+    initial?.category ?? defaultCategory ?? "Arquitectura",
+  );
+  const [subcategory, setSubcategory] = useState<string>(initial?.subcategory ?? "");
+  const [title, setTitle] = useState(initial?.title ?? "");
+  const [shortDescription, setShortDescription] = useState(initial?.shortDescription ?? "");
+  const [description, setDescription] = useState(initial?.description ?? "");
+  const [includesText, setIncludesText] = useState(initial?.includesText ?? "");
+  const [requirementsText, setRequirementsText] = useState(initial?.requirementsText ?? "");
+  const [thumbnailUrl, setThumbnailUrl] = useState(initial?.thumbnailUrl ?? "");
   const [thumbnailUploading, setThumbnailUploading] = useState(false);
   const [thumbnailError, setThumbnailError] = useState<string | null>(null);
-  const [priceEuros, setPriceEuros] = useState<number | "">("");
-  const [deliveryDays, setDeliveryDays] = useState<number | "">(7);
-  const [fastDeliveryEnabled, setFastDeliveryEnabled] = useState(false);
-  const [fastDeliveryExtraEuros, setFastDeliveryExtraEuros] = useState<number | "">("");
-  const [isPromoted, setIsPromoted] = useState(false);
+  const [priceEuros, setPriceEuros] = useState<number | "">(initial?.priceEuros ?? "");
+  const [deliveryDays, setDeliveryDays] = useState<number | "">(initial?.deliveryDays ?? 7);
+  const [fastDeliveryEnabled, setFastDeliveryEnabled] = useState(Boolean(initial?.fastDeliveryEnabled));
+  const [fastDeliveryExtraEuros, setFastDeliveryExtraEuros] = useState<number | "">(initial?.fastDeliveryExtraEuros ?? "");
+  const [isPromoted, setIsPromoted] = useState(Boolean(initial?.isPromoted));
 
   const subcategories = SERVICE_SUBCATEGORIES[category] ?? [];
 
@@ -366,7 +382,13 @@ export default function ServiceComposer({ sellerName, action, defaultCategory }:
             <div className="mt-3 overflow-hidden rounded-xl border border-gray-200 bg-gray-50">
               <div className="relative aspect-[16/10] w-full">
                 {thumbnailUrl ? (
-                  <Image src={thumbnailUrl} alt="Portada del servicio" fill sizes="(max-width: 1024px) 100vw, 33vw" className="object-cover" />
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={thumbnailUrl}
+                    alt="Portada del servicio"
+                    className="absolute inset-0 h-full w-full object-cover"
+                    loading="lazy"
+                  />
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center text-sm text-gray-500">
                     Añade una imagen para ver la portada

@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { getPublicProfileName, truncateText } from "@/lib/publicProfile";
 
@@ -52,12 +51,12 @@ export default function ServiceCard({ service, stats }: Props) {
       <Link href={primaryHref} className="block">
         <div className="relative aspect-[16/10] w-full bg-gradient-to-br from-gray-50 to-gray-100">
           {service.thumbnailUrl ? (
-            <Image
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
               src={service.thumbnailUrl}
               alt={service.title}
-              fill
-              sizes="(max-width: 768px) 100vw, 33vw"
-              className="object-cover"
+              className="absolute inset-0 h-full w-full object-cover"
+              loading="lazy"
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center">
@@ -119,7 +118,8 @@ export default function ServiceCard({ service, stats }: Props) {
           <div className="flex items-center gap-2">
             <div className="relative h-8 w-8 overflow-hidden rounded-full border border-gray-200 bg-gray-50">
               {service.profile.avatarUrl ? (
-                <Image src={service.profile.avatarUrl} alt={sellerName} fill sizes="32px" className="object-cover" />
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={service.profile.avatarUrl} alt={sellerName} className="absolute inset-0 h-full w-full object-cover" loading="lazy" />
               ) : (
                 <div className="flex h-full w-full items-center justify-center text-[11px] font-semibold text-gray-600">
                   {sellerName.slice(0, 1).toUpperCase()}

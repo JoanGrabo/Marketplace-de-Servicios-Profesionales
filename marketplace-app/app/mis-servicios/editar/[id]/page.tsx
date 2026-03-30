@@ -2,6 +2,8 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { validateServiceInput } from "@/lib/validation";
+import { getPublicProfileName } from "@/lib/publicProfile";
+import ServiceEditor from "./ServiceEditor";
 
 type Params = {
   params: {
@@ -41,15 +43,37 @@ export default async function EditarServicioPage({ params }: Params) {
     }
 
     const title = String(formData.get("title") ?? "");
+    const category = String(formData.get("category") ?? "");
+    const subcategory = String(formData.get("subcategory") ?? "");
+    const shortDescription = String(formData.get("shortDescription") ?? "");
     const description = String(formData.get("description") ?? "");
+    const includesText = String(formData.get("includesText") ?? "");
+    const requirementsText = String(formData.get("requirementsText") ?? "");
+    const thumbnailUrl = String(formData.get("thumbnailUrl") ?? "");
     const priceEuros = Number(formData.get("priceEuros") ?? 0);
     const deliveryDays = Number(formData.get("deliveryDays") ?? 7);
+    const fastDeliveryEnabled = formData.get("fastDeliveryEnabled") === "on";
+    const fastDeliveryExtraEurosRaw = formData.get("fastDeliveryExtraEuros");
+    const fastDeliveryExtraEuros =
+      fastDeliveryExtraEurosRaw == null || fastDeliveryExtraEurosRaw === ""
+        ? null
+        : Number(fastDeliveryExtraEurosRaw);
+    const isPromoted = formData.get("isPromoted") === "on";
 
     const validation = validateServiceInput({
       title,
+      category,
+      subcategory,
+      shortDescription,
       description,
+      includesText,
+      requirementsText,
+      thumbnailUrl,
       priceEuros,
       deliveryDays,
+      fastDeliveryEnabled,
+      fastDeliveryExtraEuros: fastDeliveryExtraEuros ?? undefined,
+      isPromoted,
     });
     if (!validation.ok || !validation.data) {
       return;
@@ -60,9 +84,18 @@ export default async function EditarServicioPage({ params }: Params) {
       where: { id: existing.id, profileId: current.id },
       data: {
         title: safe.title,
+        category: safe.category,
+        subcategory: safe.subcategory,
+        shortDescription: safe.shortDescription,
         description: safe.description,
+        includesText: safe.includesText,
+        requirementsText: safe.requirementsText,
+        thumbnailUrl: safe.thumbnailUrl,
         priceCents: safe.priceCents,
         deliveryDays: safe.deliveryDays,
+        fastDeliveryEnabled: safe.fastDeliveryEnabled,
+        fastDeliveryExtraCents: safe.fastDeliveryExtraCents,
+        isPromoted: safe.isPromoted,
       },
     });
 
@@ -70,84 +103,20 @@ export default async function EditarServicioPage({ params }: Params) {
   }
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
-      <h1 className="mb-2 text-3xl font-bold text-[var(--connectia-gray)]">
-        Editar servicio
-      </h1>
-      <p className="mb-8 text-gray-600">
-        Actualiza la información de tu servicio.
-      </p>
+    <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+      <h1 className="mb-2 text-3xl font-bold text-[var(--connectia-gray)]">Editar servicio</h1>
+      <p className="mb-8 text-gray-600">Actualiza la ficha para que se vea mejor en el catálogo.</p>
 
-      <form
-        action={updateService}
-        className="space-y-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
-      >
-        <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">
-            Título
-          </label>
-          <input
-            name="title"
-            defaultValue={servicio.title}
-            required
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-[var(--connectia-gold)] focus:outline-none focus:ring-1 focus:ring-[var(--connectia-gold)]"
-          />
-        </div>
-        <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">
-            Descripción
-          </label>
-          <textarea
-            name="description"
-            rows={4}
-            defaultValue={servicio.description ?? ""}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-[var(--connectia-gold)] focus:outline-none focus:ring-1 focus:ring-[var(--connectia-gold)]"
-          />
-        </div>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
-              Precio (EUR)
-            </label>
-            <input
-              name="priceEuros"
-              type="number"
-              min={1}
-              step={1}
-              defaultValue={Math.round(servicio.priceCents / 100)}
-              required
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-[var(--connectia-gold)] focus:outline-none focus:ring-1 focus:ring-[var(--connectia-gold)]"
-            />
-          </div>
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
-              Días de entrega
-            </label>
-            <input
-              name="deliveryDays"
-              type="number"
-              min={1}
-              step={1}
-              defaultValue={servicio.deliveryDays}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-[var(--connectia-gold)] focus:outline-none focus:ring-1 focus:ring-[var(--connectia-gold)]"
-            />
-          </div>
-        </div>
-        <div className="flex gap-3">
-          <button
-            type="submit"
-            className="rounded-lg bg-[var(--connectia-gold)] px-6 py-2 font-medium text-white transition hover:opacity-90"
-          >
-            Guardar cambios
-          </button>
-          <a
-            href="/mis-servicios"
-            className="rounded-lg border border-gray-300 px-6 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-          >
-            Cancelar
-          </a>
-        </div>
-      </form>
+      <ServiceEditor sellerName={getPublicProfileName(user)} initial={servicio} action={updateService} />
+
+      <div className="mt-6">
+        <a
+          href="/mis-servicios"
+          className="inline-flex rounded-lg border border-gray-300 px-6 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+        >
+          Volver a Mis servicios
+        </a>
+      </div>
     </main>
   );
 }
