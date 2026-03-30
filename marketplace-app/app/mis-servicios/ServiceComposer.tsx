@@ -25,6 +25,8 @@ export default function ServiceComposer({ sellerName, action, defaultCategory }:
   const [includesText, setIncludesText] = useState("");
   const [requirementsText, setRequirementsText] = useState("");
   const [thumbnailUrl, setThumbnailUrl] = useState("");
+  const [thumbnailUploading, setThumbnailUploading] = useState(false);
+  const [thumbnailError, setThumbnailError] = useState<string | null>(null);
   const [priceEuros, setPriceEuros] = useState<number | "">("");
   const [deliveryDays, setDeliveryDays] = useState<number | "">(7);
   const [fastDeliveryEnabled, setFastDeliveryEnabled] = useState(false);
@@ -59,6 +61,32 @@ export default function ServiceComposer({ sellerName, action, defaultCategory }:
       fastOk
     );
   }, [category, deliveryDays, fastDeliveryEnabled, fastDeliveryExtraEuros, priceEuros, thumbnailUrl, title]);
+
+  async function onChangeThumbnail(file: File | null) {
+    if (!file) return;
+    setThumbnailError(null);
+    setThumbnailUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("thumbnail", file);
+      const res = await fetch("/api/mis-servicios/thumbnail", {
+        method: "POST",
+        body: formData,
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        setThumbnailError(data.message ?? "No se pudo subir la imagen.");
+        setThumbnailUploading(false);
+        return;
+      }
+      setThumbnailUrl(String(data.url ?? ""));
+      setThumbnailUploading(false);
+    } catch {
+      setThumbnailError("Error inesperado al subir la imagen.");
+      setThumbnailUploading(false);
+    }
+  }
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
@@ -277,17 +305,27 @@ export default function ServiceComposer({ sellerName, action, defaultCategory }:
         {/* Bloque: Imagen */}
         <section className="space-y-4 border-t border-gray-100 pt-6">
           <h3 className="text-sm font-semibold uppercase tracking-widest text-gray-700">Imágenes</h3>
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">Imagen principal (URL) *</label>
-            <input
-              name="thumbnailUrl"
-              value={thumbnailUrl}
-              onChange={(e) => setThumbnailUrl(e.target.value)}
-              required
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-[var(--connectia-gold)] focus:outline-none focus:ring-1 focus:ring-[var(--connectia-gold)]"
-              placeholder="https://..."
-            />
-            <p className="mt-1 text-xs text-gray-500">De momento por URL. En breve subiremos archivos directamente.</p>
+          <div className="space-y-2">
+            <label className="mb-1 block text-sm font-medium text-gray-700">Imagen principal *</label>
+            <div className="flex flex-wrap items-center gap-3">
+              <label className="inline-flex cursor-pointer items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50">
+                {thumbnailUploading ? "Subiendo..." : "Adjuntar imagen"}
+                <input
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                  className="hidden"
+                  disabled={thumbnailUploading}
+                  onChange={(e) => void onChangeThumbnail(e.target.files?.[0] ?? null)}
+                />
+              </label>
+              {thumbnailUrl ? (
+                <span className="text-xs font-medium text-emerald-700">Imagen cargada correctamente</span>
+              ) : (
+                <span className="text-xs text-gray-500">Formatos: JPG/PNG/WEBP. Máx. 4MB.</span>
+              )}
+            </div>
+            {thumbnailError && <p className="text-xs text-red-600">{thumbnailError}</p>}
+            <input type="hidden" name="thumbnailUrl" value={thumbnailUrl} />
           </div>
         </section>
 

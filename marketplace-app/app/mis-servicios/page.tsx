@@ -99,7 +99,7 @@ export default async function MisServiciosPage() {
   }
 
   return (
-    <main className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
+    <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
       <h1 className="mb-2 text-3xl font-bold text-[var(--connectia-gray)]">
         Mis servicios
       </h1>
