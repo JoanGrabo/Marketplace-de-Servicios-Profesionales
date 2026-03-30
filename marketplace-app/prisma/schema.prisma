@@ -26,11 +26,13 @@ model Profile {
   yearsExperience Int? @map("years_experience")
   emailVerifiedAt DateTime? @map("email_verified_at")
   authProvider String @default("credentials") @map("auth_provider")
+  sellerLevel String @default("nuevo") @map("seller_level") // nuevo | verificado | top
   role      String   @default("cliente") // "cliente" | "profesional"
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
   services Service[]
+  reviewsWritten Review[] @relation("ReviewWriter")
   emailVerificationTokens EmailVerificationToken[]
   passwordResetTokens PasswordResetToken[]
   conversationsAsClient Conversation[] @relation("ConversationClient")
@@ -74,6 +76,8 @@ model Service {
   title        String
   slug         String   @unique
   description  String?
+  category     String?  @map("category")
+  thumbnailUrl String?  @map("thumbnail_url")
   priceCents   Int      @map("price_cents") // precio en céntimos
   deliveryDays Int      @map("delivery_days") @default(7)
   active       Boolean  @default(true)
@@ -82,8 +86,26 @@ model Service {
 
   profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
   conversations Conversation[]
+  reviews Review[]
 
+  @@index([category])
   @@map("services")
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  serviceId  String   @map("service_id")
+  writerId   String   @map("writer_id")
+  rating     Int
+  body       String?
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  service Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  writer  Profile @relation("ReviewWriter", fields: [writerId], references: [id], onDelete: Cascade)
+
+  @@index([serviceId, createdAt])
+  @@index([writerId])
+  @@map("reviews")
 }
 
 model Conversation {
