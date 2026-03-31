@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { getPublicProfileName } from "@/lib/publicProfile";
 import { getCurrentUser } from "@/lib/auth";
 import { resolveRouteParams, safeDecodeURIComponent } from "@/lib/routeParams";
+import PayForServiceButton from "@/app/servicios/[slug]/_components/PayForServiceButton";
 
 type ServicioDetalleProps = {
   params: {
@@ -97,12 +98,15 @@ export default async function ServicioDetallePage({ params }: ServicioDetallePro
               </p>
             </div>
           ) : (
-            <Link
-              href={`/servicios/${encodeURIComponent(servicio.slug)}/contactar`}
-              className="rounded-lg bg-[var(--connectia-gold)] px-5 py-2 text-sm font-semibold text-white transition hover:opacity-90"
-            >
-              Contactar para contratar
-            </Link>
+            <>
+              <PayForServiceButton serviceSlug={servicio.slug} />
+              <Link
+                href={`/servicios/${encodeURIComponent(servicio.slug)}/contactar`}
+                className="rounded-lg border border-gray-300 px-5 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+              >
+                Contactar (sin pagar aún)
+              </Link>
+            </>
           )}
           <Link
             href="/servicios"

@@ -1,0 +1,80 @@
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { getStripeClient } from "@/lib/stripe";
+
+function getWebhookSecret(): string {
+  const secret = process.env.STRIPE_WEBHOOK_SECRET;
+  if (!secret) throw new Error("STRIPE_WEBHOOK_SECRET no está configurada.");
+  return secret;
+}
+
+export async function POST(req: Request) {
+  try {
+    const stripe = getStripeClient();
+    const sig = req.headers.get("stripe-signature");
+    if (!sig) {
+      return NextResponse.json({ ok: false, message: "Falta stripe-signature." }, { status: 400 });
+    }
+
+    const rawBody = await req.text();
+
+    let event;
+    try {
+      event = stripe.webhooks.constructEvent(rawBody, sig, getWebhookSecret());
+    } catch (err) {
+      return NextResponse.json({ ok: false, message: "Firma inválida." }, { status: 400 });
+    }
+
+    if (event.type === "checkout.session.completed") {
+      const session = event.data.object as unknown as {
+        id: string;
+        payment_intent?: string | null;
+        metadata?: { orderId?: string };
+      };
+      const orderId = session.metadata?.orderId;
+      if (orderId) {
+        await prisma.order.updateMany({
+          where: { id: orderId, status: "pending" },
+          data: {
+            status: "paid",
+            paidAt: new Date(),
+            stripePaymentIntentId: session.payment_intent ?? null,
+          },
+        });
+      } else {
+        // fallback por si se perdió metadata
+        await prisma.order.updateMany({
+          where: { stripeCheckoutSessionId: session.id, status: "pending" },
+          data: {
+            status: "paid",
+            paidAt: new Date(),
+            stripePaymentIntentId: session.payment_intent ?? null,
+          },
+        });
+      }
+    }
+
+    if (event.type === "checkout.session.expired") {
+      const session = event.data.object as unknown as { id: string; metadata?: { orderId?: string } };
+      const orderId = session.metadata?.orderId;
+      if (orderId) {
+        await prisma.order.updateMany({
+          where: { id: orderId, status: "pending" },
+          data: { status: "canceled" },
+        });
+      } else {
+        await prisma.order.updateMany({
+          where: { stripeCheckoutSessionId: session.id, status: "pending" },
+          data: { status: "canceled" },
+        });
+      }
+    }
+
+    return NextResponse.json({ received: true });
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error("stripe webhook:", e);
+    return NextResponse.json({ ok: false }, { status: 500 });
+  }
+}
+

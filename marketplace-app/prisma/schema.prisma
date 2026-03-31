@@ -36,6 +36,8 @@ model Profile {
   conversationsAsClient Conversation[] @relation("ConversationClient")
   conversationsAsProfessional Conversation[] @relation("ConversationProfessional")
   sentMessages Message[] @relation("MessageSender")
+  ordersAsBuyer Order[] @relation("OrderBuyer")
+  ordersAsSeller Order[] @relation("OrderSeller")
 
   @@map("profiles")
 }
@@ -98,6 +100,7 @@ model Service {
 
   profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
   conversations Conversation[]
+  orders Order[]
 
   @@index([category])
   @@index([isPromoted, promoExpiresAt])
@@ -137,4 +140,32 @@ model Message {
   @@index([conversationId, createdAt])
   @@index([senderId])
   @@map("messages")
+}
+
+model Order {
+  id                String   @id @default(cuid())
+  serviceId          String   @map("service_id")
+  buyerId            String   @map("buyer_id")
+  sellerId           String   @map("seller_id")
+
+  amountCents        Int      @map("amount_cents")
+  currency           String   @default("EUR")
+  status             String   @default("pending") // pending | paid | canceled | failed
+
+  stripeCheckoutSessionId String?  @unique @map("stripe_checkout_session_id")
+  stripePaymentIntentId   String?  @unique @map("stripe_payment_intent_id")
+  paidAt             DateTime? @map("paid_at")
+
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  service Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  buyer   Profile @relation("OrderBuyer", fields: [buyerId], references: [id], onDelete: Cascade)
+  seller  Profile @relation("OrderSeller", fields: [sellerId], references: [id], onDelete: Cascade)
+
+  @@index([serviceId])
+  @@index([buyerId])
+  @@index([sellerId])
+  @@index([status, createdAt])
+  @@map("orders")
 }
