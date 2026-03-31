@@ -58,7 +58,6 @@ export default async function EditarServicioPage({ params }: Params) {
       fastDeliveryExtraEurosRaw == null || fastDeliveryExtraEurosRaw === ""
         ? null
         : Number(fastDeliveryExtraEurosRaw);
-    const isPromoted = formData.get("isPromoted") === "on";
 
     const validation = validateServiceInput({
       title,
@@ -73,7 +72,6 @@ export default async function EditarServicioPage({ params }: Params) {
       deliveryDays,
       fastDeliveryEnabled,
       fastDeliveryExtraEuros: fastDeliveryExtraEuros ?? undefined,
-      isPromoted,
     });
     if (!validation.ok || !validation.data) {
       return;
@@ -95,7 +93,6 @@ export default async function EditarServicioPage({ params }: Params) {
         deliveryDays: safe.deliveryDays,
         fastDeliveryEnabled: safe.fastDeliveryEnabled,
         fastDeliveryExtraCents: safe.fastDeliveryExtraCents,
-        isPromoted: safe.isPromoted,
       },
     });
 

@@ -5,6 +5,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { validateServiceInput } from "@/lib/validation";
 import { getPublicProfileName } from "@/lib/publicProfile";
 import ServiceComposer from "@/app/mis-servicios/ServiceComposer";
+import PromoteServiceButton from "@/app/mis-servicios/_components/PromoteServiceButton";
 
 export const dynamic = "force-dynamic";
 
@@ -46,7 +47,6 @@ export default async function MisServiciosPage() {
       fastDeliveryExtraEurosRaw == null || fastDeliveryExtraEurosRaw === ""
         ? null
         : Number(fastDeliveryExtraEurosRaw);
-    const isPromoted = formData.get("isPromoted") === "on";
 
     const validation = validateServiceInput({
       title,
@@ -61,7 +61,6 @@ export default async function MisServiciosPage() {
       deliveryDays,
       fastDeliveryEnabled,
       fastDeliveryExtraEuros: fastDeliveryExtraEuros ?? undefined,
-      isPromoted,
     });
     if (!validation.ok || !validation.data) {
       return;
@@ -90,7 +89,7 @@ export default async function MisServiciosPage() {
         deliveryDays: safe.deliveryDays,
         fastDeliveryEnabled: safe.fastDeliveryEnabled,
         fastDeliveryExtraCents: safe.fastDeliveryExtraCents,
-        isPromoted: safe.isPromoted,
+        isPromoted: false,
         active: true,
       },
     });
@@ -152,6 +151,7 @@ export default async function MisServiciosPage() {
                   </div>
                 </div>
                 <div className="flex flex-col items-end gap-1">
+                  {!s.isPromoted ? <PromoteServiceButton serviceId={s.id} /> : null}
                   <a
                     href={`/mis-servicios/editar/${s.id}`}
                     className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-1 text-xs font-medium text-gray-700 transition hover:bg-gray-100"

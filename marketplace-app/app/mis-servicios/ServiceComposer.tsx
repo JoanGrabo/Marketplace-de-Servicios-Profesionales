@@ -52,7 +52,6 @@ export default function ServiceComposer({ sellerName, action, defaultCategory, i
   const [deliveryDays, setDeliveryDays] = useState<number | "">(initial?.deliveryDays ?? 7);
   const [fastDeliveryEnabled, setFastDeliveryEnabled] = useState(Boolean(initial?.fastDeliveryEnabled));
   const [fastDeliveryExtraEuros, setFastDeliveryExtraEuros] = useState<number | "">(initial?.fastDeliveryExtraEuros ?? "");
-  const [isPromoted, setIsPromoted] = useState(Boolean(initial?.isPromoted));
 
   const subcategories = SERVICE_SUBCATEGORIES[category] ?? [];
 
@@ -76,12 +75,11 @@ export default function ServiceComposer({ sellerName, action, defaultCategory, i
       title.trim().length >= SERVICE_LIMITS.titleMin &&
       title.trim().length <= SERVICE_LIMITS.titleMax &&
       Boolean(category) &&
-      Boolean(thumbnailUrl.trim()) &&
       priceOk &&
       deliveryOk &&
       fastOk
     );
-  }, [category, deliveryDays, fastDeliveryEnabled, fastDeliveryExtraEuros, priceEuros, thumbnailUrl, title]);
+  }, [category, deliveryDays, fastDeliveryEnabled, fastDeliveryExtraEuros, priceEuros, title]);
 
   async function onChangeThumbnail(file: File | null) {
     if (!file) return;
@@ -331,7 +329,9 @@ export default function ServiceComposer({ sellerName, action, defaultCategory, i
         <section className="space-y-4 border-t border-gray-100 pt-6">
           <h3 className="text-sm font-semibold uppercase tracking-widest text-gray-700">Imágenes</h3>
           <div className="space-y-2">
-            <label className="mb-1 block text-sm font-medium text-gray-700">Imagen principal *</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700">
+              Imagen principal <span className="text-gray-400">(opcional)</span>
+            </label>
             <div className="flex flex-wrap items-center gap-3">
               <label className="inline-flex cursor-pointer items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50">
                 {thumbnailUploading ? "Subiendo..." : "Adjuntar imagen"}
@@ -359,26 +359,6 @@ export default function ServiceComposer({ sellerName, action, defaultCategory, i
                 </a>
               </p>
             ) : null}
-          </div>
-        </section>
-
-        {/* Bloque: Promoción */}
-        <section className="space-y-4 border-t border-gray-100 pt-6">
-          <h3 className="text-sm font-semibold uppercase tracking-widest text-gray-700">Promocionar servicio</h3>
-          <div className="rounded-xl border border-gray-200 bg-white p-4">
-            <label className="flex items-start gap-3">
-              <input
-                type="checkbox"
-                name="isPromoted"
-                checked={isPromoted}
-                onChange={(e) => setIsPromoted(e.target.checked)}
-                className="mt-1 h-4 w-4 rounded border-gray-300 text-[var(--connectia-gold)] focus:ring-[var(--connectia-gold)]"
-              />
-              <div>
-                <p className="text-sm font-semibold text-gray-800">Quiero destacar este servicio</p>
-                <p className="text-xs text-gray-600">Los servicios destacados aparecen antes en el catálogo.</p>
-              </div>
-            </label>
           </div>
         </section>
 
@@ -416,11 +396,6 @@ export default function ServiceComposer({ sellerName, action, defaultCategory, i
                   <span className="rounded-full border border-gray-200 bg-white/80 px-2.5 py-1 text-[11px] font-semibold text-gray-800 backdrop-blur">
                     {category}
                   </span>
-                  {isPromoted && (
-                    <span className="rounded-full bg-[var(--connectia-gold)]/15 px-2.5 py-1 text-[11px] font-semibold text-[var(--connectia-gold)] ring-1 ring-[var(--connectia-gold)]/20">
-                      Destacado
-                    </span>
-                  )}
                 </div>
               </div>
               <div className="space-y-3 p-4">

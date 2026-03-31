@@ -39,8 +39,6 @@ export async function POST(req: Request) {
     body.fastDeliveryExtraEuros == null || body.fastDeliveryExtraEuros === ""
       ? undefined
       : Number(body.fastDeliveryExtraEuros);
-  const isPromoted = Boolean(body.isPromoted);
-
   const validation = validateServiceInput({
     title,
     category,
@@ -54,7 +52,6 @@ export async function POST(req: Request) {
     deliveryDays,
     fastDeliveryEnabled,
     fastDeliveryExtraEuros,
-    isPromoted,
   });
   if (!validation.ok || !validation.data) {
     return NextResponse.json(
@@ -86,7 +83,7 @@ export async function POST(req: Request) {
       deliveryDays: safe.deliveryDays,
       fastDeliveryEnabled: safe.fastDeliveryEnabled,
       fastDeliveryExtraCents: safe.fastDeliveryExtraCents,
-      isPromoted: safe.isPromoted,
+      isPromoted: false,
       active: true,
     },
   });

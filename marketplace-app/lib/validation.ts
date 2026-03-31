@@ -58,7 +58,6 @@ type ServiceInput = {
   deliveryDays: number;
   fastDeliveryEnabled?: boolean;
   fastDeliveryExtraEuros?: number;
-  isPromoted?: boolean;
 };
 
 export function normalizeEmail(raw: unknown): string {
@@ -88,12 +87,11 @@ export function validateServiceInput(input: ServiceInput): {
     description: string | null;
     includesText: string | null;
     requirementsText: string | null;
-    thumbnailUrl: string;
+    thumbnailUrl: string | null;
     priceCents: number;
     deliveryDays: number;
     fastDeliveryEnabled: boolean;
     fastDeliveryExtraCents: number | null;
-    isPromoted: boolean;
   };
 } {
   const title = input.title.trim();
@@ -108,7 +106,6 @@ export function validateServiceInput(input: ServiceInput): {
   const deliveryDays = Number(input.deliveryDays);
   const fastDeliveryEnabled = Boolean(input.fastDeliveryEnabled);
   const fastDeliveryExtraEuros = input.fastDeliveryExtraEuros == null ? null : Number(input.fastDeliveryExtraEuros);
-  const isPromoted = Boolean(input.isPromoted);
 
   const category = (SERVICE_CATEGORIES as readonly string[]).includes(categoryRaw)
     ? (categoryRaw as (typeof SERVICE_CATEGORIES)[number])
@@ -147,10 +144,6 @@ export function validateServiceInput(input: ServiceInput): {
       ok: false,
       message: `La descripción corta no puede superar ${SERVICE_LIMITS.shortDescriptionMax} caracteres.`,
     };
-  }
-
-  if (!thumbnailUrl) {
-    return { ok: false, message: "Debes añadir una imagen principal (URL) para la portada del servicio." };
   }
 
   if (
@@ -192,12 +185,11 @@ export function validateServiceInput(input: ServiceInput): {
       description: description || null,
       includesText: includesText || null,
       requirementsText: requirementsText || null,
-      thumbnailUrl,
+      thumbnailUrl: thumbnailUrl || null,
       priceCents: Math.round(priceEuros * 100),
       deliveryDays,
       fastDeliveryEnabled,
       fastDeliveryExtraCents: fastDeliveryEnabled ? Math.round((fastDeliveryExtraEuros as number) * 100) : null,
-      isPromoted,
     },
   };
 }

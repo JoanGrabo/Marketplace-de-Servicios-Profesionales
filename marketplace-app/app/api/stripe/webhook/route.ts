@@ -29,9 +29,10 @@ export async function POST(req: Request) {
       const session = event.data.object as unknown as {
         id: string;
         payment_intent?: string | null;
-        metadata?: { orderId?: string };
+        metadata?: { orderId?: string; purpose?: string; serviceId?: string; promotionDays?: string };
       };
       const orderId = session.metadata?.orderId;
+      const purpose = session.metadata?.purpose;
       if (orderId) {
         await prisma.order.updateMany({
           where: { id: orderId, status: "pending" },
@@ -51,6 +52,19 @@ export async function POST(req: Request) {
             stripePaymentIntentId: session.payment_intent ?? null,
           },
         });
+      }
+
+      if (purpose === "promote_service") {
+        const serviceId = session.metadata?.serviceId;
+        const daysRaw = Number(session.metadata?.promotionDays ?? "");
+        const days = Number.isFinite(daysRaw) && daysRaw > 0 ? Math.floor(daysRaw) : 30;
+        if (serviceId) {
+          const promoExpiresAt = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
+          await prisma.service.updateMany({
+            where: { id: serviceId },
+            data: { isPromoted: true, promoExpiresAt },
+          });
+        }
       }
     }
 

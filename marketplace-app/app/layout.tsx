@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import Script from "next/script";
 import "./globals.css";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
@@ -11,6 +12,9 @@ export const metadata: Metadata = {
   description:
     "Marketplace especializado: servicios profesionales de arquitectura y asesoría legal. Contrata o publica con claridad.",
   icons: { icon: "/connectia-logo.png" },
+  other: {
+    "google-adsense-account": "ca-pub-4967206150420468",
+  },
 };
 
 export default async function RootLayout({
@@ -41,6 +45,12 @@ export default async function RootLayout({
   return (
     <html lang="es">
       <body className="antialiased min-h-screen bg-gray-50 text-[var(--connectia-gray)]">
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4967206150420468"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
         <header className="border-b border-gray-200 bg-white shadow-sm">
           <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
             <Link href="/" className="flex shrink-0 items-center gap-3">
