@@ -9,13 +9,25 @@ type Params = {
   params: {
     id: string;
   };
+  searchParams?: Record<string, string | string[] | undefined>;
 };
 
 export const dynamic = "force-dynamic";
 
-export default async function EditarServicioPage({ params }: Params) {
+function getPromotionOffer() {
+  const priceRaw = Number(process.env.PROMOTION_PRICE_CENTS ?? "");
+  const daysRaw = Number(process.env.PROMOTION_DAYS ?? "");
+  const priceCents = Number.isFinite(priceRaw) && priceRaw > 0 ? Math.floor(priceRaw) : 499;
+  const days = Number.isFinite(daysRaw) && daysRaw > 0 ? Math.floor(daysRaw) : 7;
+  return { priceCents, days };
+}
+
+export default async function EditarServicioPage({ params, searchParams }: Params) {
   const user = await getCurrentUser();
   if (!user) redirect("/auth/login");
+
+  const promotionOffer = getPromotionOffer();
+  const promote = String(searchParams?.promote ?? "") === "1";
 
   const servicio = await prisma.service.findFirst({
     where: {
@@ -110,6 +122,8 @@ export default async function EditarServicioPage({ params }: Params) {
         sellerName={getPublicProfileName(user)}
         serviceId={servicio.id}
         promotionActive={promotionActive}
+        promoteOnLoad={promote}
+        promotionOffer={promotionOffer}
         initial={servicio}
         action={updateService}
       />

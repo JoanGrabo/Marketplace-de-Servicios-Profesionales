@@ -10,6 +10,7 @@ type Props = {
   sellerName: string;
   action: (formData: FormData) => void;
   defaultCategory?: Category;
+  promotionOffer?: { priceCents: number; days: number };
   initial?: {
     category?: Category | null;
     subcategory?: string | null;
@@ -52,6 +53,7 @@ export default function ServiceComposer({ sellerName, action, defaultCategory, i
   const [deliveryDays, setDeliveryDays] = useState<number | "">(initial?.deliveryDays ?? 7);
   const [fastDeliveryEnabled, setFastDeliveryEnabled] = useState(Boolean(initial?.fastDeliveryEnabled));
   const [fastDeliveryExtraEuros, setFastDeliveryExtraEuros] = useState<number | "">(initial?.fastDeliveryExtraEuros ?? "");
+  const [promoteAfterPublish, setPromoteAfterPublish] = useState(false);
 
   const subcategories = SERVICE_SUBCATEGORIES[category] ?? [];
 
@@ -290,6 +292,32 @@ export default function ServiceComposer({ sellerName, action, defaultCategory, i
               />
             </div>
           </div>
+
+          {promotionOffer ? (
+            <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
+              <label className="flex items-start gap-3">
+                <input
+                  type="checkbox"
+                  name="promoteAfterPublish"
+                  checked={promoteAfterPublish}
+                  onChange={(e) => setPromoteAfterPublish(e.target.checked)}
+                  className="mt-1 h-4 w-4 rounded border-amber-300 text-[var(--connectia-gold)] focus:ring-[var(--connectia-gold)]"
+                />
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-amber-900">
+                    Destacar al publicar{" "}
+                    <span className="font-semibold text-amber-900/80">
+                      ({Intl.NumberFormat("es-ES", { style: "currency", currency: "EUR" }).format(promotionOffer.priceCents / 100)} ·{" "}
+                      {promotionOffer.days} {promotionOffer.days === 1 ? "día" : "días"})
+                    </span>
+                  </p>
+                  <p className="mt-0.5 text-xs text-amber-800/90">
+                    Si lo marcas, al publicar te llevaremos a Stripe para pagar el destacado. Si no lo marcas, publicarás sin coste extra.
+                  </p>
+                </div>
+              </label>
+            </div>
+          ) : null}
 
           <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
             <label className="flex items-start gap-3">

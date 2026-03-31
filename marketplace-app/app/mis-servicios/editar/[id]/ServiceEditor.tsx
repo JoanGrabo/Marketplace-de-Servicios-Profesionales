@@ -23,6 +23,8 @@ type Props = {
   sellerName: string;
   serviceId: string;
   promotionActive: boolean;
+  promoteOnLoad?: boolean;
+  promotionOffer?: { priceCents: number; days: number };
   initial: Service;
   action: (formData: FormData) => void;
 };
@@ -44,7 +46,7 @@ export default function ServiceEditor({ sellerName, serviceId, promotionActive, 
               Destacado activo
             </span>
           ) : (
-            <PromoteServiceButton serviceId={serviceId} />
+            <PromoteServiceButton serviceId={serviceId} offer={promotionOffer} autoStart={promoteOnLoad} />
           )}
         </div>
       </div>

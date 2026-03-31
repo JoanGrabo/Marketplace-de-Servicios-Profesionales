@@ -9,9 +9,19 @@ import PromoteServiceButton from "@/app/mis-servicios/_components/PromoteService
 
 export const dynamic = "force-dynamic";
 
+function getPromotionOffer() {
+  const priceRaw = Number(process.env.PROMOTION_PRICE_CENTS ?? "");
+  const daysRaw = Number(process.env.PROMOTION_DAYS ?? "");
+  const priceCents = Number.isFinite(priceRaw) && priceRaw > 0 ? Math.floor(priceRaw) : 499;
+  const days = Number.isFinite(daysRaw) && daysRaw > 0 ? Math.floor(daysRaw) : 7;
+  return { priceCents, days };
+}
+
 export default async function MisServiciosPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/auth/login");
+
+  const promotionOffer = getPromotionOffer();
 
   const services = await prisma.service.findMany({
     where: { profileId: user.id },
@@ -42,6 +52,7 @@ export default async function MisServiciosPage() {
     const priceEuros = Number(formData.get("priceEuros") ?? 0);
     const deliveryDays = Number(formData.get("deliveryDays") ?? 7);
     const fastDeliveryEnabled = formData.get("fastDeliveryEnabled") === "on";
+    const promoteAfterPublish = formData.get("promoteAfterPublish") === "on";
     const fastDeliveryExtraEurosRaw = formData.get("fastDeliveryExtraEuros");
     const fastDeliveryExtraEuros =
       fastDeliveryExtraEurosRaw == null || fastDeliveryExtraEurosRaw === ""
@@ -95,8 +106,8 @@ export default async function MisServiciosPage() {
       select: { id: true },
     });
 
-    // Después de publicar, llevamos al usuario a editar para “enganchar” el destacado.
-    redirect(`/mis-servicios/editar/${created.id}?new=1`);
+    // Después de publicar, si marcó “Destacar”, llevamos a editar y autoiniciamos el pago.
+    redirect(`/mis-servicios/editar/${created.id}?new=1${promoteAfterPublish ? "&promote=1" : ""}`);
   }
 
   return (
@@ -109,7 +120,7 @@ export default async function MisServiciosPage() {
       </p>
 
       <div className="mb-10">
-        <ServiceComposer sellerName={getPublicProfileName(user)} action={createService} />
+        <ServiceComposer sellerName={getPublicProfileName(user)} action={createService} promotionOffer={promotionOffer} />
       </div>
 
       <h2 className="mb-4 text-lg font-semibold text-[var(--connectia-gray)]">
