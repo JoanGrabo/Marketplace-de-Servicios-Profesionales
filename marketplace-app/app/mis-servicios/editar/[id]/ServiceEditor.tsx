@@ -29,7 +29,15 @@ type Props = {
   action: (formData: FormData) => void;
 };
 
-export default function ServiceEditor({ sellerName, serviceId, promotionActive, initial, action }: Props) {
+export default function ServiceEditor({
+  sellerName,
+  serviceId,
+  promotionActive,
+  promoteOnLoad,
+  promotionOffer,
+  initial,
+  action,
+}: Props) {
   return (
     <div className="space-y-6">
       <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
