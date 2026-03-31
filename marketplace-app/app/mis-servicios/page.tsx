@@ -22,6 +22,7 @@ export default async function MisServiciosPage() {
   if (!user) redirect("/auth/login");
 
   const promotionOffer = getPromotionOffer();
+  const now = new Date();
 
   const services = await prisma.service.findMany({
     where: { profileId: user.id },
@@ -164,7 +165,26 @@ export default async function MisServiciosPage() {
                   </div>
                 </div>
                 <div className="flex flex-col items-end gap-1">
-                  {!s.isPromoted ? <PromoteServiceButton serviceId={s.id} /> : null}
+                  {(() => {
+                    const promotionActive = Boolean(s.isPromoted && (s as any).promoExpiresAt && (s as any).promoExpiresAt > now);
+                    if (promotionActive) {
+                      const until = new Date((s as any).promoExpiresAt);
+                      const untilLabel = Intl.DateTimeFormat("es-ES", { dateStyle: "medium" }).format(until);
+                      return (
+                        <div className="flex flex-col items-end gap-1">
+                          <span className="inline-flex items-center rounded-full bg-[var(--connectia-gold)]/15 px-3 py-1 text-[11px] font-semibold text-[var(--connectia-gold)] ring-1 ring-[var(--connectia-gold)]/20">
+                            Destacado hasta {untilLabel}
+                          </span>
+                          <p className="text-right text-[11px] text-gray-500">
+                            Apareces más arriba en el catálogo.
+                          </p>
+                        </div>
+                      );
+                    }
+                    return (
+                      <PromoteServiceButton serviceId={s.id} offer={promotionOffer} />
+                    );
+                  })()}
                   <a
                     href={`/mis-servicios/editar/${s.id}`}
                     className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-1 text-xs font-medium text-gray-700 transition hover:bg-gray-100"
