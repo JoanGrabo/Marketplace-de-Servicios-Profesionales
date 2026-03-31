@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { getPublicProfileName, truncateText } from "@/lib/publicProfile";
 import ServiceCard from "@/app/servicios/_components/ServiceCard";
+import { Prisma } from "@prisma/client";
 
 export const metadata: Metadata = {
   title: "Servicios — CONNECTIA",
@@ -43,15 +44,15 @@ export default async function ServiciosPage({ searchParams }: ServiciosPageProps
 
   const CATEGORIES = ["Arquitectura", "Legal"] as const;
 
-  const baseWhere = {
+  const baseWhere: Prisma.ServiceWhereInput = {
     active: true,
     ...(category ? { category } : {}),
     ...(q
       ? {
           OR: [
-            { title: { contains: q, mode: "insensitive" } },
-            { description: { contains: q, mode: "insensitive" } },
-            { profile: { displayName: { contains: q, mode: "insensitive" } } },
+            { title: { contains: q, mode: Prisma.QueryMode.insensitive } },
+            { description: { contains: q, mode: Prisma.QueryMode.insensitive } },
+            { profile: { displayName: { contains: q, mode: Prisma.QueryMode.insensitive } } },
           ],
         }
       : {}),
@@ -71,7 +72,7 @@ export default async function ServiciosPage({ searchParams }: ServiciosPageProps
           },
         }
       : {}),
-  } as const;
+  };
 
   const select = {
     id: true,
