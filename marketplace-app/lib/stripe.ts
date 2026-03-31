@@ -19,7 +19,10 @@ export function getStripeClient(): Stripe {
 }
 
 export function getAppBaseUrl(): string {
-  const baseUrl = process.env.APP_BASE_URL?.replace(/\/$/, "");
+  const raw = process.env.APP_BASE_URL ?? "";
+  // Soporta el caso típico de `.env` con comentario al final: APP_BASE_URL="https://..." # comentario
+  const withoutInlineComment = raw.split(/\s+#/)[0]?.trim() ?? "";
+  const baseUrl = withoutInlineComment.replace(/\/$/, "");
   if (!baseUrl) {
     if (process.env.NODE_ENV !== "production") return "http://localhost:3000";
     throw new Error("APP_BASE_URL no está configurada.");

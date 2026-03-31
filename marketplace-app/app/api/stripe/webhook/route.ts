@@ -5,6 +5,9 @@ import { getStripeClient } from "@/lib/stripe";
 function getWebhookSecret(): string {
   const secret = process.env.STRIPE_WEBHOOK_SECRET;
   if (!secret) throw new Error("STRIPE_WEBHOOK_SECRET no está configurada.");
+  if (!secret.startsWith("whsec_")) {
+    throw new Error('STRIPE_WEBHOOK_SECRET no parece válida (debe empezar por "whsec_").');
+  }
   return secret;
 }
 

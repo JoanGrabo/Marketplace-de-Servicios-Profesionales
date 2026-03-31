@@ -44,5 +44,6 @@ export function getAppBaseUrl(): string {
   if (!appBaseUrl) {
     throw new Error("Falta APP_BASE_URL para construir enlaces de verificación.");
   }
-  return appBaseUrl.replace(/\/$/, "");
+  const withoutInlineComment = appBaseUrl.split(/\s+#/)[0]?.trim() ?? "";
+  return withoutInlineComment.replace(/\/$/, "");
 }
