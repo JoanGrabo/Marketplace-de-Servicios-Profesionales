@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ConfirmPromotion from "./ConfirmPromotion";
 
 type Props = {
   searchParams?: {
@@ -21,19 +22,20 @@ export default function PagoExitoPage({ searchParams }: Props) {
             </>
           ) : null}
         </p>
+        <ConfirmPromotion sessionId={sessionId} />
       </div>
       <div className="mt-6 flex flex-wrap gap-3">
         <Link
-          href="/mensajes"
+          href="/mis-servicios"
           className="rounded-lg bg-[var(--connectia-gold)] px-5 py-2 text-sm font-semibold text-white transition hover:opacity-90"
         >
-          Ir a mensajes
+          Ir a Mis servicios
         </Link>
         <Link
-          href="/servicios"
+          href="/mensajes"
           className="rounded-lg border border-gray-300 px-5 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
         >
-          Seguir explorando
+          Ir a Mensajes
         </Link>
       </div>
     </main>

@@ -36,10 +36,18 @@ export async function POST(req: Request) {
 
     const service = await prisma.service.findFirst({
       where: { id: serviceId, profileId: user.id, active: true },
-      select: { id: true, title: true },
+      select: { id: true, title: true, isPromoted: true, promoExpiresAt: true },
     });
     if (!service) {
       return NextResponse.json({ ok: false, message: "Servicio no encontrado." }, { status: 404 });
+    }
+    const now = new Date();
+    const promotionActive = Boolean(service.isPromoted && service.promoExpiresAt && service.promoExpiresAt > now);
+    if (promotionActive) {
+      return NextResponse.json(
+        { ok: false, message: "Este servicio ya está destacado actualmente." },
+        { status: 400 },
+      );
     }
 
     const stripe = getStripeClient();
