@@ -9,6 +9,7 @@ export type HomeFeaturedService = {
   category: string | null;
   thumbnailUrl: string | null;
   isPromoted: boolean;
+  promoExpiresAt: Date | null;
   priceCents: number;
   deliveryDays: number;
   updatedAt: Date;
@@ -26,6 +27,7 @@ export type HomeFeaturedItem = {
 
 /** Servicios para la home: prioriza promocionados y recientes. */
 export async function getFeaturedForHome(limit = 6): Promise<HomeFeaturedItem[]> {
+  const now = new Date();
   const rows = await prisma.service.findMany({
     where: { active: true },
     orderBy: [{ isPromoted: "desc" }, { promoExpiresAt: "desc" }, { updatedAt: "desc" }],
@@ -39,6 +41,7 @@ export async function getFeaturedForHome(limit = 6): Promise<HomeFeaturedItem[]>
       category: true,
       thumbnailUrl: true,
       isPromoted: true,
+      promoExpiresAt: true,
       priceCents: true,
       deliveryDays: true,
       updatedAt: true,
@@ -47,6 +50,13 @@ export async function getFeaturedForHome(limit = 6): Promise<HomeFeaturedItem[]>
       },
     },
   });
+
+  for (const s of rows) {
+    if (s.isPromoted && s.promoExpiresAt && s.promoExpiresAt <= now) {
+      // No “contar” como destacado si ya caducó (sin tocar BD).
+      (s as any).isPromoted = false;
+    }
+  }
 
   const ids = rows.map((r) => r.id);
   const convoStats =

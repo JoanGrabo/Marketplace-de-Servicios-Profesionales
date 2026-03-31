@@ -20,6 +20,7 @@ type Props = {
     thumbnailUrl?: string | null;
     shortDescription?: string | null;
     isPromoted?: boolean | null;
+    promoExpiresAt?: Date | null;
     updatedAt?: Date;
     priceCents: number;
     deliveryDays: number;
@@ -45,7 +46,7 @@ export default function ServiceCard({ service, stats, showMessageButton = true }
 
   const isFast = service.deliveryDays <= 3;
   const isBestSeller = convoCount >= 3;
-  const isPromoted = Boolean(service.isPromoted);
+  const isPromoted = Boolean(service.isPromoted && service.promoExpiresAt && service.promoExpiresAt > new Date());
 
   const primaryHref = `/servicios/${encodeURIComponent(service.slug)}`;
   const contactHref = `/servicios/${encodeURIComponent(service.slug)}/contactar`;

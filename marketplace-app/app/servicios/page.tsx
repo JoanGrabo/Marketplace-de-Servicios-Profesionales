@@ -30,6 +30,7 @@ export default async function ServiciosPage({ searchParams }: ServiciosPageProps
     ? "/mis-servicios"
     : `/auth/login?next=${encodeURIComponent("/mis-servicios")}`;
 
+  const now = new Date();
   const q = String(searchParams?.q ?? "").trim();
   const minRaw = String(searchParams?.min ?? "").trim();
   const maxRaw = String(searchParams?.max ?? "").trim();
@@ -42,58 +43,75 @@ export default async function ServiciosPage({ searchParams }: ServiciosPageProps
 
   const CATEGORIES = ["Arquitectura", "Legal"] as const;
 
-  const servicios = await prisma.service.findMany({
-    where: {
-      active: true,
-      ...(category ? { category } : {}),
-      ...(q
-        ? {
-            OR: [
-              { title: { contains: q, mode: "insensitive" } },
-              { description: { contains: q, mode: "insensitive" } },
-              { profile: { displayName: { contains: q, mode: "insensitive" } } },
-            ],
-          }
-        : {}),
-      ...(typeof delivery === "number" && Number.isFinite(delivery) && delivery > 0
-        ? { deliveryDays: { lte: Math.floor(delivery) } }
-        : {}),
-      ...(typeof min === "number" && Number.isFinite(min) && min >= 0
-        ? { priceCents: { gte: Math.round(min * 100) } }
-        : {}),
-      ...(typeof max === "number" && Number.isFinite(max) && max > 0
-        ? {
-            priceCents: {
-              ...(typeof min === "number" && Number.isFinite(min) && min >= 0
-                ? { gte: Math.round(min * 100) }
-                : {}),
-              lte: Math.round(max * 100),
-            },
-          }
-        : {}),
+  const baseWhere = {
+    active: true,
+    ...(category ? { category } : {}),
+    ...(q
+      ? {
+          OR: [
+            { title: { contains: q, mode: "insensitive" } },
+            { description: { contains: q, mode: "insensitive" } },
+            { profile: { displayName: { contains: q, mode: "insensitive" } } },
+          ],
+        }
+      : {}),
+    ...(typeof delivery === "number" && Number.isFinite(delivery) && delivery > 0
+      ? { deliveryDays: { lte: Math.floor(delivery) } }
+      : {}),
+    ...(typeof min === "number" && Number.isFinite(min) && min >= 0
+      ? { priceCents: { gte: Math.round(min * 100) } }
+      : {}),
+    ...(typeof max === "number" && Number.isFinite(max) && max > 0
+      ? {
+          priceCents: {
+            ...(typeof min === "number" && Number.isFinite(min) && min >= 0
+              ? { gte: Math.round(min * 100) }
+              : {}),
+            lte: Math.round(max * 100),
+          },
+        }
+      : {}),
+  } as const;
+
+  const select = {
+    id: true,
+    slug: true,
+    title: true,
+    description: true,
+    shortDescription: true,
+    category: true,
+    thumbnailUrl: true,
+    isPromoted: true,
+    promoExpiresAt: true,
+    priceCents: true,
+    deliveryDays: true,
+    updatedAt: true,
+    profile: {
+      select: { id: true, displayName: true, avatarUrl: true },
     },
-    orderBy: [
-      { isPromoted: "desc" },
-      { promoExpiresAt: "desc" },
-      { createdAt: "desc" },
-    ],
-    select: {
-      id: true,
-      slug: true,
-      title: true,
-      description: true,
-      shortDescription: true,
-      category: true,
-      thumbnailUrl: true,
-      isPromoted: true,
-      priceCents: true,
-      deliveryDays: true,
-      updatedAt: true,
-      profile: {
-        select: { id: true, displayName: true, avatarUrl: true },
+  } as const;
+
+  const [promoted, regular] = await Promise.all([
+    prisma.service.findMany({
+      where: {
+        ...baseWhere,
+        isPromoted: true,
+        promoExpiresAt: { gt: now },
       },
-    },
-  });
+      orderBy: [{ promoExpiresAt: "desc" }, { createdAt: "desc" }],
+      select,
+    }),
+    prisma.service.findMany({
+      where: {
+        ...baseWhere,
+        OR: [{ isPromoted: false }, { promoExpiresAt: null }, { promoExpiresAt: { lte: now } }],
+      },
+      orderBy: [{ createdAt: "desc" }],
+      select,
+    }),
+  ]);
+
+  const servicios = [...promoted, ...regular];
 
   const serviceIds = servicios.map((s) => s.id);
   const convoStats = serviceIds.length

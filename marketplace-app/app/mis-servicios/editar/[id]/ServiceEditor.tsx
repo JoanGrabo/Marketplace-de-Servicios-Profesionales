@@ -1,6 +1,7 @@
 "use client";
 
 import ServiceComposer from "@/app/mis-servicios/ServiceComposer";
+import PromoteServiceButton from "@/app/mis-servicios/_components/PromoteServiceButton";
 
 type Service = {
   title: string;
@@ -20,15 +21,32 @@ type Service = {
 
 type Props = {
   sellerName: string;
+  serviceId: string;
+  promotionActive: boolean;
   initial: Service;
   action: (formData: FormData) => void;
 };
 
-export default function ServiceEditor({ sellerName, initial, action }: Props) {
+export default function ServiceEditor({ sellerName, serviceId, promotionActive, initial, action }: Props) {
   return (
     <div className="space-y-6">
       <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
-        Estás editando tu servicio. Puedes actualizar campos y volver a publicar los cambios.
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <p className="font-semibold">Estás editando tu servicio.</p>
+            <p className="mt-1 text-amber-800/90">
+              Puedes actualizar campos y volver a publicar los cambios. Si quieres aparecer primero en el catálogo,
+              puedes destacar el servicio mediante pago.
+            </p>
+          </div>
+          {promotionActive ? (
+            <span className="inline-flex shrink-0 items-center rounded-full bg-[var(--connectia-gold)]/15 px-3 py-1 text-xs font-semibold text-[var(--connectia-gold)] ring-1 ring-[var(--connectia-gold)]/20">
+              Destacado activo
+            </span>
+          ) : (
+            <PromoteServiceButton serviceId={serviceId} />
+          )}
+        </div>
       </div>
       <ServiceComposer
         sellerName={sellerName}
@@ -47,7 +65,6 @@ export default function ServiceEditor({ sellerName, initial, action }: Props) {
           fastDeliveryEnabled: initial.fastDeliveryEnabled,
           fastDeliveryExtraEuros:
             initial.fastDeliveryExtraCents == null ? null : Math.round(initial.fastDeliveryExtraCents / 100),
-          isPromoted: initial.isPromoted,
         }}
       />
     </div>

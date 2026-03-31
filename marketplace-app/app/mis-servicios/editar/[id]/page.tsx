@@ -29,6 +29,8 @@ export default async function EditarServicioPage({ params }: Params) {
   }
 
   const serviceId = servicio.id;
+  const now = new Date();
+  const promotionActive = Boolean(servicio.isPromoted && servicio.promoExpiresAt && servicio.promoExpiresAt > now);
 
   async function updateService(formData: FormData) {
     "use server";
@@ -104,7 +106,13 @@ export default async function EditarServicioPage({ params }: Params) {
       <h1 className="mb-2 text-3xl font-bold text-[var(--connectia-gray)]">Editar servicio</h1>
       <p className="mb-8 text-gray-600">Actualiza la ficha para que se vea mejor en el catálogo.</p>
 
-      <ServiceEditor sellerName={getPublicProfileName(user)} initial={servicio} action={updateService} />
+      <ServiceEditor
+        sellerName={getPublicProfileName(user)}
+        serviceId={servicio.id}
+        promotionActive={promotionActive}
+        initial={servicio}
+        action={updateService}
+      />
 
       <div className="mt-6">
         <a
