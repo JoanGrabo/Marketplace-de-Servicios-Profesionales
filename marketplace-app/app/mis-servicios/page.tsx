@@ -73,7 +73,7 @@ export default async function MisServiciosPage() {
       .replace(/(^-|-$)/g, "");
     const slug = `${slugBase}-${Date.now().toString(36)}`;
 
-    await prisma.service.create({
+    const created = await prisma.service.create({
       data: {
         profileId: current.id,
         title: safe.title,
@@ -92,9 +92,11 @@ export default async function MisServiciosPage() {
         isPromoted: false,
         active: true,
       },
+      select: { id: true },
     });
 
-    redirect("/mis-servicios");
+    // Después de publicar, llevamos al usuario a editar para “enganchar” el destacado.
+    redirect(`/mis-servicios/editar/${created.id}?new=1`);
   }
 
   return (

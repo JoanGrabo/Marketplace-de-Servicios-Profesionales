@@ -39,7 +39,8 @@ export default function PromoteServiceButton({ serviceId }: { serviceId: string 
       >
         {loading ? "Redirigiendo..." : "Destacar (pago)"}
       </button>
-      {error ? <p className="text-right text-[11px] text-red-600">{error}</p> : null}
+      <p className="text-right text-[11px] text-gray-500">Aparece primero en “Servicios”.</p>
+      {error ? <p className="max-w-[260px] text-right text-[11px] text-red-600">{error}</p> : null}
     </div>
   );
 }

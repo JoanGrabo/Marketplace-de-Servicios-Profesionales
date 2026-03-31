@@ -87,10 +87,8 @@ export async function POST(req: Request) {
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error("stripe checkout:", e);
-    return NextResponse.json(
-      { ok: false, message: "No se pudo iniciar el pago. Inténtalo más tarde." },
-      { status: 500 },
-    );
+    const msg = e instanceof Error ? e.message : "No se pudo iniciar el pago. Inténtalo más tarde.";
+    return NextResponse.json({ ok: false, message: msg }, { status: 500 });
   }
 }
 

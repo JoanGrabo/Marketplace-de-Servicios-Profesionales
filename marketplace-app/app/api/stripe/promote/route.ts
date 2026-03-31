@@ -93,7 +93,8 @@ export async function POST(req: Request) {
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error("stripe promote:", e);
-    return NextResponse.json({ ok: false, message: "No se pudo iniciar el pago." }, { status: 500 });
+    const msg = e instanceof Error ? e.message : "No se pudo iniciar el pago.";
+    return NextResponse.json({ ok: false, message: msg }, { status: 500 });
   }
 }
 

@@ -5,6 +5,9 @@ function getStripeSecretKey(): string {
   if (!key) {
     throw new Error("STRIPE_SECRET_KEY no está configurada.");
   }
+  if (!key.startsWith("sk_")) {
+    throw new Error('STRIPE_SECRET_KEY no parece válida (debe empezar por "sk_").');
+  }
   return key;
 }
 
@@ -20,6 +23,9 @@ export function getAppBaseUrl(): string {
   if (!baseUrl) {
     if (process.env.NODE_ENV !== "production") return "http://localhost:3000";
     throw new Error("APP_BASE_URL no está configurada.");
+  }
+  if (!/^https?:\/\//i.test(baseUrl)) {
+    throw new Error('APP_BASE_URL debe empezar por "http://" o "https://".');
   }
   return baseUrl;
 }
