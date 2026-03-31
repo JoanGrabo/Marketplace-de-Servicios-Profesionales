@@ -33,6 +33,8 @@ function clampText(text: string, max: number) {
 }
 
 export default function ServiceComposer({ sellerName, action, defaultCategory, initial }: Props) {
+  // `promotionOffer` es opcional y solo se muestra en creación si se pasa desde el servidor.
+  const promotionOffer = (arguments[0] as Props).promotionOffer;
   const [category, setCategory] = useState<Category>(
     initial?.category ?? defaultCategory ?? "Arquitectura",
   );
