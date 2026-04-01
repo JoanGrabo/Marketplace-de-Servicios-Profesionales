@@ -2,12 +2,19 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
+import { isAdmin } from "@/lib/admin";
 import { validateServiceInput } from "@/lib/validation";
 import { getPublicProfileName } from "@/lib/publicProfile";
 import ServiceComposer from "@/app/mis-servicios/ServiceComposer";
 import PromoteServiceButton from "@/app/mis-servicios/_components/PromoteServiceButton";
 
 export const dynamic = "force-dynamic";
+
+type Props = {
+  searchParams?: {
+    limit?: string;
+  };
+};
 
 function getPromotionOffer() {
   const priceRaw = Number(process.env.PROMOTION_PRICE_CENTS ?? "");
@@ -17,10 +24,11 @@ function getPromotionOffer() {
   return { priceCents, days };
 }
 
-export default async function MisServiciosPage() {
+export default async function MisServiciosPage({ searchParams }: Props) {
   const user = await getCurrentUser();
   if (!user) redirect("/auth/login");
 
+  const admin = isAdmin(user);
   const promotionOffer = getPromotionOffer();
   const now = new Date();
 
@@ -41,6 +49,14 @@ export default async function MisServiciosPage() {
     "use server";
     const current = await getCurrentUser();
     if (!current) redirect("/auth/login");
+    const adminCurrent = isAdmin(current);
+
+    if (!adminCurrent) {
+      const count = await prisma.service.count({ where: { profileId: current.id } });
+      if (count >= 3) {
+        redirect("/mis-servicios?limit=1");
+      }
+    }
 
     const title = String(formData.get("title") ?? "");
     const category = String(formData.get("category") ?? "");
@@ -119,6 +135,12 @@ export default async function MisServiciosPage() {
       <p className="mb-8 text-gray-600">
         Crea y gestiona los servicios que ofreces en CONNECTIA.
       </p>
+      {String(searchParams?.limit ?? "") === "1" && (
+        <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+          Has alcanzado el límite de <strong>3 servicios</strong>. Para publicar más, elimina alguno o destaca los
+          actuales.
+        </div>
+      )}
 
       <div className="mb-10">
         <ServiceComposer sellerName={getPublicProfileName(user)} action={createService} promotionOffer={promotionOffer} />
@@ -224,6 +246,16 @@ export default async function MisServiciosPage() {
         </Link>
         .
       </p>
+
+      {admin && (
+        <p className="mt-3 text-sm text-gray-600">
+          Eres administrador. Acceso rápido a{" "}
+          <Link href="/admin" className="font-semibold text-[var(--connectia-gold)] hover:underline">
+            Administrador
+          </Link>
+          .
+        </p>
+      )}
     </main>
   );
 }

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { validateServiceInput } from "@/lib/validation";
+import { isAdmin } from "@/lib/admin";
 
 export async function GET() {
   const user = await getCurrentUser();
@@ -21,6 +22,16 @@ export async function POST(req: Request) {
   const user = await getCurrentUser();
   if (!user) {
     return NextResponse.json({ ok: false, message: "No autenticado" }, { status: 401 });
+  }
+
+  if (!isAdmin(user)) {
+    const count = await prisma.service.count({ where: { profileId: user.id } });
+    if (count >= 3) {
+      return NextResponse.json(
+        { ok: false, message: "Has alcanzado el límite de 3 servicios. Borra alguno para publicar más." },
+        { status: 403 },
+      );
+    }
   }
 
   const body = await req.json();
