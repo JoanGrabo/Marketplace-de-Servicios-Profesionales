@@ -167,20 +167,13 @@ export default async function ServiciosPage({ searchParams }: ServiciosPageProps
   return (
     <main className="bg-gradient-to-b from-white via-gray-50 to-gray-100">
       <section className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-        <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="max-w-2xl">
             <h1 className="text-3xl font-bold tracking-tight text-[var(--connectia-gray)] sm:text-4xl">
               Servicios
             </h1>
-            <p className="mt-2 text-sm text-gray-600 sm:text-base">
-              Encuentra servicios profesionales de <span className="font-semibold">arquitectura</span> y{" "}
-              <span className="font-semibold">asesoría legal</span>. Claros, comparables y listos para contratar.
-            </p>
           </div>
-          <div className="flex w-full flex-col gap-2 sm:w-auto sm:items-end sm:text-right">
-            <p className="text-sm leading-snug text-gray-600">
-              ¿Quieres ofrecer un servicio? Publícalo aquí.
-            </p>
+          <div className="flex w-full sm:w-auto sm:items-center">
             <Link
               href={crearServicioHref}
               className="inline-flex w-full items-center justify-center rounded-lg bg-[var(--connectia-gold)] px-5 py-2.5 text-center text-sm font-semibold text-white shadow-sm transition hover:opacity-90 sm:w-auto"
@@ -190,20 +183,7 @@ export default async function ServiciosPage({ searchParams }: ServiciosPageProps
           </div>
         </div>
 
-        <div className="mt-8 flex items-end justify-between gap-4">
-          <div>
-            <h2 className="text-xl font-semibold text-[var(--connectia-gray)] sm:text-2xl">Categorías</h2>
-            <p className="mt-1 text-sm text-gray-600">Explora rápido por tipo de servicio.</p>
-          </div>
-          <Link
-            href="#catalogo"
-            className="hidden text-sm font-semibold text-[var(--connectia-gold)] hover:underline sm:inline"
-          >
-            Ir al catálogo
-          </Link>
-        </div>
-
-        <div className="mt-4 flex gap-3 overflow-x-auto pb-2">
+        <div className="mt-5 flex gap-3 overflow-x-auto pb-2">
           <Link
             href="/servicios"
             className={`shrink-0 rounded-full border px-4 py-2 text-sm font-semibold transition ${
