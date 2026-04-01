@@ -43,6 +43,7 @@ export default function ServiceCard({ service, stats, showMessageButton = true }
 
   const title = service.title.length > 60 ? `${service.title.slice(0, 57)}...` : service.title;
   const sellerName = getPublicProfileName(service.profile as any);
+  const sellerHref = `/profesionales/${encodeURIComponent(service.profile.id)}`;
 
   const isFast = service.deliveryDays <= 3;
   const isBestSeller = convoCount >= 3;
@@ -134,7 +135,9 @@ export default function ServiceCard({ service, stats, showMessageButton = true }
               )}
             </div>
             <div className="min-w-0">
-              <p className="truncate text-xs font-semibold text-gray-800">{sellerName}</p>
+              <Link href={sellerHref} className="block truncate text-xs font-semibold text-gray-800 hover:underline">
+                {sellerName}
+              </Link>
               <p className="text-[11px] text-gray-500">Entrega en {service.deliveryDays} {service.deliveryDays === 1 ? "día" : "días"}</p>
             </div>
           </div>

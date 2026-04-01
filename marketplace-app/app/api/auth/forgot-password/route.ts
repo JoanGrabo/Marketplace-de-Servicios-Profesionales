@@ -3,9 +3,19 @@ import { prisma } from "@/lib/db";
 import { canSendMail } from "@/lib/mailer";
 import { createPasswordResetToken, sendPasswordResetEmail } from "@/lib/passwordReset";
 import { isValidEmail, normalizeEmail } from "@/lib/validation";
+import { rateLimit } from "@/lib/rateLimit";
 
 export async function POST(req: Request) {
   try {
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    const rl = rateLimit(`auth:forgot:${ip}`, { limit: 5, windowMs: 60_000 });
+    if (!rl.ok) {
+      return NextResponse.json(
+        { ok: false, message: `Demasiadas solicitudes. Espera ${rl.retryAfterSeconds}s.` },
+        { status: 429 },
+      );
+    }
+
     const body = await req.json();
     const email = normalizeEmail(body.email);
 

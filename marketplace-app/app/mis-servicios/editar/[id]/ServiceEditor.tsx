@@ -23,6 +23,7 @@ type Props = {
   sellerName: string;
   serviceId: string;
   promotionActive: boolean;
+  promotionUntilLabel?: string | null;
   promoteOnLoad?: boolean;
   promotionOffer?: { priceCents: number; days: number };
   initial: Service;
@@ -33,6 +34,7 @@ export default function ServiceEditor({
   sellerName,
   serviceId,
   promotionActive,
+  promotionUntilLabel,
   promoteOnLoad,
   promotionOffer,
   initial,
@@ -48,14 +50,17 @@ export default function ServiceEditor({
               Puedes actualizar campos y volver a publicar los cambios. Si quieres aparecer primero en el catálogo,
               puedes destacar el servicio mediante pago.
             </p>
+            {promotionActive && promotionUntilLabel ? (
+              <p className="mt-2 text-xs text-amber-800/90">
+                Destacado activo hasta <span className="font-semibold">{promotionUntilLabel}</span>.
+              </p>
+            ) : null}
           </div>
-          {promotionActive ? (
-            <span className="inline-flex shrink-0 items-center rounded-full bg-[var(--connectia-gold)]/15 px-3 py-1 text-xs font-semibold text-[var(--connectia-gold)] ring-1 ring-[var(--connectia-gold)]/20">
-              Destacado activo
-            </span>
-          ) : (
-            <PromoteServiceButton serviceId={serviceId} offer={promotionOffer} autoStart={promoteOnLoad} />
-          )}
+          <PromoteServiceButton
+            serviceId={serviceId}
+            offer={promotionOffer}
+            autoStart={!promotionActive && promoteOnLoad}
+          />
         </div>
       </div>
       <ServiceComposer

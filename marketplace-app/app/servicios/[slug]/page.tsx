@@ -54,7 +54,12 @@ export default async function ServicioDetallePage({ params }: ServicioDetallePro
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-y border-gray-100 py-4">
           <div className="text-sm text-gray-600">
             <div className="font-medium text-gray-700">Profesional</div>
-            <div>{getPublicProfileName(servicio.profile)}</div>
+            <Link
+              href={`/profesionales/${encodeURIComponent(servicio.profile.id)}`}
+              className="font-semibold text-[var(--connectia-gold)] hover:underline"
+            >
+              {getPublicProfileName(servicio.profile)}
+            </Link>
           </div>
           <div className="text-right">
             <div className="text-xs text-gray-500">Precio</div>

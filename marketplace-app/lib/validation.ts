@@ -4,6 +4,7 @@ export const SERVICE_LIMITS = {
   titleMin: 5,
   titleMax: 80,
   shortDescriptionMax: 120,
+  shortDescriptionMin: 20,
   descriptionMax: 1200,
   minPriceEuros: 1,
   maxPriceEuros: 200000,
@@ -143,6 +144,13 @@ export function validateServiceInput(input: ServiceInput): {
     return {
       ok: false,
       message: `La descripción corta no puede superar ${SERVICE_LIMITS.shortDescriptionMax} caracteres.`,
+    };
+  }
+
+  if (shortDescription.length < SERVICE_LIMITS.shortDescriptionMin) {
+    return {
+      ok: false,
+      message: `La descripción corta debe tener al menos ${SERVICE_LIMITS.shortDescriptionMin} caracteres.`,
     };
   }
 

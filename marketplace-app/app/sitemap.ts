@@ -8,6 +8,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     lastModified: new Date(),
   }));
 
+  if (process.env.SKIP_DB_SITEMAP === "1") {
+    return staticRoutes;
+  }
+
   const services = await prisma.service.findMany({
     where: { active: true },
     select: { slug: true, updatedAt: true },

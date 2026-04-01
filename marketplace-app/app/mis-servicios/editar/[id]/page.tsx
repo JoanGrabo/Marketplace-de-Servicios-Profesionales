@@ -43,6 +43,10 @@ export default async function EditarServicioPage({ params, searchParams }: Param
   const serviceId = servicio.id;
   const now = new Date();
   const promotionActive = Boolean(servicio.isPromoted && servicio.promoExpiresAt && servicio.promoExpiresAt > now);
+  const promotionUntilLabel =
+    servicio.promoExpiresAt && servicio.promoExpiresAt > now
+      ? Intl.DateTimeFormat("es-ES", { dateStyle: "medium" }).format(servicio.promoExpiresAt)
+      : null;
 
   async function updateService(formData: FormData) {
     "use server";
@@ -122,6 +126,7 @@ export default async function EditarServicioPage({ params, searchParams }: Param
         sellerName={getPublicProfileName(user)}
         serviceId={servicio.id}
         promotionActive={promotionActive}
+        promotionUntilLabel={promotionUntilLabel}
         promoteOnLoad={promote}
         promotionOffer={promotionOffer}
         initial={servicio}

@@ -193,7 +193,7 @@ export default function ServiceComposer({ sellerName, action, defaultCategory, i
 
           <div>
             <div className="flex items-end justify-between gap-3">
-              <label className="mb-1 block text-sm font-medium text-gray-700">Descripción corta</label>
+              <label className="mb-1 block text-sm font-medium text-gray-700">Descripción corta *</label>
               <span className="text-xs text-gray-500">
                 {clampText(shortDescription.trim(), SERVICE_LIMITS.shortDescriptionMax).length}/{SERVICE_LIMITS.shortDescriptionMax}
               </span>
@@ -202,6 +202,7 @@ export default function ServiceComposer({ sellerName, action, defaultCategory, i
               name="shortDescription"
               value={shortDescription}
               onChange={(e) => setShortDescription(clampText(e.target.value, SERVICE_LIMITS.shortDescriptionMax))}
+              required
               className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-[var(--connectia-gold)] focus:outline-none focus:ring-1 focus:ring-[var(--connectia-gold)]"
               placeholder="Resumen para el catálogo (máx. 120 caracteres)"
             />

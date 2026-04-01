@@ -7,6 +7,9 @@ import { prisma } from "@/lib/db";
  */
 export async function GET() {
   try {
+    if (process.env.SKIP_DB_HEALTH === "1") {
+      return NextResponse.json({ ok: true, database: "skipped" });
+    }
     await prisma.$queryRaw`SELECT 1`;
     return NextResponse.json({
       ok: true,

@@ -62,11 +62,14 @@ export async function POST(req: Request) {
         const daysRaw = Number(session.metadata?.promotionDays ?? "");
         const days = Number.isFinite(daysRaw) && daysRaw > 0 ? Math.floor(daysRaw) : 30;
         if (serviceId) {
-          const promoExpiresAt = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
-          await prisma.service.updateMany({
+          const now = new Date();
+          const svc = await prisma.service.findUnique({
             where: { id: serviceId },
-            data: { isPromoted: true, promoExpiresAt },
+            select: { promoExpiresAt: true },
           });
+          const base = svc?.promoExpiresAt && svc.promoExpiresAt > now ? svc.promoExpiresAt : now;
+          const promoExpiresAt = new Date(base.getTime() + days * 24 * 60 * 60 * 1000);
+          await prisma.service.updateMany({ where: { id: serviceId }, data: { isPromoted: true, promoExpiresAt } });
         }
       }
     }

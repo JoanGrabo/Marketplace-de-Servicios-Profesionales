@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { canSendMail, sendMail } from "@/lib/mailer";
 import { getMessageCooldownSeconds, validateMessageBody } from "@/lib/validation";
 import { resolveRouteParams, safeDecodeURIComponent } from "@/lib/routeParams";
+import { rateLimit } from "@/lib/rateLimit";
 
 type Params = {
   params: {
@@ -15,6 +16,15 @@ type Params = {
 
 export async function POST(req: Request, context: Params) {
   try {
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    const rl = rateLimit(`contact:${ip}`, { limit: 20, windowMs: 60_000 });
+    if (!rl.ok) {
+      return NextResponse.json(
+        { ok: false, message: `Demasiados mensajes. Espera ${rl.retryAfterSeconds}s.` },
+        { status: 429 },
+      );
+    }
+
     const { slug: rawSlug } = await resolveRouteParams(context.params);
     const slug = safeDecodeURIComponent(String(rawSlug ?? ""));
 

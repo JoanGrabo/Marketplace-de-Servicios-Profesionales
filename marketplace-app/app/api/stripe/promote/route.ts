@@ -41,14 +41,6 @@ export async function POST(req: Request) {
     if (!service) {
       return NextResponse.json({ ok: false, message: "Servicio no encontrado." }, { status: 404 });
     }
-    const now = new Date();
-    const promotionActive = Boolean(service.isPromoted && service.promoExpiresAt && service.promoExpiresAt > now);
-    if (promotionActive) {
-      return NextResponse.json(
-        { ok: false, message: "Este servicio ya está destacado actualmente." },
-        { status: 400 },
-      );
-    }
 
     const stripe = getStripeClient();
     const baseUrl = getAppBaseUrl();
@@ -78,7 +70,7 @@ export async function POST(req: Request) {
             currency: "eur",
             unit_amount: amount,
             product_data: {
-              name: `Destacar servicio (${days} días)`,
+              name: `Destacar/renovar servicio (${days} días)`,
               description: service.title,
             },
           },

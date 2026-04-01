@@ -7,9 +7,19 @@ import {
 import { isValidEmail, normalizeEmail } from "@/lib/validation";
 import { buildSessionClearCookie, buildSessionSetCookie } from "@/lib/sessionCookie";
 import bcrypt from "bcryptjs";
+import { rateLimit } from "@/lib/rateLimit";
 
 export async function POST(req: Request) {
   try {
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    const rl = rateLimit(`auth:login:${ip}`, { limit: 10, windowMs: 60_000 });
+    if (!rl.ok) {
+      return NextResponse.json(
+        { ok: false, message: `Demasiados intentos. Espera ${rl.retryAfterSeconds}s.` },
+        { status: 429 },
+      );
+    }
+
     const body = await req.json();
     const email = normalizeEmail(body.email);
     const password = body.password as string | undefined;
