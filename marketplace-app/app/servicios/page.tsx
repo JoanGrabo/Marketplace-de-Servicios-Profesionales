@@ -24,6 +24,7 @@ type ServiciosPageProps = {
     delivery?: string;
     sort?: string;
     page?: string;
+    featured?: string;
   };
 };
 
@@ -41,6 +42,8 @@ export default async function ServiciosPage({ searchParams }: ServiciosPageProps
   const deliveryRaw = String(searchParams?.delivery ?? "").trim();
   const sort = String(searchParams?.sort ?? "").trim();
   const pageRaw = String(searchParams?.page ?? "").trim();
+  const featuredRaw = String(searchParams?.featured ?? "").trim();
+  const featuredOnly = featuredRaw === "1";
 
   const min = minRaw === "" ? null : Number(minRaw);
   const max = maxRaw === "" ? null : Number(maxRaw);
@@ -107,30 +110,32 @@ export default async function ServiciosPage({ searchParams }: ServiciosPageProps
           ? [{ deliveryDays: "asc" }, { createdAt: "desc" }]
           : [{ createdAt: "desc" }];
 
-  const [promoted, regular] = await Promise.all([
-    prisma.service.findMany({
-      where: {
-        ...baseWhere,
-        isPromoted: true,
-        promoExpiresAt: { gt: now },
-      },
-      orderBy: [{ promoExpiresAt: "desc" }, { createdAt: "desc" }],
-      select,
-      take: page === 1 ? 6 : 0,
-    }),
-    prisma.service.findMany({
-      where: {
-        ...baseWhere,
-        OR: [{ isPromoted: false }, { promoExpiresAt: null }, { promoExpiresAt: { lte: now } }],
-      },
-      orderBy: regularOrderBy,
-      select,
-      take: perPage,
-      skip: (page - 1) * perPage,
-    }),
-  ]);
-
-  const servicios = [...promoted, ...regular];
+  const servicios = featuredOnly
+    ? await prisma.service.findMany({
+        where: { ...baseWhere, isPromoted: true, promoExpiresAt: { gt: now } },
+        orderBy: [{ promoExpiresAt: "desc" }, { createdAt: "desc" }],
+        select,
+        take: perPage,
+        skip: (page - 1) * perPage,
+      })
+    : ((await Promise.all([
+        prisma.service.findMany({
+          where: { ...baseWhere, isPromoted: true, promoExpiresAt: { gt: now } },
+          orderBy: [{ promoExpiresAt: "desc" }, { createdAt: "desc" }],
+          select,
+          take: page === 1 ? 6 : 0,
+        }),
+        prisma.service.findMany({
+          where: {
+            ...baseWhere,
+            OR: [{ isPromoted: false }, { promoExpiresAt: null }, { promoExpiresAt: { lte: now } }],
+          },
+          orderBy: regularOrderBy,
+          select,
+          take: perPage,
+          skip: (page - 1) * perPage,
+        }),
+      ])) as [typeof select extends never ? never : any[], any[]]).flat();
 
   const serviceIds = servicios.map((s) => s.id);
   const convoStats = serviceIds.length
@@ -156,6 +161,7 @@ export default async function ServiciosPage({ searchParams }: ServiciosPageProps
   if (minRaw) queryBase.min = minRaw;
   if (maxRaw) queryBase.max = maxRaw;
   if (sort) queryBase.sort = sort;
+  if (featuredOnly) queryBase.featured = "1";
 
   const prevHref =
     page > 1
@@ -276,11 +282,12 @@ export default async function ServiciosPage({ searchParams }: ServiciosPageProps
         </button>
       </form>
 
-      {(q || category || deliveryRaw || minRaw || maxRaw || sort) && (
+      {(q || category || deliveryRaw || minRaw || maxRaw || sort || featuredOnly) && (
         <div className="mb-6 flex flex-wrap items-center gap-2">
           <span className="text-xs font-semibold uppercase tracking-widest text-gray-500">Filtros:</span>
           {q ? <span className="rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-semibold text-gray-700">“{q}”</span> : null}
           {category ? <span className="rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-semibold text-gray-700">{category}</span> : null}
+          {featuredOnly ? <span className="rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-semibold text-gray-700">Destacados</span> : null}
           {deliveryRaw ? <span className="rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-semibold text-gray-700">Entrega ≤ {deliveryRaw}d</span> : null}
           {minRaw ? <span className="rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-semibold text-gray-700">Min {minRaw}€</span> : null}
           {maxRaw ? <span className="rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-semibold text-gray-700">Max {maxRaw}€</span> : null}

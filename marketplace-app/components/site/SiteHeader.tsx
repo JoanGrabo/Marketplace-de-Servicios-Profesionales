@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { SERVICE_CATEGORIES, SERVICE_SUBCATEGORIES } from "@/lib/validation";
+import { isAdmin } from "@/lib/admin";
 
 type User = {
   id: string;
@@ -35,6 +36,8 @@ export default function SiteHeader({
   authDebugEnabled: boolean;
 }) {
   const [unreadCount, setUnreadCount] = useState<number>(0);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement | null>(null);
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const qCurrent = pathname?.startsWith("/servicios") ? (searchParams?.get("q") ?? "") : "";
@@ -74,6 +77,26 @@ export default function SiteHeader({
       window.clearInterval(id);
     };
   }, [user]);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    function onDocMouseDown(e: MouseEvent) {
+      const target = e.target as Node | null;
+      if (!target) return;
+      if (menuRef.current && !menuRef.current.contains(target)) {
+        setMenuOpen(false);
+      }
+    }
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") setMenuOpen(false);
+    }
+    document.addEventListener("mousedown", onDocMouseDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", onDocMouseDown);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [menuOpen]);
 
   return (
     <header className="border-b border-gray-200 bg-white">
@@ -146,19 +169,89 @@ export default function SiteHeader({
                 </Icon>
                 {badge ? <span className="absolute -right-1 -top-1">{badge}</span> : null}
               </Link>
-              <Link href="/mi-perfil">
-                <Icon label="Mi perfil">
-                  <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-gray-200 text-xs font-bold text-gray-700">
+              <div className="relative" ref={menuRef}>
+                <button
+                  type="button"
+                  onClick={() => setMenuOpen((v) => !v)}
+                  className="inline-flex items-center"
+                  aria-haspopup="menu"
+                  aria-expanded={menuOpen}
+                  aria-label="Menú de usuario"
+                >
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-gray-200 text-sm font-bold text-gray-700 ring-1 ring-gray-300 transition hover:ring-[var(--connectia-gold)]">
                     {(user?.email?.[0] ?? "U").toUpperCase()}
                   </span>
-                </Icon>
-              </Link>
-              <Link
-                href="/auth/logout"
-                className="hidden rounded-full bg-red-50 px-3 py-2 text-sm font-semibold text-red-700 ring-1 ring-red-200 transition hover:bg-red-100 sm:inline-flex"
-              >
-                Salir
-              </Link>
+                </button>
+
+                {menuOpen ? (
+                  <div
+                    role="menu"
+                    className="absolute right-0 top-11 z-50 w-72 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg"
+                  >
+                    <div className="px-4 py-3">
+                      <p className="text-sm font-semibold text-gray-900">Cuenta</p>
+                      <p className="mt-0.5 truncate text-xs text-gray-500">{user?.email}</p>
+                    </div>
+                    <div className="h-px bg-gray-100" />
+
+                    <div className="py-1">
+                      <Link
+                        role="menuitem"
+                        href="/mi-perfil"
+                        onClick={() => setMenuOpen(false)}
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      >
+                        Perfil
+                      </Link>
+                      <Link
+                        role="menuitem"
+                        href="/mis-servicios"
+                        onClick={() => setMenuOpen(false)}
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      >
+                        Mis servicios
+                      </Link>
+                      {isAdmin(user) ? (
+                        <Link
+                          role="menuitem"
+                          href="/admin"
+                          onClick={() => setMenuOpen(false)}
+                          className="block px-4 py-2 text-sm font-semibold text-[var(--connectia-gold)] hover:bg-gray-50"
+                        >
+                          Administrador
+                        </Link>
+                      ) : null}
+                    </div>
+
+                    <div className="h-px bg-gray-100" />
+
+                    <div className="py-1">
+                      <button
+                        type="button"
+                        role="menuitem"
+                        onClick={() => setMenuOpen(false)}
+                        className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50"
+                        disabled
+                      >
+                        Idioma (próximamente)
+                      </button>
+                    </div>
+
+                    <div className="h-px bg-gray-100" />
+
+                    <div className="py-1">
+                      <Link
+                        role="menuitem"
+                        href="/auth/logout"
+                        onClick={() => setMenuOpen(false)}
+                        className="block px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                      >
+                        Cerrar sesión
+                      </Link>
+                    </div>
+                  </div>
+                ) : null}
+              </div>
             </>
           ) : (
             <>
@@ -214,6 +307,12 @@ export default function SiteHeader({
         <nav className="mx-auto flex max-w-6xl items-center gap-6 overflow-x-auto px-4 py-2 text-sm font-semibold text-gray-700 sm:px-6">
           <Link href="/servicios" className="shrink-0 text-gray-700 hover:text-[var(--connectia-gold)]">
             Tendencias
+          </Link>
+          <Link
+            href="/servicios?featured=1"
+            className="shrink-0 text-gray-700 hover:text-[var(--connectia-gold)]"
+          >
+            Destacados
           </Link>
           {SERVICE_CATEGORIES.map((c) => (
             <Link
