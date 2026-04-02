@@ -19,7 +19,7 @@ export default function HomeHero({ publishHref }: Props) {
             </p>
 
             <div className="space-y-4">
-              <h1 className="text-[2rem] font-bold leading-[1.12] tracking-tight text-[var(--connectia-gray)] sm:text-5xl sm:leading-[1.1] lg:text-[2.75rem]">
+              <h1 className="pb-1 text-[2rem] font-bold leading-[1.16] tracking-tight text-[var(--connectia-gray)] sm:text-5xl sm:leading-[1.14] lg:text-[2.75rem]">
                 Encuentra arquitectos y abogados
                 <span className="mt-1 block bg-gradient-to-r from-[var(--connectia-gray)] to-[var(--connectia-gold)] bg-clip-text text-transparent">
                   para tu proyecto
