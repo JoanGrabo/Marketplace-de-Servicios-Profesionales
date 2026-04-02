@@ -63,6 +63,26 @@ export default async function AdminPage({ searchParams }: Props) {
           <p className="mt-2 text-sm text-gray-600">
             Control básico: listar y borrar servicios de cualquier usuario.
           </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Link
+              href="/admin"
+              className="rounded-full bg-[var(--connectia-gold)]/10 px-4 py-2 text-sm font-semibold text-[var(--connectia-gold)] ring-1 ring-[var(--connectia-gold)]/20"
+            >
+              Servicios
+            </Link>
+            <Link
+              href="/admin/mensajes"
+              className="rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+            >
+              Mensajes
+            </Link>
+            <Link
+              href="/admin/orders"
+              className="rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+            >
+              Orders
+            </Link>
+          </div>
         </div>
         <Link
           href="/mis-servicios"
