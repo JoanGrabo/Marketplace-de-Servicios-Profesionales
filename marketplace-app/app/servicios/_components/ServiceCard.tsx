@@ -131,7 +131,7 @@ export default function ServiceCard({ service, stats, showMessageButton = true }
             </p>
           ) : service.description ? (
             <p className="line-clamp-3 min-h-[4.25rem] text-sm text-gray-600">
-              {truncateText(service.description, 180)}
+              {service.description}
             </p>
           ) : (
             <p className="min-h-[4.25rem] text-sm text-gray-400">
