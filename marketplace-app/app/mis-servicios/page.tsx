@@ -193,9 +193,9 @@ export default async function MisServiciosPage({ searchParams }: Props) {
                       const until = new Date((s as any).promoExpiresAt);
                       const untilLabel = Intl.DateTimeFormat("es-ES", { dateStyle: "medium" }).format(until);
                       return (
-                        <div className="flex flex-col items-end gap-1">
-                          <span className="inline-flex items-center rounded-full bg-[var(--connectia-gold)]/15 px-3 py-1 text-[11px] font-semibold text-[var(--connectia-gold)] ring-1 ring-[var(--connectia-gold)]/20">
-                            Destacado hasta {untilLabel}
+                        <div className="flex w-44 flex-col items-end gap-1">
+                          <span className="inline-flex h-9 w-full items-center justify-center rounded-lg bg-[var(--connectia-gold)]/15 px-3 text-center text-[11px] font-semibold leading-tight text-[var(--connectia-gold)] ring-1 ring-[var(--connectia-gold)]/20">
+                            <span className="line-clamp-2">Destacado hasta {untilLabel}</span>
                           </span>
                           <p className="text-right text-[11px] text-gray-500">
                             Apareces más arriba en el catálogo.

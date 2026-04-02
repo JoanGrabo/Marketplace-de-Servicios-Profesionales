@@ -50,14 +50,14 @@ export default function PromoteServiceButton({
   }, [autoStart]);
 
   return (
-    <div className="flex flex-col items-end gap-1">
+    <div className="flex w-44 flex-col items-end gap-1">
       <button
         type="button"
         onClick={start}
         disabled={loading}
-        className="rounded-lg bg-[var(--connectia-cta)] px-3 py-1 text-xs font-semibold text-white transition hover:opacity-90 disabled:opacity-60"
+        className="flex h-9 w-full items-center justify-center rounded-lg bg-[var(--connectia-cta)] px-3 text-center text-xs font-semibold leading-tight text-white transition hover:opacity-90 disabled:opacity-60"
       >
-        {loading ? "Redirigiendo..." : label}
+        <span className="line-clamp-2">{loading ? "Redirigiendo..." : label}</span>
       </button>
       <p className="text-right text-[11px] text-gray-500">Aparece primero en “Servicios”.</p>
       {error ? <p className="max-w-[260px] text-right text-[11px] text-red-600">{error}</p> : null}
