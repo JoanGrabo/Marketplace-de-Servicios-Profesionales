@@ -5,6 +5,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { getPublicProfileName, truncateText } from "@/lib/publicProfile";
 import ServiceCard from "@/app/servicios/_components/ServiceCard";
 import { Prisma } from "@prisma/client";
+import { SERVICE_SUBCATEGORIES } from "@/lib/validation";
 
 export const metadata: Metadata = {
   title: "Servicios — CONNECTIA",
@@ -21,6 +22,7 @@ type ServiciosPageProps = {
     min?: string;
     max?: string;
     category?: string;
+    subcategory?: string;
     delivery?: string;
     sort?: string;
     page?: string;
@@ -39,11 +41,13 @@ export default async function ServiciosPage({ searchParams }: ServiciosPageProps
   const minRaw = String(searchParams?.min ?? "").trim();
   const maxRaw = String(searchParams?.max ?? "").trim();
   const category = String(searchParams?.category ?? "").trim();
+  const subcategoryRaw = String(searchParams?.subcategory ?? "").trim();
   const deliveryRaw = String(searchParams?.delivery ?? "").trim();
   const sort = String(searchParams?.sort ?? "").trim();
   const pageRaw = String(searchParams?.page ?? "").trim();
   const featuredRaw = String(searchParams?.featured ?? "").trim();
   const featuredOnly = featuredRaw === "1";
+  const qEffective = q || subcategoryRaw;
 
   const min = minRaw === "" ? null : Number(minRaw);
   const max = maxRaw === "" ? null : Number(maxRaw);
@@ -56,12 +60,12 @@ export default async function ServiciosPage({ searchParams }: ServiciosPageProps
   const baseWhere: Prisma.ServiceWhereInput = {
     active: true,
     ...(category ? { category } : {}),
-    ...(q
+    ...(qEffective
       ? {
           OR: [
-            { title: { contains: q, mode: Prisma.QueryMode.insensitive } },
-            { description: { contains: q, mode: Prisma.QueryMode.insensitive } },
-            { profile: { displayName: { contains: q, mode: Prisma.QueryMode.insensitive } } },
+            { title: { contains: qEffective, mode: Prisma.QueryMode.insensitive } },
+            { description: { contains: qEffective, mode: Prisma.QueryMode.insensitive } },
+            { profile: { displayName: { contains: qEffective, mode: Prisma.QueryMode.insensitive } } },
           ],
         }
       : {}),
@@ -157,6 +161,7 @@ export default async function ServiciosPage({ searchParams }: ServiciosPageProps
   const queryBase: Record<string, string> = {};
   if (q) queryBase.q = q;
   if (category) queryBase.category = category;
+  if (subcategoryRaw && !q) queryBase.subcategory = subcategoryRaw;
   if (deliveryRaw) queryBase.delivery = deliveryRaw;
   if (minRaw) queryBase.min = minRaw;
   if (maxRaw) queryBase.max = maxRaw;
@@ -233,6 +238,33 @@ export default async function ServiciosPage({ searchParams }: ServiciosPageProps
           ))}
         </select>
         <select
+          name="subcategory"
+          defaultValue={subcategoryRaw}
+          className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-[var(--connectia-gold)] focus:outline-none focus:ring-1 focus:ring-[var(--connectia-gold)] sm:col-span-6 lg:col-span-2"
+        >
+          <option value="">Subcategoría</option>
+          {category === "Arquitectura"
+            ? SERVICE_SUBCATEGORIES.Arquitectura.map((sc) => (
+                <option key={`arq-${sc}`} value={sc}>
+                  {sc}
+                </option>
+              ))
+            : category === "Legal"
+              ? SERVICE_SUBCATEGORIES.Legal.map((sc) => (
+                  <option key={`leg-${sc}`} value={sc}>
+                    {sc}
+                  </option>
+                ))
+              : [
+                  ...SERVICE_SUBCATEGORIES.Arquitectura.map((sc) => ({ key: `arq-${sc}`, label: `Arquitectura · ${sc}`, value: sc })),
+                  ...SERVICE_SUBCATEGORIES.Legal.map((sc) => ({ key: `leg-${sc}`, label: `Legal · ${sc}`, value: sc })),
+                ].map((o) => (
+                  <option key={o.key} value={o.value}>
+                    {o.label}
+                  </option>
+                ))}
+        </select>
+        <select
           name="delivery"
           defaultValue={deliveryRaw}
           className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-[var(--connectia-gold)] focus:outline-none focus:ring-1 focus:ring-[var(--connectia-gold)] sm:col-span-6 lg:col-span-2"
@@ -282,10 +314,15 @@ export default async function ServiciosPage({ searchParams }: ServiciosPageProps
         </button>
       </form>
 
-      {(q || category || deliveryRaw || minRaw || maxRaw || sort || featuredOnly) && (
+      {(q || subcategoryRaw || category || deliveryRaw || minRaw || maxRaw || sort || featuredOnly) && (
         <div className="mb-6 flex flex-wrap items-center gap-2">
           <span className="text-xs font-semibold uppercase tracking-widest text-gray-500">Filtros:</span>
           {q ? <span className="rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-semibold text-gray-700">“{q}”</span> : null}
+          {!q && subcategoryRaw ? (
+            <span className="rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-semibold text-gray-700">
+              {subcategoryRaw}
+            </span>
+          ) : null}
           {category ? <span className="rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-semibold text-gray-700">{category}</span> : null}
           {featuredOnly ? <span className="rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-semibold text-gray-700">Destacados</span> : null}
           {deliveryRaw ? <span className="rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-semibold text-gray-700">Entrega ≤ {deliveryRaw}d</span> : null}

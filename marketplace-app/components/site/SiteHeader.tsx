@@ -104,7 +104,7 @@ export default function SiteHeader({
         <Link href="/" className="flex shrink-0 items-center gap-3">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/expertysm-logo.svg"
+            src="/expertysm-logo.png"
             alt="Expertysm"
             className="h-10 w-auto object-contain sm:h-12"
           />
@@ -302,43 +302,24 @@ export default function SiteHeader({
       {/* Categories bar */}
       <div className="border-t border-gray-100 bg-white">
         <nav className="mx-auto flex max-w-6xl items-center gap-6 overflow-x-auto px-4 py-2 text-sm font-semibold text-gray-700 sm:px-6">
-          <Link href="/servicios" className="shrink-0 text-gray-700 hover:text-[var(--connectia-gold-light)]">
-            Tendencias
+          <Link
+            href={`/servicios?category=${encodeURIComponent("Arquitectura")}`}
+            className="shrink-0 text-gray-700 hover:text-[var(--connectia-gold-light)]"
+          >
+            Arquitectura
           </Link>
-          {SERVICE_CATEGORIES.map((c) => (
-            <Link
-              key={c}
-              href={`/servicios?category=${encodeURIComponent(c)}`}
-              className="shrink-0 text-gray-700 hover:text-[var(--connectia-gold-light)]"
-            >
-              {c}
-            </Link>
-          ))}
+          <Link
+            href={`/servicios?category=${encodeURIComponent("Legal")}`}
+            className="shrink-0 text-gray-700 hover:text-[var(--connectia-gold-light)]"
+          >
+            Legal
+          </Link>
           <Link
             href="/servicios?featured=1"
             className="shrink-0 text-gray-700 hover:text-[var(--connectia-gold-light)]"
           >
             Destacados
           </Link>
-          {/* Subcategorías rápidas */}
-          {SERVICE_SUBCATEGORIES.Arquitectura.slice(0, 3).map((sc) => (
-            <Link
-              key={`arq-${sc}`}
-              href={`/servicios?category=${encodeURIComponent("Arquitectura")}&q=${encodeURIComponent(sc)}`}
-              className="hidden shrink-0 text-gray-600 hover:text-[var(--connectia-gold-light)] sm:inline"
-            >
-              {sc}
-            </Link>
-          ))}
-          {SERVICE_SUBCATEGORIES.Legal.slice(0, 3).map((sc) => (
-            <Link
-              key={`leg-${sc}`}
-              href={`/servicios?category=${encodeURIComponent("Legal")}&q=${encodeURIComponent(sc)}`}
-              className="hidden shrink-0 text-gray-600 hover:text-[var(--connectia-gold-light)] sm:inline"
-            >
-              {sc}
-            </Link>
-          ))}
         </nav>
       </div>
 

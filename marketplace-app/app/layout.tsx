@@ -11,8 +11,10 @@ export const metadata: Metadata = {
     "Marketplace especializado: servicios profesionales de arquitectura y asesoría legal. Contrata o publica con claridad.",
   icons: {
     icon: [
+      { url: "/favicon-32.png", type: "image/png", sizes: "32x32" },
       { url: "/icon.svg", type: "image/svg+xml" },
     ],
+    apple: [{ url: "/favicon-512.png", type: "image/png" }],
   },
   other: {
     "google-adsense-account": "ca-pub-4967206150420468",
