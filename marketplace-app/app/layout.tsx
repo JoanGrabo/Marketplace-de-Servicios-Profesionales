@@ -6,9 +6,24 @@ import SiteFooter from "@/components/site/SiteFooter";
 import SiteHeader from "@/components/site/SiteHeader";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.APP_BASE_URL?.replace(/\/$/, "") || "https://expertysm.com"),
   title: "Expertysm — Arquitectura y legal",
   description:
     "Marketplace especializado: servicios profesionales de arquitectura y asesoría legal. Contrata o publica con claridad.",
+  openGraph: {
+    type: "website",
+    title: "Expertysm — Arquitectura y legal",
+    description:
+      "Marketplace especializado: servicios profesionales de arquitectura y asesoría legal. Contrata o publica con claridad.",
+    siteName: "Expertysm",
+    url: "/",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Expertysm — Arquitectura y legal",
+    description:
+      "Marketplace especializado: servicios profesionales de arquitectura y asesoría legal. Contrata o publica con claridad.",
+  },
   icons: {
     icon: [
       { url: "/favicon-32.png", type: "image/png", sizes: "32x32" },
