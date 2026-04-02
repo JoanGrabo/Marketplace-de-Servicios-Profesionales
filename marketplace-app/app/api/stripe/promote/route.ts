@@ -42,6 +42,15 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, message: "Servicio no encontrado." }, { status: 404 });
     }
 
+    const now = new Date();
+    if (service.isPromoted && service.promoExpiresAt && service.promoExpiresAt > now) {
+      const untilLabel = Intl.DateTimeFormat("es-ES", { dateStyle: "medium" }).format(service.promoExpiresAt);
+      return NextResponse.json(
+        { ok: false, message: `Este servicio ya está destacado hasta ${untilLabel}.` },
+        { status: 400 },
+      );
+    }
+
     const stripe = getStripeClient();
     const baseUrl = getAppBaseUrl();
     const amount = getPromotionPriceCents();

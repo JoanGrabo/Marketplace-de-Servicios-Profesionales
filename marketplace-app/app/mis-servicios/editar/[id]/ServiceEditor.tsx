@@ -56,11 +56,13 @@ export default function ServiceEditor({
               </p>
             ) : null}
           </div>
-          <PromoteServiceButton
-            serviceId={serviceId}
-            offer={promotionOffer}
-            autoStart={!promotionActive && promoteOnLoad}
-          />
+          {!promotionActive ? (
+            <PromoteServiceButton
+              serviceId={serviceId}
+              offer={promotionOffer}
+              autoStart={Boolean(promoteOnLoad)}
+            />
+          ) : null}
         </div>
       </div>
       <ServiceComposer
