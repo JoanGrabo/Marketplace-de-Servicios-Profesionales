@@ -55,7 +55,7 @@ export default function PromoteServiceButton({
         type="button"
         onClick={start}
         disabled={loading}
-        className="rounded-lg bg-[var(--connectia-gold)] px-3 py-1 text-xs font-semibold text-white transition hover:opacity-90 disabled:opacity-60"
+        className="rounded-lg bg-[var(--connectia-cta)] px-3 py-1 text-xs font-semibold text-white transition hover:opacity-90 disabled:opacity-60"
       >
         {loading ? "Redirigiendo..." : label}
       </button>

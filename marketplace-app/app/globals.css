@@ -4,8 +4,14 @@
 
 /* CONNECTIA / Mapahub brand */
 :root {
-  --connectia-gray: #2d2d2d;
-  --connectia-gold: #b8860b;
-  --connectia-gold-light: #d4a84b;
-  --connectia-bg: #f5f4f1;
+  /* Base */
+  --connectia-bg: #f8fafc; /* fondo base (blanco roto) */
+  --connectia-gray: #1f2933; /* texto principal */
+
+  /* Marca */
+  --connectia-gold: #1e3a5f; /* color principal (azul profundo) */
+  --connectia-gold-light: #3b82f6; /* hover/interacción */
+
+  /* CTA premium */
+  --connectia-cta: #d4a373; /* dorado suave */
 }

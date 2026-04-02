@@ -20,7 +20,7 @@ function Icon({
   label: string;
 }) {
   return (
-    <span className="inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-600 transition hover:bg-gray-100 hover:text-[var(--connectia-gold)]">
+    <span className="inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-600 transition hover:bg-gray-100 hover:text-[var(--connectia-gold-light)]">
       <span className="sr-only">{label}</span>
       {children}
     </span>
@@ -110,7 +110,7 @@ export default function SiteHeader({
           />
           <div className="hidden sm:block">
             <span className="font-semibold tracking-tight text-[var(--connectia-gray)]">Experty</span>
-            <span className="font-semibold tracking-tight text-[var(--connectia-gold)]">sm</span>
+            <span className="font-semibold tracking-tight text-[var(--connectia-cta)]">sm</span>
             <p className="text-xs font-normal text-gray-500">Arquitectura y legal</p>
           </div>
         </Link>
@@ -130,7 +130,7 @@ export default function SiteHeader({
             />
             <button
               type="submit"
-              className="inline-flex items-center justify-center bg-[var(--connectia-gray)] px-4 text-white transition hover:bg-black"
+              className="inline-flex items-center justify-center bg-[var(--connectia-gold)] px-4 text-white transition hover:bg-[var(--connectia-gold-light)]"
               aria-label="Buscar"
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -278,7 +278,7 @@ export default function SiteHeader({
             />
             <button
               type="submit"
-              className="inline-flex items-center justify-center bg-[var(--connectia-gray)] px-4 text-white transition hover:bg-black"
+              className="inline-flex items-center justify-center bg-[var(--connectia-gold)] px-4 text-white transition hover:bg-[var(--connectia-gold-light)]"
               aria-label="Buscar"
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -302,21 +302,21 @@ export default function SiteHeader({
       {/* Categories bar */}
       <div className="border-t border-gray-100 bg-white">
         <nav className="mx-auto flex max-w-6xl items-center gap-6 overflow-x-auto px-4 py-2 text-sm font-semibold text-gray-700 sm:px-6">
-          <Link href="/servicios" className="shrink-0 text-gray-700 hover:text-[var(--connectia-gold)]">
+          <Link href="/servicios" className="shrink-0 text-gray-700 hover:text-[var(--connectia-gold-light)]">
             Tendencias
           </Link>
           {SERVICE_CATEGORIES.map((c) => (
             <Link
               key={c}
               href={`/servicios?category=${encodeURIComponent(c)}`}
-              className="shrink-0 text-gray-700 hover:text-[var(--connectia-gold)]"
+              className="shrink-0 text-gray-700 hover:text-[var(--connectia-gold-light)]"
             >
               {c}
             </Link>
           ))}
           <Link
             href="/servicios?featured=1"
-            className="shrink-0 text-gray-700 hover:text-[var(--connectia-gold)]"
+            className="shrink-0 text-gray-700 hover:text-[var(--connectia-gold-light)]"
           >
             Destacados
           </Link>
@@ -325,7 +325,7 @@ export default function SiteHeader({
             <Link
               key={`arq-${sc}`}
               href={`/servicios?category=${encodeURIComponent("Arquitectura")}&q=${encodeURIComponent(sc)}`}
-              className="hidden shrink-0 text-gray-600 hover:text-[var(--connectia-gold)] sm:inline"
+              className="hidden shrink-0 text-gray-600 hover:text-[var(--connectia-gold-light)] sm:inline"
             >
               {sc}
             </Link>
@@ -334,7 +334,7 @@ export default function SiteHeader({
             <Link
               key={`leg-${sc}`}
               href={`/servicios?category=${encodeURIComponent("Legal")}&q=${encodeURIComponent(sc)}`}
-              className="hidden shrink-0 text-gray-600 hover:text-[var(--connectia-gold)] sm:inline"
+              className="hidden shrink-0 text-gray-600 hover:text-[var(--connectia-gold-light)] sm:inline"
             >
               {sc}
             </Link>

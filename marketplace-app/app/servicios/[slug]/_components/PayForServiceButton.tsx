@@ -35,7 +35,7 @@ export default function PayForServiceButton({ serviceSlug }: { serviceSlug: stri
         type="button"
         onClick={startCheckout}
         disabled={loading}
-        className="rounded-lg bg-[var(--connectia-gold)] px-5 py-2 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-60"
+        className="rounded-lg bg-[var(--connectia-cta)] px-5 py-2 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-60"
       >
         {loading ? "Redirigiendo..." : "Pagar con tarjeta"}
       </button>

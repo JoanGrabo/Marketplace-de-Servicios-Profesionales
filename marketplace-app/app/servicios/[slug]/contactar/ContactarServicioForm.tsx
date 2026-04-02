@@ -85,7 +85,7 @@ export default function ContactarServicioForm({ slug }: Props) {
       <button
         type="submit"
         disabled={sending}
-        className="rounded-lg bg-[var(--connectia-gold)] px-5 py-2 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-60"
+        className="rounded-lg bg-[var(--connectia-cta)] px-5 py-2 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-60"
       >
         {sending ? "Enviando..." : "Enviar mensaje"}
       </button>

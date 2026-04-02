@@ -63,7 +63,7 @@ export default async function ServicioDetallePage({ params }: ServicioDetallePro
           </div>
           <div className="text-right">
             <div className="text-xs text-gray-500">Precio</div>
-            <div className="text-2xl font-bold text-[var(--connectia-gold)]">
+            <div className="text-2xl font-bold text-[var(--connectia-cta)]">
               {Intl.NumberFormat("es-ES", {
                 style: "currency",
                 currency: "EUR",
