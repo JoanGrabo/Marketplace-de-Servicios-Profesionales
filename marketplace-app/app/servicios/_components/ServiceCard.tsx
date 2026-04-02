@@ -126,15 +126,15 @@ export default function ServiceCard({ service, stats, showMessageButton = true }
 
         <div className="mt-3">
           {service.shortDescription ? (
-            <p className="line-clamp-3 min-h-[4.25rem] text-sm text-gray-600">
+            <p className="line-clamp-3 min-h-[4.5rem] pb-0.5 text-sm leading-6 text-gray-600">
               {service.shortDescription}
             </p>
           ) : service.description ? (
-            <p className="line-clamp-3 min-h-[4.25rem] text-sm text-gray-600">
+            <p className="line-clamp-3 min-h-[4.5rem] pb-0.5 text-sm leading-6 text-gray-600">
               {service.description}
             </p>
           ) : (
-            <p className="min-h-[4.25rem] text-sm text-gray-400">
+            <p className="min-h-[4.5rem] pb-0.5 text-sm leading-6 text-gray-400">
               Sin descripción adicional.
             </p>
           )}
