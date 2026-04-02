@@ -6,7 +6,7 @@
     </style>
   </defs>
   <!-- Minimal padding via viewBox; transparent background -->
-  <text x="10" y="128" class="base" font-size="120" fill="#1F2933">experty</text>
-  <text x="560" y="128" class="base" font-size="120" fill="#B8860B">sm</text>
+  <text x="10" y="128" class="base" font-size="120" fill="#1F2933">expert</text>
+  <text x="440" y="128" class="base" font-size="120" fill="#B8860B">ysm</text>
 </svg>
 
