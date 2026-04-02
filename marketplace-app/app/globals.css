@@ -5,13 +5,13 @@
 /* Expertysm brand */
 :root {
   /* Base */
-  --connectia-bg: #f8fafc; /* fondo base (blanco roto) */
+  --connectia-bg: #f5f4f1; /* fondo base (más cálido) */
   --connectia-gray: #1f2933; /* texto principal */
 
   /* Marca */
-  --connectia-gold: #1e3a5f; /* color principal (azul profundo) */
-  --connectia-gold-light: #3b82f6; /* hover/interacción */
+  --connectia-gold: #b8860b; /* principal (dorado/amarillo) */
+  --connectia-gold-light: #d4a84b; /* hover/interacción */
 
   /* CTA premium */
-  --connectia-cta: #d4a373; /* dorado suave */
+  --connectia-cta: #d4a84b; /* CTA (amarillo más vivo) */
 }

@@ -105,7 +105,7 @@ export default function SiteHeader({
           <img
             src="/expertysm-logo.png"
             alt="Expertysm"
-            className="h-9 w-[170px] object-contain sm:h-10 sm:w-[200px]"
+            className="h-10 w-auto object-contain sm:h-12"
           />
         </Link>
 
