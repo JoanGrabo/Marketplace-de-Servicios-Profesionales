@@ -133,7 +133,7 @@ export default async function MisServiciosPage({ searchParams }: Props) {
         Mis servicios
       </h1>
       <p className="mb-8 text-gray-600">
-        Crea y gestiona los servicios que ofreces en CONNECTIA.
+        Crea y gestiona los servicios que ofreces en Expertysm.
       </p>
       {String(searchParams?.limit ?? "") === "1" && (
         <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">

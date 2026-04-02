@@ -27,13 +27,13 @@ export default function HomeBenefits() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mx-auto mb-12 max-w-2xl text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--connectia-gold)]">
-            Por qué Mapahub
+            Por qué Expertysm
           </p>
           <h2 className="mt-3 text-3xl font-bold tracking-tight text-[var(--connectia-gray)] sm:text-4xl">
             Hecho para proyectos serios
           </h2>
           <p className="mt-3 text-base text-gray-600">
-            No competimos con marketplaces gigantes de todo para todos. Mapahub es el espacio donde la
+            No competimos con marketplaces gigantes de todo para todos. Expertysm es el espacio donde la
             especialización y la claridad importan.
           </p>
         </div>

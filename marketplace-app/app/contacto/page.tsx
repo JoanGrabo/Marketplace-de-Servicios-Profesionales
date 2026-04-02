@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Contacto — CONNECTIA",
-  description: "Contacta con CONNECTIA. Consultas, colaboraciones y soporte.",
+  title: "Contacto — Expertysm",
+  description: "Contacta con Expertysm. Consultas, colaboraciones y soporte.",
 };
 
 export default function ContactoPage() {

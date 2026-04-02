@@ -116,7 +116,7 @@ function HeroVisual() {
               Vista previa
             </span>
             <span className="rounded-full bg-[var(--connectia-gold)]/12 px-2.5 py-0.5 text-[10px] font-semibold text-[var(--connectia-gold)]">
-              Mapahub
+              Expertysm
             </span>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">

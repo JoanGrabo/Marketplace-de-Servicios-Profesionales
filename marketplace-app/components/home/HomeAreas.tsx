@@ -33,7 +33,7 @@ export default function HomeAreas() {
             Especialización que se nota
           </h2>
           <p className="mt-3 text-base text-gray-600">
-            Mapahub concentra talento en <strong className="font-medium text-gray-800">Arquitectura</strong> y{" "}
+            Expertysm concentra talento en <strong className="font-medium text-gray-800">Arquitectura</strong> y{" "}
             <strong className="font-medium text-gray-800">Legal</strong>. Nada de listados interminables de
             categorías irrelevantes: aquí sabes qué vas a encontrar.
           </p>

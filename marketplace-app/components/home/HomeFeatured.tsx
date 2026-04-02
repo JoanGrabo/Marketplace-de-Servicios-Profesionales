@@ -21,7 +21,7 @@ export default function HomeFeatured({ items }: Props) {
               Servicios destacados
             </h2>
             <p className="mt-2 max-w-xl text-base text-gray-600">
-              Una muestra de lo que publican profesionales en Mapahub.{" "}
+              Una muestra de lo que publican profesionales en Expertysm.{" "}
               {hasReal
                 ? "Actualizado con servicios reales de la plataforma."
                 : "Cuando haya servicios activos, aparecerán aquí automáticamente."}

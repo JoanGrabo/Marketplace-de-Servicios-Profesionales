@@ -8,7 +8,7 @@ import { Prisma } from "@prisma/client";
 import { SERVICE_SUBCATEGORIES } from "@/lib/validation";
 
 export const metadata: Metadata = {
-  title: "Servicios — CONNECTIA",
+  title: "Servicios — Expertysm",
   description:
     "Servicios profesionales: arquitectura, renders, planos, asesoría y próximamente servicios legales.",
 };

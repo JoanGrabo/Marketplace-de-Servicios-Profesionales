@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { SERVICE_CATEGORIES, SERVICE_SUBCATEGORIES } from "@/lib/validation";
 import { isAdmin } from "@/lib/admin";
 
 type User = {
@@ -101,18 +100,13 @@ export default function SiteHeader({
     <header className="border-b border-gray-200 bg-white">
       {/* Top bar */}
       <div className="mx-auto flex max-w-6xl items-center gap-4 px-4 py-3 sm:px-6">
-        <Link href="/" className="flex shrink-0 items-center gap-3">
+        <Link href="/" className="flex shrink-0 items-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/expertysm-logo.png"
             alt="Expertysm"
-            className="h-10 w-auto object-contain sm:h-12"
+            className="h-9 w-[170px] object-contain sm:h-10 sm:w-[200px]"
           />
-          <div className="hidden sm:block">
-            <span className="font-semibold tracking-tight text-[var(--connectia-gray)]">Experty</span>
-            <span className="font-semibold tracking-tight text-[var(--connectia-cta)]">sm</span>
-            <p className="text-xs font-normal text-gray-500">Arquitectura y legal</p>
-          </div>
         </Link>
 
         {/* Search */}
@@ -151,10 +145,13 @@ export default function SiteHeader({
         </form>
 
         {/* Right actions */}
-        <div className="ml-auto flex items-center gap-1">
+        <div className="ml-auto flex items-center gap-2">
           {showAuthedNav ? (
             <>
-              <Link href="/mis-servicios" className="hidden rounded-full px-3 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-100 sm:inline-flex">
+              <Link
+                href="/mis-servicios"
+                className="hidden rounded-full border border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:border-gray-300 hover:bg-gray-50 sm:inline-flex"
+              >
                 Publicar
               </Link>
               <Link href="/mensajes" className="relative">
@@ -175,7 +172,7 @@ export default function SiteHeader({
                   aria-expanded={menuOpen}
                   aria-label="Menú de usuario"
                 >
-                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-gray-200 text-sm font-bold text-gray-700 ring-1 ring-gray-300 transition hover:ring-[var(--connectia-gold)]">
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-gray-200 text-sm font-bold text-gray-700 ring-1 ring-gray-300 transition hover:ring-[var(--connectia-gold-light)]">
                     {(user?.email?.[0] ?? "U").toUpperCase()}
                   </span>
                 </button>
@@ -316,8 +313,14 @@ export default function SiteHeader({
           </Link>
           <Link
             href="/servicios?featured=1"
-            className="shrink-0 text-gray-700 hover:text-[var(--connectia-gold-light)]"
+            className="inline-flex shrink-0 items-center gap-1.5 text-gray-700 hover:text-[var(--connectia-gold-light)]"
           >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path
+                d="M12 17.3 6.8 20l1-5.9L3.6 9.9l5.9-.9L12 3.6l2.5 5.4 5.9.9-4.2 4.2 1 5.9L12 17.3Z"
+                fill="currentColor"
+              />
+            </svg>
             Destacados
           </Link>
         </nav>

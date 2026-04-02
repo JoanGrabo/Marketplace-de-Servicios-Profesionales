@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Términos y condiciones — Mapahub",
-  description: "Condiciones de uso de la plataforma Mapahub.",
+  title: "Términos y condiciones — Expertysm",
+  description: "Condiciones de uso de la plataforma Expertysm.",
 };
 
 export default function TerminosPage() {
@@ -17,7 +17,7 @@ export default function TerminosPage() {
       </p>
       <h1 className="mt-4 text-3xl font-bold text-[var(--connectia-gray)]">Términos y condiciones</h1>
       <p className="mt-6 text-gray-600 leading-relaxed">
-        El uso de Mapahub implica la aceptación de unas condiciones de uso que definirán el marco
+        El uso de Expertysm implica la aceptación de unas condiciones de uso que definirán el marco
         entre la plataforma, los profesionales y los clientes. Este documento legal está en
         preparación y se publicará aquí cuando esté disponible la versión revisada.
       </p>

@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Política de cookies — Mapahub",
-  description: "Información sobre cookies en Mapahub.",
+  title: "Política de cookies — Expertysm",
+  description: "Información sobre cookies en Expertysm.",
 };
 
 export default function CookiesPage() {
@@ -17,7 +17,7 @@ export default function CookiesPage() {
       </p>
       <h1 className="mt-4 text-3xl font-bold text-[var(--connectia-gray)]">Política de cookies</h1>
       <p className="mt-6 text-gray-600 leading-relaxed">
-        Mapahub utiliza cookies y tecnologías similares necesarias para el funcionamiento de la sesión
+        Expertysm utiliza cookies y tecnologías similares necesarias para el funcionamiento de la sesión
         y la seguridad del sitio. Esta página se completará con el detalle de tipos de cookies,
         finalidades y cómo gestionar tus preferencias, conforme a la normativa aplicable.
       </p>

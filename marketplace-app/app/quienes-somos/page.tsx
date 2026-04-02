@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Quiénes somos — CONNECTIA",
+  title: "Quiénes somos — Expertysm",
   description:
-    "Conecta, aprende y crece. CONNECTIA es el marketplace de servicios profesionales para arquitectura, visualización, documentación y asesoría.",
+    "Conecta, aprende y crece. Expertysm es el marketplace de servicios profesionales para arquitectura, visualización, documentación y asesoría.",
 };
 
 export default function QuienesSomosPage() {
@@ -13,13 +13,13 @@ export default function QuienesSomosPage() {
       <section className="border-b border-gray-200 bg-white">
         <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
           <p className="inline-flex rounded-full border border-[var(--connectia-gold)]/30 bg-[var(--connectia-gold)]/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--connectia-gold)]">
-            Sobre CONNECTIA
+            Sobre Expertysm
           </p>
           <h1 className="mt-4 max-w-3xl text-4xl font-bold tracking-tight text-[var(--connectia-gray)] sm:text-5xl">
             Construimos el punto de encuentro entre talento profesional y proyectos reales.
           </h1>
           <p className="mt-4 max-w-3xl text-sm text-gray-600 sm:text-base">
-            CONNECTIA nace para que contratar y ofrecer servicios especializados sea claro,
+            Expertysm nace para que contratar y ofrecer servicios especializados sea claro,
             rápido y confiable. Queremos reducir fricción, elevar la calidad de los
             proyectos y crear oportunidades para profesionales y clientes.
           </p>
@@ -78,7 +78,7 @@ export default function QuienesSomosPage() {
       <section className="border-y border-gray-200 bg-white/90">
         <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
           <h2 className="text-2xl font-semibold text-[var(--connectia-gray)]">
-            Qué hace diferente a CONNECTIA
+            Qué hace diferente a Expertysm
           </h2>
           <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             <article className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
@@ -168,7 +168,7 @@ export default function QuienesSomosPage() {
               ¿Quieres colaborar o saber más?
             </h2>
             <p className="text-sm text-gray-600">
-              Escríbenos y cuéntanos tu proyecto o cómo te gustaría participar en CONNECTIA.
+              Escríbenos y cuéntanos tu proyecto o cómo te gustaría participar en Expertysm.
             </p>
           </div>
           <div className="flex gap-3">

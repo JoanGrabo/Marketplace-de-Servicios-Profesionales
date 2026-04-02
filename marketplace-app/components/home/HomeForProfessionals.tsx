@@ -17,7 +17,7 @@ export default function HomeForProfessionals({ publishHref }: Props) {
               ¿Eres arquitecto o abogado?
             </h2>
             <p className="mt-4 max-w-xl text-base leading-relaxed text-gray-300">
-              Publica tus servicios en Mapahub y conecta con clientes que ya buscan ayuda en{" "}
+              Publica tus servicios en Expertysm y conecta con clientes que ya buscan ayuda en{" "}
               <strong className="font-medium text-white">arquitectura</strong> o{" "}
               <strong className="font-medium text-white">legal</strong>. Gana visibilidad en un entorno
               acotado y alineado con tu especialidad.

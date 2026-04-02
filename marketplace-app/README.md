@@ -1,4 +1,4 @@
-# CONNECTIA — Marketplace de Servicios Profesionales
+# Expertysm — Marketplace de Servicios Profesionales
 
 App Next.js (App Router) + Tailwind + **PostgreSQL** (Prisma).
 

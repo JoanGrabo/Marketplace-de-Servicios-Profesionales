@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Preguntas frecuentes — Mapahub",
-  description: "Respuestas sobre el marketplace Mapahub: arquitectura y servicios legales.",
+  title: "Preguntas frecuentes — Expertysm",
+  description: "Respuestas sobre el marketplace Expertysm: arquitectura y servicios legales.",
 };
 
 export default function PreguntasFrecuentesPage() {
@@ -17,7 +17,7 @@ export default function PreguntasFrecuentesPage() {
       </p>
       <h1 className="mt-4 text-3xl font-bold text-[var(--connectia-gray)]">Preguntas frecuentes</h1>
       <p className="mt-6 text-gray-600 leading-relaxed">
-        Estamos preparando esta sección con respuestas claras sobre cómo usar Mapahub, publicar
+        Estamos preparando esta sección con respuestas claras sobre cómo usar Expertysm, publicar
         servicios y contactar con profesionales de arquitectura y legal. Si necesitas ayuda
         mientras tanto, puedes escribirnos desde{" "}
         <Link href="/contacto" className="font-medium text-[var(--connectia-gold)] hover:underline">
