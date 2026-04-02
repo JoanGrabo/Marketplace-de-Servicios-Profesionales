@@ -74,7 +74,7 @@ export default function SiteHeader({
       cancelled = true;
       window.clearInterval(id);
     };
-  }, [user]);
+  }, [user, pathname]);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -103,9 +103,9 @@ export default function SiteHeader({
         <Link href="/" className="flex shrink-0 items-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/expertysm-logo.png"
-            alt="Expertysm"
-            className="h-10 w-auto object-contain sm:h-12"
+            src="/expertysm-wordmark.svg"
+            alt="expertysm"
+            className="h-9 w-auto object-contain sm:h-10"
           />
         </Link>
 
@@ -300,18 +300,6 @@ export default function SiteHeader({
       <div className="border-t border-gray-100 bg-white">
         <nav className="mx-auto flex max-w-6xl items-center gap-6 overflow-x-auto px-4 py-2 text-sm font-semibold text-gray-700 sm:px-6">
           <Link
-            href={`/servicios?category=${encodeURIComponent("Arquitectura")}`}
-            className="shrink-0 text-gray-700 hover:text-[var(--connectia-gold-light)]"
-          >
-            Arquitectura
-          </Link>
-          <Link
-            href={`/servicios?category=${encodeURIComponent("Legal")}`}
-            className="shrink-0 text-gray-700 hover:text-[var(--connectia-gold-light)]"
-          >
-            Legal
-          </Link>
-          <Link
             href="/servicios?featured=1"
             className="inline-flex shrink-0 items-center gap-1.5 text-gray-700 hover:text-[var(--connectia-gold-light)]"
           >
@@ -322,6 +310,18 @@ export default function SiteHeader({
               />
             </svg>
             Destacados
+          </Link>
+          <Link
+            href={`/servicios?category=${encodeURIComponent("Arquitectura")}`}
+            className="shrink-0 text-gray-700 hover:text-[var(--connectia-gold-light)]"
+          >
+            Arquitectura
+          </Link>
+          <Link
+            href={`/servicios?category=${encodeURIComponent("Legal")}`}
+            className="shrink-0 text-gray-700 hover:text-[var(--connectia-gold-light)]"
+          >
+            Legal
           </Link>
         </nav>
       </div>

@@ -55,7 +55,7 @@ export default function ServiceCard({ service, stats, showMessageButton = true }
   const thumbnailSrc = resolveServiceThumbnailSrc(service.thumbnailUrl);
 
   return (
-    <article className="group overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+    <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
       <Link href={primaryHref} className="block">
         <div className="relative aspect-[16/10] w-full bg-gradient-to-br from-gray-50 to-gray-100">
           {thumbnailSrc ? (
@@ -77,7 +77,15 @@ export default function ServiceCard({ service, stats, showMessageButton = true }
           <div className="absolute left-3 top-3 flex flex-wrap gap-2">
             {isPromoted && (
               <span className="rounded-full bg-[var(--connectia-gold)]/15 px-2 py-1 text-[11px] font-semibold text-[var(--connectia-gold)] ring-1 ring-[var(--connectia-gold)]/20">
-                Destacado
+                <span className="inline-flex items-center gap-1.5">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path
+                      d="M12 17.3 6.8 20l1-5.9L3.6 9.9l5.9-.9L12 3.6l2.5 5.4 5.9.9-4.2 4.2 1 5.9L12 17.3Z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                  Destacado
+                </span>
               </span>
             )}
             {isBestSeller && (
@@ -94,7 +102,7 @@ export default function ServiceCard({ service, stats, showMessageButton = true }
         </div>
       </Link>
 
-      <div className="space-y-3 p-4">
+      <div className="flex flex-1 flex-col p-4">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <Link href={primaryHref} className="block">
@@ -116,13 +124,23 @@ export default function ServiceCard({ service, stats, showMessageButton = true }
           </div>
         </div>
 
-        {service.shortDescription ? (
-          <p className="text-sm text-gray-600">{truncateText(service.shortDescription, 120)}</p>
-        ) : service.description ? (
-          <p className="text-sm text-gray-600">{truncateText(service.description, 90)}</p>
-        ) : null}
+        <div className="mt-3">
+          {service.shortDescription ? (
+            <p className="line-clamp-3 min-h-[4.25rem] text-sm text-gray-600">
+              {service.shortDescription}
+            </p>
+          ) : service.description ? (
+            <p className="line-clamp-3 min-h-[4.25rem] text-sm text-gray-600">
+              {truncateText(service.description, 180)}
+            </p>
+          ) : (
+            <p className="min-h-[4.25rem] text-sm text-gray-400">
+              Sin descripción adicional.
+            </p>
+          )}
+        </div>
 
-        <div className="flex items-center justify-between gap-3">
+        <div className="mt-4 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <div className="relative h-8 w-8 overflow-hidden rounded-full border border-gray-200 bg-gray-50">
               {service.profile.avatarUrl ? (
@@ -143,7 +161,7 @@ export default function ServiceCard({ service, stats, showMessageButton = true }
           </div>
         </div>
 
-        <div className={`flex gap-2 pt-1 ${showMessageButton ? "" : "w-full"}`}>
+        <div className={`mt-auto flex gap-2 pt-4 ${showMessageButton ? "" : "w-full"}`}>
           <Link
             href={primaryHref}
             className={`inline-flex items-center justify-center rounded-lg bg-[var(--connectia-gold)] px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90 ${showMessageButton ? "flex-1" : "w-full"}`}

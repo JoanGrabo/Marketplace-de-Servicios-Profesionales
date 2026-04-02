@@ -46,6 +46,19 @@ export default async function ConversationPage({
     notFound();
   }
 
+  // Marcar como leídos los mensajes recibidos en esta conversación.
+  // (Solo los que vienen del otro usuario y aún no tienen readAt)
+  await prisma.message
+    .updateMany({
+      where: {
+        conversationId: conversation.id,
+        readAt: null,
+        senderId: { not: user.id },
+      },
+      data: { readAt: new Date() },
+    })
+    .catch(() => null);
+
   const isClient = conversation.clientId === user.id;
   const otherProfile = isClient
     ? conversation.professional

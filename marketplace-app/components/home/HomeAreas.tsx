@@ -41,9 +41,11 @@ export default function HomeAreas() {
 
         <div className="grid gap-6 lg:grid-cols-2">
           {AREAS.map((area) => (
-            <article
+            <Link
               key={area.title}
-              className={`group relative overflow-hidden rounded-3xl border border-gray-200/90 bg-gradient-to-br ${area.accent} p-8 shadow-sm ring-1 ring-black/[0.03] transition hover:-translate-y-0.5 hover:shadow-lg`}
+              href={area.href}
+              aria-label={`Explorar ${area.title.toLowerCase()}`}
+              className={`group relative block overflow-hidden rounded-3xl border border-gray-200/90 bg-gradient-to-br ${area.accent} p-8 shadow-sm ring-1 ring-black/[0.03] transition hover:-translate-y-0.5 hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--connectia-gold)] focus-visible:ring-offset-2`}
             >
               <div className={`mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-white shadow-md shadow-gray-900/5 ring-1 ring-gray-100`}>
                 <area.icon className="h-7 w-7 text-[var(--connectia-gray)]" />
@@ -51,14 +53,11 @@ export default function HomeAreas() {
               <div className={`mb-4 h-1 w-12 rounded-full ${area.bar}`} />
               <h3 className="text-2xl font-bold text-[var(--connectia-gray)]">{area.title}</h3>
               <p className="mt-3 text-sm leading-relaxed text-gray-600 sm:text-base">{area.description}</p>
-              <Link
-                href={area.href}
-                className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-[var(--connectia-gold)] transition group-hover:gap-3"
-              >
+              <span className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-[var(--connectia-gold)] transition group-hover:gap-3">
                 Explorar {area.title.toLowerCase()}
                 <span aria-hidden>→</span>
-              </Link>
-            </article>
+              </span>
+            </Link>
           ))}
         </div>
       </div>
