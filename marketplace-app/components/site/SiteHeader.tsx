@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { SERVICE_CATEGORIES, SERVICE_SUBCATEGORIES } from "@/lib/validation";
@@ -103,17 +102,15 @@ export default function SiteHeader({
       {/* Top bar */}
       <div className="mx-auto flex max-w-6xl items-center gap-4 px-4 py-3 sm:px-6">
         <Link href="/" className="flex shrink-0 items-center gap-3">
-          <Image
-            src="/connectia-logo.png"
-            alt="Mapahub"
-            width={120}
-            height={48}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/expertysm-logo.svg"
+            alt="Expertysm"
             className="h-10 w-auto object-contain sm:h-12"
-            priority
           />
           <div className="hidden sm:block">
-            <span className="font-semibold tracking-tight text-[var(--connectia-gray)]">Mapa</span>
-            <span className="font-semibold tracking-tight text-[var(--connectia-gold)]">hub</span>
+            <span className="font-semibold tracking-tight text-[var(--connectia-gray)]">Experty</span>
+            <span className="font-semibold tracking-tight text-[var(--connectia-gold)]">sm</span>
             <p className="text-xs font-normal text-gray-500">Arquitectura y legal</p>
           </div>
         </Link>
@@ -308,12 +305,6 @@ export default function SiteHeader({
           <Link href="/servicios" className="shrink-0 text-gray-700 hover:text-[var(--connectia-gold)]">
             Tendencias
           </Link>
-          <Link
-            href="/servicios?featured=1"
-            className="shrink-0 text-gray-700 hover:text-[var(--connectia-gold)]"
-          >
-            Destacados
-          </Link>
           {SERVICE_CATEGORIES.map((c) => (
             <Link
               key={c}
@@ -323,6 +314,12 @@ export default function SiteHeader({
               {c}
             </Link>
           ))}
+          <Link
+            href="/servicios?featured=1"
+            className="shrink-0 text-gray-700 hover:text-[var(--connectia-gold)]"
+          >
+            Destacados
+          </Link>
           {/* Subcategorías rápidas */}
           {SERVICE_SUBCATEGORIES.Arquitectura.slice(0, 3).map((sc) => (
             <Link

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="Expertysm icon">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1f2937"/>
+      <stop offset="1" stop-color="#b8860b"/>
+    </linearGradient>
+  </defs>
+  <rect x="24" y="24" width="464" height="464" rx="120" fill="url(#g)"/>
+  <path d="M192 144h184v44H236v58h118v44H236v66h140v44H192z" fill="#fff" opacity="0.98"/>
+  <path d="M150 360c38 44 88 66 148 66" fill="none" stroke="#fff" stroke-width="22" stroke-linecap="round" opacity="0.9"/>
+</svg>
+

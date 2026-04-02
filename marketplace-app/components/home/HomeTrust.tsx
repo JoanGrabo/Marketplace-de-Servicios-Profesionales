@@ -17,7 +17,7 @@ export default function HomeTrust() {
             Transparencia desde el primer vistazo
           </h2>
           <p className="mt-2 text-sm text-gray-600 sm:text-base">
-            Estamos construyendo Mapahub con criterios de claridad. Más adelante podrás ver aquí métricas
+            Estamos construyendo Expertysm con criterios de claridad. Más adelante podrás ver aquí métricas
             reales de uso; de momento, estos son nuestros compromisos.
           </p>
         </div>

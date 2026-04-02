@@ -29,10 +29,10 @@ export async function sendPasswordResetEmail(email: string, rawToken: string): P
   const resetUrl = `${getAppBaseUrl()}/auth/reset-password?token=${encodeURIComponent(rawToken)}`;
   await sendMail({
     to: email,
-    subject: "Restablece tu contraseña en CONNECTIA",
-    text: `Para restablecer tu contraseña en CONNECTIA abre este enlace: ${resetUrl}`,
+    subject: "Restablece tu contraseña en Expertysm",
+    text: `Para restablecer tu contraseña en Expertysm abre este enlace: ${resetUrl}`,
     html: `
-      <p>Hemos recibido una solicitud para restablecer tu contraseña en <strong>CONNECTIA</strong>.</p>
+      <p>Hemos recibido una solicitud para restablecer tu contraseña en <strong>Expertysm</strong>.</p>
       <p>Puedes crear una nueva contraseña con este enlace:</p>
       <p><a href="${resetUrl}">Restablecer contraseña</a></p>
       <p>Este enlace caduca en ${TOKEN_TTL_HOURS} horas.</p>

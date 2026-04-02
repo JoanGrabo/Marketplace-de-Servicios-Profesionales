@@ -93,7 +93,7 @@ export default function RegistroPage() {
         </div>
         <div>
           <label htmlFor="role" className="mb-1 block text-sm font-medium text-gray-700">
-            ¿Cómo quieres usar CONNECTIA?
+            ¿Cómo quieres usar Expertysm?
           </label>
           <select
             id="role"

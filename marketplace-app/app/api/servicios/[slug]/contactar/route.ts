@@ -126,12 +126,12 @@ export async function POST(req: Request, context: Params) {
         to: servicio.profile.email,
         subject: `Nuevo mensaje por tu servicio: ${servicio.title}`,
         text:
-          `Has recibido un nuevo mensaje en CONNECTIA.\n\n` +
+          `Has recibido un nuevo mensaje en Expertysm.\n\n` +
           `Servicio: ${servicio.title}\n` +
           `De: ${user.email}\n\n` +
           `Mensaje:\n${message}\n`,
         html: `
-        <p>Has recibido un nuevo mensaje en <strong>CONNECTIA</strong>.</p>
+        <p>Has recibido un nuevo mensaje en <strong>Expertysm</strong>.</p>
         <p><strong>Servicio:</strong> ${servicio.title}</p>
         <p><strong>De:</strong> ${user.email}</p>
         <p><strong>Mensaje:</strong></p>

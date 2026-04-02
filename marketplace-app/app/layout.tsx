@@ -6,10 +6,14 @@ import SiteFooter from "@/components/site/SiteFooter";
 import SiteHeader from "@/components/site/SiteHeader";
 
 export const metadata: Metadata = {
-  title: "Mapahub — Arquitectura y legal",
+  title: "Expertysm — Arquitectura y legal",
   description:
     "Marketplace especializado: servicios profesionales de arquitectura y asesoría legal. Contrata o publica con claridad.",
-  icons: { icon: "/connectia-logo.png" },
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
+  },
   other: {
     "google-adsense-account": "ca-pub-4967206150420468",
   },

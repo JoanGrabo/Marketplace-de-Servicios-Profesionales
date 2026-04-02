@@ -28,10 +28,10 @@ export async function sendVerificationEmail(email: string, rawToken: string): Pr
   const verifyUrl = `${getAppBaseUrl()}/api/auth/verify-email?token=${encodeURIComponent(rawToken)}`;
   await sendMail({
     to: email,
-    subject: "Verifica tu correo en CONNECTIA",
-    text: `Confirma tu cuenta en CONNECTIA abriendo este enlace: ${verifyUrl}`,
+    subject: "Verifica tu correo en Expertysm",
+    text: `Confirma tu cuenta en Expertysm abriendo este enlace: ${verifyUrl}`,
     html: `
-      <p>Gracias por registrarte en <strong>CONNECTIA</strong>.</p>
+      <p>Gracias por registrarte en <strong>Expertysm</strong>.</p>
       <p>Para activar tu cuenta, verifica tu correo con este enlace:</p>
       <p><a href="${verifyUrl}">Verificar mi cuenta</a></p>
       <p>Este enlace caduca en ${TOKEN_TTL_HOURS} horas.</p>

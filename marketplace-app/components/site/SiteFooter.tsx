@@ -16,8 +16,8 @@ export default function SiteFooter({ user }: Props) {
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div className="lg:col-span-2">
             <p className="text-lg font-bold tracking-tight text-white">
-              <span className="text-white">Mapa</span>
-              <span className="text-[var(--connectia-gold)]">hub</span>
+              <span className="text-white">Experty</span>
+              <span className="text-[var(--connectia-gold)]">sm</span>
             </p>
             <p className="mt-3 max-w-md text-sm leading-relaxed text-gray-400">
               Marketplace especializado en servicios de <strong className="font-medium text-gray-300">Arquitectura</strong> y{" "}
@@ -110,7 +110,7 @@ export default function SiteFooter({ user }: Props) {
               Privacidad
             </Link>
           </nav>
-          <p className="mt-8 text-xs text-gray-500">© Barcelona | 2026</p>
+          <p className="mt-8 text-xs text-gray-500">© Expertysm | 2026</p>
         </div>
       </div>
     </footer>
