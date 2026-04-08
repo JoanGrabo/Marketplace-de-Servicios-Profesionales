@@ -2,9 +2,18 @@ import Link from "next/link";
 
 type Props = {
   publishHref: string;
+  stats?: {
+    professionals: number;
+    services: number;
+  };
 };
 
-export default function HomeHero({ publishHref }: Props) {
+export default function HomeHero({ publishHref, stats }: Props) {
+  const professionalsLabel = stats?.professionals
+    ? `+${stats.professionals} profesionales`
+    : "+25 profesionales";
+  const servicesLabel = stats?.services ? `+${stats.services} servicios` : "+10 servicios";
+
   return (
     <section className="relative overflow-hidden border-b border-gray-200/80 bg-gradient-to-b from-white via-[#faf9f7] to-[#f3f1ed]">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(184,134,11,0.12),transparent)]" />
@@ -15,21 +24,19 @@ export default function HomeHero({ publishHref }: Props) {
         <div className="grid items-center gap-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-16">
           <div className="space-y-8">
             <p className="inline-flex items-center gap-2 rounded-full border border-[var(--connectia-gold)]/25 bg-white/80 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--connectia-gold)] shadow-sm backdrop-blur-sm">
-              Marketplace especializado
+              Arquitectura & Legal
             </p>
 
             <div className="space-y-4">
               <h1 className="pb-1 text-[2rem] font-bold leading-[1.16] tracking-tight text-[var(--connectia-gray)] sm:text-5xl sm:leading-[1.14] lg:text-[2.75rem]">
-                Encuentra arquitectos y abogados
+                Encuentra arquitectos reales para tu proyecto
                 <span className="mt-1 block bg-gradient-to-r from-[var(--connectia-gray)] to-[var(--connectia-gold)] bg-clip-text text-transparent">
-                  para tu proyecto
+                  en días, no semanas
                 </span>
               </h1>
               <p className="max-w-xl text-base leading-relaxed text-gray-600 sm:text-lg">
-                Contrata servicios profesionales de{" "}
-                <strong className="font-semibold text-gray-800">arquitectura</strong> y{" "}
-                <strong className="font-semibold text-gray-800">asesoría legal</strong> de forma
-                clara, rápida y segura. Sin ruido de categorías genéricas: solo lo que necesitas.
+                Catálogo vertical: <strong className="font-semibold text-gray-800">Arquitectura</strong> y{" "}
+                <strong className="font-semibold text-gray-800">Legal</strong>. Precios orientativos, plazos y contacto directo.
               </p>
             </div>
 
@@ -38,14 +45,26 @@ export default function HomeHero({ publishHref }: Props) {
                 href="/servicios"
                 className="inline-flex h-12 items-center justify-center rounded-xl bg-[var(--connectia-gold)] px-8 text-sm font-semibold text-white shadow-lg shadow-[var(--connectia-gold)]/25 transition hover:brightness-105"
               >
-                Explorar servicios
+                Encontrar profesional
               </Link>
               <Link
                 href={publishHref}
                 className="inline-flex h-12 items-center justify-center rounded-xl border-2 border-[var(--connectia-gray)]/15 bg-white px-8 text-sm font-semibold text-[var(--connectia-gray)] shadow-sm transition hover:border-[var(--connectia-gold)]/40 hover:bg-[var(--connectia-gold)]/5"
               >
-                Publicar servicio
+                Publica tu servicio gratis
               </Link>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              <span className="inline-flex items-center rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-semibold text-gray-700">
+                {professionalsLabel}
+              </span>
+              <span className="inline-flex items-center rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-semibold text-gray-700">
+                {servicesLabel}
+              </span>
+              <span className="inline-flex items-center rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-semibold text-gray-700">
+                Contacto directo
+              </span>
             </div>
 
             <ul className="flex flex-wrap gap-x-6 gap-y-2 border-t border-gray-200/80 pt-6 text-sm text-gray-600">

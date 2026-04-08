@@ -57,6 +57,21 @@ export default function ContactoPage() {
               .
             </p>
           </article>
+          <article className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+            <h2 className="text-base font-semibold text-[var(--connectia-gray)]">
+              Email directo
+            </h2>
+            <p className="mt-2 text-sm text-gray-600">
+              Si necesitas respuesta inmediata, escríbenos a{" "}
+              <a
+                href="mailto:joangrabo@gmail.com"
+                className="font-semibold text-[var(--connectia-gold)] hover:underline"
+              >
+                joangrabo@gmail.com
+              </a>
+              .
+            </p>
+          </article>
         </div>
 
         <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm lg:col-span-2">
@@ -152,9 +167,7 @@ export default function ContactoPage() {
           </form>
 
           <p className="mt-4 text-sm text-gray-500">
-            Nota: estamos terminando la integración final del envío automático. Si necesitas
-            contacto inmediato, indica claramente tu email y el motivo para que te respondamos
-            por la vía más rápida.
+            Preferimos mensajes claros y directos: objetivo, plazos y cualquier restricción (ubicación, normativa, presupuesto).
           </p>
         </div>
       </section>

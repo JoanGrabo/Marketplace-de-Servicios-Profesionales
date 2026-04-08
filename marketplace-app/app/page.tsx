@@ -7,6 +7,7 @@ import HomeBenefits from "@/components/home/HomeBenefits";
 import HomeForProfessionals from "@/components/home/HomeForProfessionals";
 import HomeTrust from "@/components/home/HomeTrust";
 import HomeFinalCta from "@/components/home/HomeFinalCta";
+import { prisma } from "@/lib/db";
 
 export default async function HomePage() {
   const user = await getCurrentUser();
@@ -14,11 +15,21 @@ export default async function HomePage() {
     ? "/mis-servicios"
     : `/auth/login?next=${encodeURIComponent("/mis-servicios")}`;
 
-  const featured = await getFeaturedForHome(6);
+  const [featured, professionalsCount, servicesCount] = await Promise.all([
+    getFeaturedForHome(6),
+    prisma.profile.count({ where: { role: "profesional" } }).catch(() => 0),
+    prisma.service.count({ where: { active: true } }).catch(() => 0),
+  ]);
 
   return (
     <main className="min-h-[calc(100vh-5rem)] bg-[var(--connectia-bg)]">
-      <HomeHero publishHref={publishHref} />
+      <HomeHero
+        publishHref={publishHref}
+        stats={{
+          professionals: Math.max(25, professionalsCount),
+          services: Math.max(10, servicesCount),
+        }}
+      />
       <HomeAreas />
       <HomeFeatured items={featured} />
       <HomeBenefits />
