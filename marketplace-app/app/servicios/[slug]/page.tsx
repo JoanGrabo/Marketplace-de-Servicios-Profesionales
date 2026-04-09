@@ -145,6 +145,12 @@ export default async function ServicioDetallePage({ params }: ServicioDetallePro
           >
             Ver más servicios
           </Link>
+          <Link
+            href={`/servicios?profileId=${encodeURIComponent(servicio.profile.id)}`}
+            className="rounded-lg border border-gray-300 px-5 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+          >
+            Ver más servicios de {getPublicProfileName(servicio.profile)}
+          </Link>
         </div>
       </article>
     </main>

@@ -27,6 +27,7 @@ type ServiciosPageProps = {
     sort?: string;
     page?: string;
     featured?: string;
+    profileId?: string;
   };
 };
 
@@ -46,6 +47,7 @@ export default async function ServiciosPage({ searchParams }: ServiciosPageProps
   const sort = String(searchParams?.sort ?? "").trim();
   const pageRaw = String(searchParams?.page ?? "").trim();
   const featuredRaw = String(searchParams?.featured ?? "").trim();
+  const profileId = String(searchParams?.profileId ?? "").trim();
   const featuredOnly = featuredRaw === "1";
   const qEffective = q || subcategoryRaw;
 
@@ -59,6 +61,7 @@ export default async function ServiciosPage({ searchParams }: ServiciosPageProps
 
   const baseWhere: Prisma.ServiceWhereInput = {
     active: true,
+    ...(profileId ? { profileId } : {}),
     ...(category ? { category } : {}),
     ...(qEffective
       ? {
@@ -219,6 +222,7 @@ export default async function ServiciosPage({ searchParams }: ServiciosPageProps
 
       <section id="catalogo" className="mx-auto max-w-6xl px-4 pb-12 sm:px-6">
       <form className="mb-4 grid gap-3 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:grid-cols-12">
+        {profileId ? <input type="hidden" name="profileId" value={profileId} /> : null}
         <input
           name="q"
           defaultValue={q}
@@ -314,7 +318,7 @@ export default async function ServiciosPage({ searchParams }: ServiciosPageProps
         </button>
       </form>
 
-      {(q || subcategoryRaw || category || deliveryRaw || minRaw || maxRaw || sort || featuredOnly) && (
+      {(q || subcategoryRaw || category || deliveryRaw || minRaw || maxRaw || sort || featuredOnly || profileId) && (
         <div className="mb-6 flex flex-wrap items-center gap-2">
           <span className="text-xs font-semibold uppercase tracking-widest text-gray-500">Filtros:</span>
           {q ? <span className="rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-semibold text-gray-700">“{q}”</span> : null}

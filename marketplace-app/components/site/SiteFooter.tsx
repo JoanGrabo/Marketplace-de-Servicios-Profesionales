@@ -65,6 +65,11 @@ export default function SiteFooter({ user }: Props) {
                     </Link>
                   </li>
                   <li>
+                    <Link href="/mi-perfil/editar" className="transition hover:text-white">
+                      Editar perfil
+                    </Link>
+                  </li>
+                  <li>
                     <Link href="/mensajes" className="transition hover:text-white">
                       Mensajes
                     </Link>

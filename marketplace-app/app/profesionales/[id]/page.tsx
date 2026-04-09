@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { getPublicProfileName } from "@/lib/publicProfile";
+import { getCurrentUser } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +14,8 @@ export default async function ProfesionalPublicoPage({ params }: Props) {
   const p = await params;
   const id = String((p as any)?.id ?? "");
 
-  const profile = await prisma.profile.findUnique({
+  const [profile, currentUser] = await Promise.all([
+    prisma.profile.findUnique({
     where: { id },
     select: {
       id: true,
@@ -46,7 +48,9 @@ export default async function ProfesionalPublicoPage({ params }: Props) {
         },
       },
     },
-  });
+    }),
+    getCurrentUser().catch(() => null),
+  ]);
 
   if (!profile) notFound();
 
@@ -79,7 +83,31 @@ export default async function ProfesionalPublicoPage({ params }: Props) {
             </div>
           )}
           <div className="min-w-0">
-            <h1 className="text-3xl font-bold text-[var(--connectia-gray)]">{name}</h1>
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <h1 className="text-3xl font-bold text-[var(--connectia-gray)]">{name}</h1>
+              {currentUser?.id === profile.id ? (
+                <Link
+                  href="/mi-perfil/editar"
+                  className="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+                  title="Editar perfil"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path
+                      d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    />
+                    <path
+                      d="M19.4 15a8.3 8.3 0 0 0 .1-1 8.3 8.3 0 0 0-.1-1l2-1.6-1.9-3.3-2.4 1a8.2 8.2 0 0 0-1.7-1l-.4-2.6H10l-.4 2.6a8.2 8.2 0 0 0-1.7 1l-2.4-1L3.6 11.4l2 1.6a8.3 8.3 0 0 0-.1 1 8.3 8.3 0 0 0 .1 1l-2 1.6 1.9 3.3 2.4-1a8.2 8.2 0 0 0 1.7 1l.4 2.6h4l.4-2.6a8.2 8.2 0 0 0 1.7-1l2.4 1 1.9-3.3-2-1.6Z"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  Ajustes
+                </Link>
+              ) : null}
+            </div>
             <p className="mt-2 text-gray-600">
               {profile.headline ? <span className="font-medium text-gray-800">{profile.headline}</span> : null}
               {profile.city ? <span> · {profile.city}</span> : null}
