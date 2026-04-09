@@ -6,24 +6,28 @@ import { Prisma } from "@prisma/client";
 export const dynamic = "force-dynamic";
 
 async function geocodeNominatim(query: string): Promise<{ label: string; lat: number; lng: number } | null> {
-  const url = new URL("https://nominatim.openstreetmap.org/search");
-  url.searchParams.set("format", "json");
-  url.searchParams.set("limit", "1");
-  url.searchParams.set("q", query);
+  try {
+    const url = new URL("https://nominatim.openstreetmap.org/search");
+    url.searchParams.set("format", "json");
+    url.searchParams.set("limit", "1");
+    url.searchParams.set("q", query);
 
-  const res = await fetch(url.toString(), {
-    headers: { "User-Agent": "expertysm.com (contact: admin@expertysm.com)" },
-    cache: "no-store",
-  });
-  if (!res.ok) return null;
-  const data = (await res.json().catch(() => null)) as any[] | null;
-  const first = Array.isArray(data) ? data[0] : null;
-  if (!first) return null;
-  const lat = Number(first.lat);
-  const lng = Number(first.lon);
-  const label = String(first.display_name ?? query);
-  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
-  return { label, lat, lng };
+    const res = await fetch(url.toString(), {
+      headers: { "User-Agent": "expertysm.com (contact: admin@expertysm.com)" },
+      cache: "no-store",
+    });
+    if (!res.ok) return null;
+    const data = (await res.json().catch(() => null)) as any[] | null;
+    const first = Array.isArray(data) ? data[0] : null;
+    if (!first) return null;
+    const lat = Number(first.lat);
+    const lng = Number(first.lon);
+    const label = String(first.display_name ?? query);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+    return { label, lat, lng };
+  } catch {
+    return null;
+  }
 }
 
 type Props = {
@@ -61,45 +65,54 @@ export default async function ProfesionalesPage({ searchParams }: Props) {
       )`
     : Prisma.sql`TRUE`;
 
+  let distanceQueryFailed = false;
+
   const professionals = geo
-    ? await prisma.$queryRaw<
-        Array<{
-          id: string;
-          displayName: string | null;
-          headline: string | null;
-          city: string | null;
-          avatarUrl: string | null;
-          updatedAt: Date;
-          distanceKm: number | null;
-        }>
-      >`
-        SELECT
-          p.id,
-          p.display_name as "displayName",
-          p.headline,
-          p.city,
-          p.avatar_url as "avatarUrl",
-          p.updated_at as "updatedAt",
-          CASE
-            WHEN p.location_lat IS NULL OR p.location_lng IS NULL THEN NULL
-            ELSE (
-              6371 * 2 * asin(
-                sqrt(
-                  power(sin(radians((${geo.lat} - p.location_lat) / 2)), 2)
-                  + cos(radians(p.location_lat)) * cos(radians(${geo.lat}))
-                  * power(sin(radians((${geo.lng} - p.location_lng) / 2)), 2)
+    ? await prisma
+        .$queryRaw<
+          Array<{
+            id: string;
+            displayName: string | null;
+            headline: string | null;
+            city: string | null;
+            avatarUrl: string | null;
+            updatedAt: Date;
+            distanceKm: number | null;
+          }>
+        >`
+          SELECT
+            p.id,
+            p.display_name as "displayName",
+            p.headline,
+            p.city,
+            p.avatar_url as "avatarUrl",
+            p.updated_at as "updatedAt",
+            CASE
+              WHEN p.location_lat IS NULL OR p.location_lng IS NULL THEN NULL
+              ELSE (
+                6371 * 2 * asin(
+                  sqrt(
+                    power(sin(radians((${geo.lat} - p.location_lat) / 2)), 2)
+                    + cos(radians(p.location_lat)) * cos(radians(${geo.lat}))
+                    * power(sin(radians((${geo.lng} - p.location_lng) / 2)), 2)
+                  )
                 )
               )
-            )
-          END as "distanceKm"
-        FROM profiles p
-        WHERE
-          p.role = 'profesional'
-          AND ${extraWhere}
-          AND ${extraSearchSql}
-        ORDER BY ("distanceKm" IS NULL) ASC, "distanceKm" ASC, p.updated_at DESC
-        LIMIT ${perPage} OFFSET ${Math.max(0, (page - 1) * perPage)};
-      `
+            END as "distanceKm"
+          FROM profiles p
+          WHERE
+            p.role = 'profesional'
+            AND ${extraWhere}
+            AND ${extraSearchSql}
+          ORDER BY ("distanceKm" IS NULL) ASC, "distanceKm" ASC, p.updated_at DESC
+          LIMIT ${perPage} OFFSET ${Math.max(0, (page - 1) * perPage)};
+        `
+        .catch((e) => {
+          // eslint-disable-next-line no-console
+          console.error("Profesionales distance query failed:", e);
+          distanceQueryFailed = true;
+          return [];
+        })
     : await prisma.profile.findMany({
         where: {
           role: "profesional",
@@ -133,6 +146,43 @@ export default async function ProfesionalesPage({ searchParams }: Props) {
           updatedAt: true,
         },
       });
+
+  const fallbackProfessionals =
+    geo && (distanceQueryFailed || professionals.length === 0)
+      ? await prisma.profile.findMany({
+          where: {
+            role: "profesional",
+            ...(q
+              ? {
+                  OR: [
+                    { displayName: { contains: q, mode: "insensitive" } },
+                    { name: { contains: q, mode: "insensitive" } },
+                    { headline: { contains: q, mode: "insensitive" } },
+                    { city: { contains: q, mode: "insensitive" } },
+                  ],
+                }
+              : {}),
+            ...(tipo === "arquitectura"
+              ? { services: { some: { active: true, category: "Arquitectura" } } }
+              : tipo === "legal"
+                ? { services: { some: { active: true, category: "Legal" } } }
+                : tipo === "destacados"
+                  ? { services: { some: { active: true, isPromoted: true, promoExpiresAt: { gt: now } } } }
+                  : {}),
+          },
+          orderBy: { updatedAt: "desc" },
+          skip: Math.max(0, (page - 1) * perPage),
+          take: perPage,
+          select: {
+            id: true,
+            displayName: true,
+            headline: true,
+            city: true,
+            avatarUrl: true,
+            updatedAt: true,
+          },
+        })
+      : null;
 
   const nextPageHref = `/profesionales?${new URLSearchParams(
     Object.entries({
@@ -196,12 +246,18 @@ export default async function ProfesionalesPage({ searchParams }: Props) {
         </p>
       ) : null}
 
-      {professionals.length === 0 ? (
+      {distanceQueryFailed ? (
+        <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+          No pude calcular distancias ahora mismo. Te muestro profesionales igualmente (sin orden por cercanía).
+        </div>
+      ) : null}
+
+      {(fallbackProfessionals ?? professionals).length === 0 ? (
         <p className="text-gray-500">No hay profesionales para esa zona todavía.</p>
       ) : (
         <>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {professionals.map((p: any) => {
+            {(fallbackProfessionals ?? professionals).map((p: any) => {
             const name = getPublicProfileName(p);
             const avatarSrc =
               p.avatarUrl && p.updatedAt
