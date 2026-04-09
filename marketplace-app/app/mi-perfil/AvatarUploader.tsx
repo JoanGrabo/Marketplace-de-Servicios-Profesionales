@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 type Props = {
@@ -12,10 +12,21 @@ export default function AvatarUploader({ initialAvatarUrl }: Props) {
   const [avatarUrl, setAvatarUrl] = useState(initialAvatarUrl);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
 
   async function onChangeAvatar(file: File | null) {
     if (!file) return;
     setError(null);
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    const nextPreview = URL.createObjectURL(file);
+    setPreviewUrl(nextPreview);
+    setAvatarUrl(nextPreview);
     setUploading(true);
     try {
       const formData = new FormData();
@@ -33,6 +44,8 @@ export default function AvatarUploader({ initialAvatarUrl }: Props) {
       // Fuerza refresh visual aunque el navegador cachee la ruta.
       const raw = String(data.avatarUrl as string);
       setAvatarUrl(`${raw}${raw.includes("?") ? "&" : "?"}v=${Date.now()}`);
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      setPreviewUrl(null);
       setUploading(false);
       router.refresh();
     } catch {
