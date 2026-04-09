@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
 import { getFeaturedForHome } from "@/lib/homeData";
 import HomeHero from "@/components/home/HomeHero";
