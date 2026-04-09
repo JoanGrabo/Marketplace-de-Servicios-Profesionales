@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { canSendMail } from "@/lib/mailer";
 import { createEmailVerificationToken, sendVerificationEmail } from "@/lib/emailVerification";
-import { isValidEmail, normalizeEmail, parseRole } from "@/lib/validation";
+import { isValidEmail, normalizeEmail } from "@/lib/validation";
 import bcrypt from "bcryptjs";
 import { rateLimit } from "@/lib/rateLimit";
 
@@ -20,7 +20,7 @@ export async function POST(req: Request) {
     const body = await req.json();
     const email = normalizeEmail(body.email);
     const password = body.password as string | undefined;
-    const role = parseRole(body.role ?? "cliente");
+    const role = "profesional";
 
     if (!email || !isValidEmail(email) || !password || password.length < 6) {
       return NextResponse.json(
@@ -31,13 +31,6 @@ export async function POST(req: Request) {
         { status: 400 },
       );
     }
-    if (!role) {
-      return NextResponse.json(
-        { ok: false, message: "Rol no válido." },
-        { status: 400 },
-      );
-    }
-
     const existing = await prisma.profile.findUnique({ where: { email } });
     if (existing) {
       if (existing.emailVerifiedAt) {

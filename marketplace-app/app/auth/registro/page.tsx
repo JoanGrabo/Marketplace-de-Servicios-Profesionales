@@ -3,15 +3,9 @@
 import { useState } from "react";
 import GoogleSignInButton from "@/app/auth/_components/GoogleSignInButton";
 
-const roles = [
-  { value: "cliente", label: "Cliente (contrata servicios)" },
-  { value: "profesional", label: "Profesional (ofrece servicios)" },
-];
-
 export default function RegistroPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("cliente");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -25,7 +19,7 @@ export default function RegistroPage() {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, role }),
+        body: JSON.stringify({ email, password }),
       });
       const data = await res.json();
       if (!res.ok || !data.ok) {
@@ -47,12 +41,12 @@ export default function RegistroPage() {
         Crear cuenta
       </h1>
       <p className="mb-8 text-sm text-gray-600">
-        Regístrate para contratar servicios o publicarlos como profesional.
+        Crea tu cuenta profesional para publicar servicios en Expertysm.
       </p>
       <form onSubmit={handleSubmit} className="space-y-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
         <div className="space-y-2">
           <p className="text-sm font-medium text-gray-700">Registro rápido con Google</p>
-          <GoogleSignInButton mode="register" role={role as "cliente" | "profesional"} />
+          <GoogleSignInButton mode="register" />
         </div>
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
@@ -90,23 +84,6 @@ export default function RegistroPage() {
             className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-[var(--connectia-gold)] focus:outline-none focus:ring-1 focus:ring-[var(--connectia-gold)]"
             placeholder="Mínimo 6 caracteres"
           />
-        </div>
-        <div>
-          <label htmlFor="role" className="mb-1 block text-sm font-medium text-gray-700">
-            ¿Cómo quieres usar Expertysm?
-          </label>
-          <select
-            id="role"
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-[var(--connectia-gold)] focus:outline-none focus:ring-1 focus:ring-[var(--connectia-gold)]"
-          >
-            {roles.map((r) => (
-              <option key={r.value} value={r.value}>
-                {r.label}
-              </option>
-            ))}
-          </select>
         </div>
         {success && <p className="text-sm text-green-700">{success}</p>}
         {error && <p className="text-sm text-red-600">{error}</p>}

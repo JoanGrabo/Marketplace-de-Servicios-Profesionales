@@ -27,13 +27,14 @@ async function geocodeNominatim(query: string): Promise<{ label: string; lat: nu
 }
 
 type Props = {
-  searchParams?: { zona?: string; tipo?: string; page?: string };
+  searchParams?: { zona?: string; tipo?: string; q?: string; page?: string };
 };
 
 export default async function ProfesionalesPage({ searchParams }: Props) {
   const zona = String(searchParams?.zona ?? "").trim();
   const tipoRaw = String(searchParams?.tipo ?? "").trim().toLowerCase();
   const tipo = tipoRaw === "arquitectura" || tipoRaw === "legal" || tipoRaw === "destacados" ? tipoRaw : "";
+  const q = String(searchParams?.q ?? "").trim();
   const radiusKm = 100;
   const pageRaw = String(searchParams?.page ?? "").trim();
   const page = Math.max(1, Number.isFinite(Number(pageRaw)) ? Math.floor(Number(pageRaw)) : 1);
@@ -50,6 +51,15 @@ export default async function ProfesionalesPage({ searchParams }: Props) {
         : tipo === "destacados"
           ? Prisma.sql`EXISTS (SELECT 1 FROM services s WHERE s.profile_id = p.id AND s.active = true AND s.is_promoted = true AND s.promo_expires_at > ${now})`
           : Prisma.sql`TRUE`;
+
+  const extraSearchSql = q
+    ? Prisma.sql`(
+        COALESCE(p.display_name, '') ILIKE ${`%${q}%`}
+        OR COALESCE(p.name, '') ILIKE ${`%${q}%`}
+        OR COALESCE(p.headline, '') ILIKE ${`%${q}%`}
+        OR COALESCE(p.city, '') ILIKE ${`%${q}%`}
+      )`
+    : Prisma.sql`TRUE`;
 
   const professionals = geo
     ? await prisma.$queryRaw<
@@ -86,12 +96,23 @@ export default async function ProfesionalesPage({ searchParams }: Props) {
         WHERE
           p.role = 'profesional'
           AND ${extraWhere}
+          AND ${extraSearchSql}
         ORDER BY ("distanceKm" IS NULL) ASC, "distanceKm" ASC, p.updated_at DESC
         LIMIT ${perPage} OFFSET ${Math.max(0, (page - 1) * perPage)};
       `
     : await prisma.profile.findMany({
         where: {
           role: "profesional",
+          ...(q
+            ? {
+                OR: [
+                  { displayName: { contains: q, mode: "insensitive" } },
+                  { name: { contains: q, mode: "insensitive" } },
+                  { headline: { contains: q, mode: "insensitive" } },
+                  { city: { contains: q, mode: "insensitive" } },
+                ],
+              }
+            : {}),
           ...(tipo === "arquitectura"
             ? { services: { some: { active: true, category: "Arquitectura" } } }
             : tipo === "legal"
@@ -117,6 +138,7 @@ export default async function ProfesionalesPage({ searchParams }: Props) {
     Object.entries({
       ...(zona ? { zona } : {}),
       ...(tipo ? { tipo } : {}),
+      ...(q ? { q } : {}),
       page: String(page + 1),
     }),
   ).toString()}`;
@@ -124,6 +146,7 @@ export default async function ProfesionalesPage({ searchParams }: Props) {
     Object.entries({
       ...(zona ? { zona } : {}),
       ...(tipo ? { tipo } : {}),
+      ...(q ? { q } : {}),
       page: String(Math.max(1, page - 1)),
     }),
   ).toString()}`;
@@ -134,21 +157,27 @@ export default async function ProfesionalesPage({ searchParams }: Props) {
         <div>
           <h1 className="text-3xl font-bold text-[var(--connectia-gray)]">Profesionales</h1>
           <p className="mt-2 text-gray-600">
-            Busca arquitectos y abogados por zona (radio {radiusKm}km).
+            Busca arquitectos y abogados por zona y nombre (España).
           </p>
         </div>
-        <form className="flex w-full max-w-xl gap-2 sm:w-auto">
+        <form className="grid w-full max-w-xl gap-2 sm:w-auto sm:grid-cols-3">
           {tipo ? <input type="hidden" name="tipo" value={tipo} /> : null}
           <input type="hidden" name="page" value="1" />
           <input
+            name="q"
+            defaultValue={q}
+            placeholder="Nombre (ej. Marta)"
+            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-[var(--connectia-gold)] focus:outline-none focus:ring-1 focus:ring-[var(--connectia-gold)] sm:col-span-1"
+          />
+          <input
             name="zona"
             defaultValue={zona}
-            placeholder="Ej. Barcelona, Girona, Tarragona…"
-            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-[var(--connectia-gold)] focus:outline-none focus:ring-1 focus:ring-[var(--connectia-gold)]"
+            placeholder="Zona (ej. Barcelona)"
+            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-[var(--connectia-gold)] focus:outline-none focus:ring-1 focus:ring-[var(--connectia-gold)] sm:col-span-1"
           />
           <button
             type="submit"
-            className="shrink-0 rounded-lg bg-[var(--connectia-gold)] px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90"
+            className="shrink-0 rounded-lg bg-[var(--connectia-gold)] px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90 sm:col-span-1"
           >
             Buscar
           </button>

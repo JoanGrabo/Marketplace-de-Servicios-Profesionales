@@ -30,14 +30,12 @@ declare global {
 
 type Props = {
   mode: "login" | "register";
-  role?: "cliente" | "profesional";
   redirectTo?: string;
   remember?: boolean;
 };
 
 export default function GoogleSignInButton({
   mode,
-  role,
   redirectTo = "/",
   remember = false,
 }: Props) {
@@ -75,7 +73,7 @@ export default function GoogleSignInButton({
           const res = await fetch("/api/auth/google", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ credential, role, remember }),
+            body: JSON.stringify({ credential, remember }),
           });
           const data = await res.json();
           if (!res.ok || !data.ok) {
@@ -94,7 +92,7 @@ export default function GoogleSignInButton({
         width: 320,
       });
     }
-  }, [mode, redirectTo, remember, role, router]);
+  }, [mode, redirectTo, remember, router]);
 
   return (
     <div className="space-y-2">

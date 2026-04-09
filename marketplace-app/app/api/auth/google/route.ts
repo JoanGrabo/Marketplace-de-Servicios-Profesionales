@@ -5,12 +5,10 @@ import {
   createSessionToken,
   getSessionMaxAgeSeconds,
 } from "@/lib/auth";
-import { parseRole } from "@/lib/validation";
 import { buildSessionSetCookie } from "@/lib/sessionCookie";
 
 type GooglePayload = {
   credential?: string;
-  role?: string;
   remember?: boolean;
 };
 
@@ -45,7 +43,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const role = parseRole(body.role ?? "cliente") ?? "cliente";
+    const role = "profesional";
     const remember = Boolean(body.remember);
 
     const user = await prisma.profile.upsert({
