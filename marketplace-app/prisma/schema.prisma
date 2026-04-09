@@ -45,6 +45,8 @@ model Profile {
   sentMessages Message[] @relation("MessageSender")
   ordersAsBuyer Order[] @relation("OrderBuyer")
   ordersAsSeller Order[] @relation("OrderSeller")
+  reviewsAsBuyer Review[] @relation("ReviewBuyer")
+  reviewsAsSeller Review[] @relation("ReviewSeller")
 
   @@map("profiles")
 }
@@ -126,11 +128,32 @@ model Conversation {
   client       Profile @relation("ConversationClient", fields: [clientId], references: [id], onDelete: Cascade)
   professional Profile @relation("ConversationProfessional", fields: [professionalId], references: [id], onDelete: Cascade)
   messages     Message[]
+  review       Review?
 
   @@unique([serviceId, clientId, professionalId])
   @@index([clientId])
   @@index([professionalId])
   @@map("conversations")
+}
+
+model Review {
+  id             String   @id @default(cuid())
+  conversationId String   @unique @map("conversation_id")
+  serviceId      String   @map("service_id")
+  buyerId        String   @map("buyer_id")
+  sellerId       String   @map("seller_id")
+  rating         Int
+  comment        String?  @map("comment")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  service      Service      @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  buyer        Profile      @relation("ReviewBuyer", fields: [buyerId], references: [id], onDelete: Cascade)
+  seller       Profile      @relation("ReviewSeller", fields: [sellerId], references: [id], onDelete: Cascade)
+
+  @@index([sellerId, createdAt])
+  @@index([serviceId, createdAt])
+  @@map("reviews")
 }
 
 model Message {

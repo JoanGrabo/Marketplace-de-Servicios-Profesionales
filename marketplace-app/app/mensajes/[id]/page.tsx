@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db";
 import { getPublicProfileName } from "@/lib/publicProfile";
 import MessageComposer from "./MessageComposer";
 import ProfileAvatar from "../_components/ProfileAvatar";
+import ReviewDialog from "./ReviewDialog";
 
 export default async function ConversationPage({
   params,
@@ -27,6 +28,7 @@ export default async function ConversationPage({
       professional: {
         select: { id: true, displayName: true, avatarUrl: true, updatedAt: true },
       },
+      review: { select: { id: true } },
       messages: {
         orderBy: { createdAt: "asc" },
         include: {
@@ -64,6 +66,7 @@ export default async function ConversationPage({
     ? conversation.professional
     : conversation.client;
   const partnerName = getPublicProfileName(otherProfile);
+  const canReview = isClient && !conversation.review;
 
   return (
     <div className="flex min-h-screen flex-col bg-[var(--connectia-bg)]">
@@ -91,6 +94,12 @@ export default async function ConversationPage({
             >
               ← Bandeja
             </Link>
+            {canReview ? (
+              <ReviewDialog
+                conversationId={conversation.id}
+                professionalName={partnerName}
+              />
+            ) : null}
           </div>
         </header>
 

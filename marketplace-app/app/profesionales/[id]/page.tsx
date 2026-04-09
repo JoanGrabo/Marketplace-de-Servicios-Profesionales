@@ -30,6 +30,17 @@ export default async function ProfesionalPublicoPage({ params }: Props) {
       colegiadoNumber: true,
       avatarUrl: true,
       updatedAt: true,
+      reviewsAsSeller: {
+        orderBy: { createdAt: "desc" },
+        take: 6,
+        select: {
+          id: true,
+          rating: true,
+          comment: true,
+          createdAt: true,
+          buyer: { select: { id: true, displayName: true } },
+        },
+      },
       services: {
         where: { active: true },
         orderBy: [{ isPromoted: "desc" }, { promoExpiresAt: "desc" }, { createdAt: "desc" }],
@@ -119,6 +130,23 @@ export default async function ProfesionalPublicoPage({ params }: Props) {
               {profile.city ? <span> · {profile.city}</span> : null}
               {profile.colegiadoNumber ? <span> · Nº colegiado {profile.colegiadoNumber}</span> : null}
             </p>
+
+            <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-gray-600">
+              {profile.reviewsAsSeller.length ? (
+                <>
+                  <span className="inline-flex items-center gap-1 font-semibold text-[var(--connectia-gray)]">
+                    <span className="text-[var(--connectia-gold)]">★</span>
+                    {(
+                      profile.reviewsAsSeller.reduce((sum, r) => sum + r.rating, 0) /
+                      profile.reviewsAsSeller.length
+                    ).toFixed(1)}
+                  </span>
+                  <span className="text-gray-500">({profile.reviewsAsSeller.length} reseñas recientes)</span>
+                </>
+              ) : (
+                <span className="text-gray-500">Aún sin reseñas</span>
+              )}
+            </div>
             <div className="mt-3 flex flex-wrap gap-3 text-sm">
               {profile.websiteUrl ? (
                 <a href={profile.websiteUrl} target="_blank" rel="noreferrer" className="font-semibold text-[var(--connectia-gold)] hover:underline">
@@ -145,6 +173,37 @@ export default async function ProfesionalPublicoPage({ params }: Props) {
         </div>
         {profile.bio ? <p className="mt-4 max-w-3xl whitespace-pre-wrap text-gray-700">{profile.bio}</p> : null}
       </div>
+
+      {profile.reviewsAsSeller.length ? (
+        <section className="mb-10">
+          <h2 className="mb-4 text-lg font-semibold text-[var(--connectia-gray)]">Reseñas</h2>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {profile.reviewsAsSeller.map((r) => (
+              <article key={r.id} className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+                <div className="flex items-start justify-between gap-2">
+                  <p className="text-sm font-semibold text-[var(--connectia-gray)]">
+                    {r.buyer.displayName?.trim() ? r.buyer.displayName : "Cliente"}
+                  </p>
+                  <span className="shrink-0 text-sm font-semibold text-[var(--connectia-gold)]">
+                    {"★".repeat(Math.max(0, Math.min(5, r.rating)))}
+                    <span className="text-gray-300">
+                      {"★".repeat(Math.max(0, 5 - Math.max(0, Math.min(5, r.rating))))}
+                    </span>
+                  </span>
+                </div>
+                {r.comment ? (
+                  <p className="mt-2 line-clamp-4 whitespace-pre-wrap text-sm text-gray-700">{r.comment}</p>
+                ) : (
+                  <p className="mt-2 text-sm text-gray-500">Sin comentario.</p>
+                )}
+                <p className="mt-3 text-xs text-gray-500">
+                  {r.createdAt.toLocaleDateString("es-ES", { day: "numeric", month: "short", year: "numeric" })}
+                </p>
+              </article>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       <h2 className="mb-4 text-lg font-semibold text-[var(--connectia-gray)]">Servicios</h2>
       {profile.services.length === 0 ? (

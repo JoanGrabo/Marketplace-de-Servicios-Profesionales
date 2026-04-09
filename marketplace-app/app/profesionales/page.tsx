@@ -27,7 +27,7 @@ async function geocodeNominatim(query: string): Promise<{ label: string; lat: nu
 }
 
 type Props = {
-  searchParams?: { zona?: string; tipo?: string };
+  searchParams?: { zona?: string; tipo?: string; page?: string };
 };
 
 export default async function ProfesionalesPage({ searchParams }: Props) {
@@ -35,6 +35,9 @@ export default async function ProfesionalesPage({ searchParams }: Props) {
   const tipoRaw = String(searchParams?.tipo ?? "").trim().toLowerCase();
   const tipo = tipoRaw === "arquitectura" || tipoRaw === "legal" || tipoRaw === "destacados" ? tipoRaw : "";
   const radiusKm = 100;
+  const pageRaw = String(searchParams?.page ?? "").trim();
+  const page = Math.max(1, Number.isFinite(Number(pageRaw)) ? Math.floor(Number(pageRaw)) : 1);
+  const perPage = 60;
 
   const geo = zona ? await geocodeNominatim(zona) : null;
   const now = new Date();
@@ -57,7 +60,7 @@ export default async function ProfesionalesPage({ searchParams }: Props) {
           city: string | null;
           avatarUrl: string | null;
           updatedAt: Date;
-          distanceKm: number;
+          distanceKm: number | null;
         }>
       >`
         SELECT
@@ -67,32 +70,24 @@ export default async function ProfesionalesPage({ searchParams }: Props) {
           p.city,
           p.avatar_url as "avatarUrl",
           p.updated_at as "updatedAt",
-          (
-            6371 * 2 * asin(
-              sqrt(
-                power(sin(radians((${geo.lat} - p.location_lat) / 2)), 2)
-                + cos(radians(p.location_lat)) * cos(radians(${geo.lat}))
-                * power(sin(radians((${geo.lng} - p.location_lng) / 2)), 2)
+          CASE
+            WHEN p.location_lat IS NULL OR p.location_lng IS NULL THEN NULL
+            ELSE (
+              6371 * 2 * asin(
+                sqrt(
+                  power(sin(radians((${geo.lat} - p.location_lat) / 2)), 2)
+                  + cos(radians(p.location_lat)) * cos(radians(${geo.lat}))
+                  * power(sin(radians((${geo.lng} - p.location_lng) / 2)), 2)
+                )
               )
             )
-          ) as "distanceKm"
+          END as "distanceKm"
         FROM profiles p
         WHERE
           p.role = 'profesional'
-          AND p.location_lat IS NOT NULL
-          AND p.location_lng IS NOT NULL
           AND ${extraWhere}
-          AND (
-            6371 * 2 * asin(
-              sqrt(
-                power(sin(radians((${geo.lat} - p.location_lat) / 2)), 2)
-                + cos(radians(p.location_lat)) * cos(radians(${geo.lat}))
-                * power(sin(radians((${geo.lng} - p.location_lng) / 2)), 2)
-              )
-            )
-          ) <= ${radiusKm}
-        ORDER BY "distanceKm" ASC
-        LIMIT 100;
+        ORDER BY ("distanceKm" IS NULL) ASC, "distanceKm" ASC, p.updated_at DESC
+        LIMIT ${perPage} OFFSET ${Math.max(0, (page - 1) * perPage)};
       `
     : await prisma.profile.findMany({
         where: {
@@ -106,7 +101,8 @@ export default async function ProfesionalesPage({ searchParams }: Props) {
                 : {}),
         },
         orderBy: { updatedAt: "desc" },
-        take: 60,
+        skip: Math.max(0, (page - 1) * perPage),
+        take: perPage,
         select: {
           id: true,
           displayName: true,
@@ -116,6 +112,21 @@ export default async function ProfesionalesPage({ searchParams }: Props) {
           updatedAt: true,
         },
       });
+
+  const nextPageHref = `/profesionales?${new URLSearchParams(
+    Object.entries({
+      ...(zona ? { zona } : {}),
+      ...(tipo ? { tipo } : {}),
+      page: String(page + 1),
+    }),
+  ).toString()}`;
+  const prevPageHref = `/profesionales?${new URLSearchParams(
+    Object.entries({
+      ...(zona ? { zona } : {}),
+      ...(tipo ? { tipo } : {}),
+      page: String(Math.max(1, page - 1)),
+    }),
+  ).toString()}`;
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
@@ -128,6 +139,7 @@ export default async function ProfesionalesPage({ searchParams }: Props) {
         </div>
         <form className="flex w-full max-w-xl gap-2 sm:w-auto">
           {tipo ? <input type="hidden" name="tipo" value={tipo} /> : null}
+          <input type="hidden" name="page" value="1" />
           <input
             name="zona"
             defaultValue={zona}
@@ -151,15 +163,16 @@ export default async function ProfesionalesPage({ searchParams }: Props) {
 
       {geo ? (
         <p className="mb-5 text-sm text-gray-600">
-          Mostrando resultados cerca de <span className="font-semibold">{geo.label}</span>.
+          Mostrando resultados cerca de <span className="font-semibold">{geo.label}</span> (ordenados por cercanía).
         </p>
       ) : null}
 
       {professionals.length === 0 ? (
         <p className="text-gray-500">No hay profesionales para esa zona todavía.</p>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {professionals.map((p: any) => {
+        <>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {professionals.map((p: any) => {
             const name = getPublicProfileName(p);
             const avatarSrc =
               p.avatarUrl && p.updatedAt
@@ -183,6 +196,8 @@ export default async function ProfesionalesPage({ searchParams }: Props) {
                       {p.city ? <span>{p.city}</span> : <span>Ciudad no indicada</span>}
                       {typeof p.distanceKm === "number" && Number.isFinite(p.distanceKm) ? (
                         <span> · a {Math.round(p.distanceKm)}km</span>
+                      ) : geo ? (
+                        <span> · sin ubicación</span>
                       ) : null}
                     </p>
                     <div className="mt-3">
@@ -197,8 +212,27 @@ export default async function ProfesionalesPage({ searchParams }: Props) {
                 </div>
               </article>
             );
-          })}
-        </div>
+            })}
+          </div>
+
+          <div className="mt-8 flex items-center justify-between">
+            <Link
+              href={prevPageHref}
+              className={`rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold transition ${
+                page <= 1 ? "pointer-events-none opacity-50" : "text-gray-700 hover:bg-gray-50"
+              }`}
+            >
+              ← Anterior
+            </Link>
+            <p className="text-sm text-gray-500">Página {page}</p>
+            <Link
+              href={nextPageHref}
+              className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+            >
+              Siguiente →
+            </Link>
+          </div>
+        </>
       )}
     </main>
   );
