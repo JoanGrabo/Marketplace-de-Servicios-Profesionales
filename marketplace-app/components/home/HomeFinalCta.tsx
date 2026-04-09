@@ -20,13 +20,13 @@ export default function HomeFinalCta({ publishHref }: Props) {
             href="/servicios"
             className="inline-flex h-12 w-full max-w-xs items-center justify-center rounded-xl bg-[var(--connectia-gold)] px-8 text-sm font-semibold text-white shadow-lg shadow-[var(--connectia-gold)]/20 transition hover:brightness-105 sm:w-auto"
           >
-            Explorar servicios
+            Encontrar profesional
           </Link>
           <Link
             href={publishHref}
             className="inline-flex h-12 w-full max-w-xs items-center justify-center rounded-xl border-2 border-[var(--connectia-gray)]/15 bg-white px-8 text-sm font-semibold text-[var(--connectia-gray)] shadow-sm transition hover:border-[var(--connectia-gold)]/35 sm:w-auto"
           >
-            Publicar servicio
+            Publica tu servicio gratis
           </Link>
         </div>
       </div>

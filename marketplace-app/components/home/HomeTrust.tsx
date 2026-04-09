@@ -17,8 +17,7 @@ export default function HomeTrust() {
             Transparencia desde el primer vistazo
           </h2>
           <p className="mt-2 text-sm text-gray-600 sm:text-base">
-            Estamos construyendo Expertysm con criterios de claridad. Más adelante podrás ver aquí métricas
-            reales de uso; de momento, estos son nuestros compromisos.
+            No prometemos humo: mostramos precio, entrega y perfil. Y mejoramos la experiencia con datos reales.
           </p>
         </div>
 
@@ -34,11 +33,12 @@ export default function HomeTrust() {
           ))}
         </div>
 
-        <div className="mx-auto mt-10 max-w-3xl rounded-2xl border border-dashed border-gray-200 bg-gray-50/50 px-6 py-8 text-center">
-          <p className="text-xs font-medium uppercase tracking-wider text-gray-400">Reservado para métricas</p>
-          <p className="mt-2 text-sm text-gray-500">
-            Cuando tengamos datos públicos (por ejemplo, número de servicios activos o profesionales), los
-            mostraremos aquí para reforzar la confianza con números reales.
+        <div className="mx-auto mt-10 max-w-3xl rounded-2xl border border-gray-200 bg-gradient-to-b from-white to-gray-50 px-6 py-8 text-center shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+            Recomendación rápida
+          </p>
+          <p className="mt-2 text-sm text-gray-600">
+            Para conseguir respuesta más rápido: explica objetivo, ubicación, plazos y adjunta una referencia (foto/planos).
           </p>
         </div>
       </div>

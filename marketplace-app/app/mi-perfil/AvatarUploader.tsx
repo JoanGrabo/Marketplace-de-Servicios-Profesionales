@@ -30,7 +30,9 @@ export default function AvatarUploader({ initialAvatarUrl }: Props) {
         setUploading(false);
         return;
       }
-      setAvatarUrl(data.avatarUrl as string);
+      // Fuerza refresh visual aunque el navegador cachee la ruta.
+      const raw = String(data.avatarUrl as string);
+      setAvatarUrl(`${raw}${raw.includes("?") ? "&" : "?"}v=${Date.now()}`);
       setUploading(false);
       router.refresh();
     } catch {

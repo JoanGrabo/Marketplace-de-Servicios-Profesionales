@@ -22,16 +22,16 @@ export default async function ConversationPage({
     include: {
       service: { select: { id: true, title: true, slug: true } },
       client: {
-        select: { id: true, displayName: true, avatarUrl: true },
+        select: { id: true, displayName: true, avatarUrl: true, updatedAt: true },
       },
       professional: {
-        select: { id: true, displayName: true, avatarUrl: true },
+        select: { id: true, displayName: true, avatarUrl: true, updatedAt: true },
       },
       messages: {
         orderBy: { createdAt: "asc" },
         include: {
           sender: {
-            select: { id: true, displayName: true, avatarUrl: true },
+            select: { id: true, displayName: true, avatarUrl: true, updatedAt: true },
           },
         },
       },

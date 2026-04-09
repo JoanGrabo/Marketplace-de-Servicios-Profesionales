@@ -4,7 +4,6 @@ import { prisma } from "@/lib/db";
 import { getPublicProfileName } from "@/lib/publicProfile";
 import { getCurrentUser } from "@/lib/auth";
 import { resolveRouteParams, safeDecodeURIComponent } from "@/lib/routeParams";
-import PayForServiceButton from "@/app/servicios/[slug]/_components/PayForServiceButton";
 
 type ServicioDetalleProps = {
   params: {
@@ -15,6 +14,14 @@ type ServicioDetalleProps = {
 };
 
 export const dynamic = "force-dynamic";
+
+function toBullets(text: string | null | undefined): string[] {
+  if (!text) return [];
+  return text
+    .split(/\r?\n/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
 
 export default async function ServicioDetallePage({ params }: ServicioDetalleProps) {
   const { slug: rawSlug } = await resolveRouteParams(params);
@@ -79,6 +86,26 @@ export default async function ServicioDetallePage({ params }: ServicioDetallePro
               {servicio.description?.trim() || "El profesional no ha añadido una descripción."}
             </p>
           </div>
+          {toBullets(servicio.includesText).length ? (
+            <div>
+              <h2 className="text-base font-semibold text-[var(--connectia-gray)]">Incluye</h2>
+              <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-gray-700">
+                {toBullets(servicio.includesText).map((line) => (
+                  <li key={line}>{line}</li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+          {toBullets(servicio.requirementsText).length ? (
+            <div>
+              <h2 className="text-base font-semibold text-[var(--connectia-gray)]">Requisitos para empezar</h2>
+              <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-gray-700">
+                {toBullets(servicio.requirementsText).map((line) => (
+                  <li key={line}>{line}</li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
           <div className="text-sm text-gray-600">
             Entrega estimada:{" "}
             <span className="font-medium text-gray-800">
@@ -104,12 +131,11 @@ export default async function ServicioDetallePage({ params }: ServicioDetallePro
             </div>
           ) : (
             <>
-              <PayForServiceButton serviceSlug={servicio.slug} />
               <Link
                 href={`/servicios/${encodeURIComponent(servicio.slug)}/contactar`}
-                className="rounded-lg border border-gray-300 px-5 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+                className="rounded-lg bg-[var(--connectia-cta)] px-5 py-2 text-sm font-semibold text-white transition hover:opacity-90"
               >
-                Contactar (sin pagar aún)
+                Contactar
               </Link>
             </>
           )}

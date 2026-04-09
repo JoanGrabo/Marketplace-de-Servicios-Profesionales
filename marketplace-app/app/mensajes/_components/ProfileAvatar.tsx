@@ -4,6 +4,7 @@ type ProfileLike = {
   id: string;
   displayName?: string | null;
   avatarUrl?: string | null;
+  updatedAt?: Date | string | null;
 };
 
 const sizeClass = {
@@ -23,10 +24,17 @@ export default function ProfileAvatar({
   const initial = name.trim().slice(0, 1).toUpperCase() || "?";
 
   if (profile.avatarUrl) {
+    const v =
+      profile.updatedAt instanceof Date
+        ? profile.updatedAt.getTime()
+        : typeof profile.updatedAt === "string"
+          ? new Date(profile.updatedAt).getTime()
+          : null;
+    const src = v ? `${profile.avatarUrl}${profile.avatarUrl.includes("?") ? "&" : "?"}v=${v}` : profile.avatarUrl;
     return (
       // eslint-disable-next-line @next/next/no-img-element
       <img
-        src={profile.avatarUrl}
+        src={src}
         alt=""
         className={`${sizeClass[size]} shrink-0 rounded-full object-cover ring-2 ring-white shadow-sm`}
       />

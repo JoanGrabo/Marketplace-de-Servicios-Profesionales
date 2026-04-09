@@ -22,11 +22,11 @@ export default async function AdminConversationPage({
     where: { id },
     include: {
       service: { select: { title: true, slug: true } },
-      client: { select: { id: true, email: true, displayName: true, avatarUrl: true } },
-      professional: { select: { id: true, email: true, displayName: true, avatarUrl: true } },
+      client: { select: { id: true, email: true, displayName: true, avatarUrl: true, updatedAt: true } },
+      professional: { select: { id: true, email: true, displayName: true, avatarUrl: true, updatedAt: true } },
       messages: {
         orderBy: { createdAt: "asc" },
-        include: { sender: { select: { id: true, email: true, displayName: true, avatarUrl: true } } },
+        include: { sender: { select: { id: true, email: true, displayName: true, avatarUrl: true, updatedAt: true } } },
       },
     },
   });

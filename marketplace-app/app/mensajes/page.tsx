@@ -18,10 +18,10 @@ export default async function MensajesPage() {
     include: {
       service: { select: { id: true, title: true, slug: true } },
       client: {
-        select: { id: true, displayName: true, avatarUrl: true },
+        select: { id: true, displayName: true, avatarUrl: true, updatedAt: true },
       },
       professional: {
-        select: { id: true, displayName: true, avatarUrl: true },
+        select: { id: true, displayName: true, avatarUrl: true, updatedAt: true },
       },
       messages: {
         orderBy: { createdAt: "desc" },

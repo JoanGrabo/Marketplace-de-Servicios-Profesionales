@@ -22,7 +22,12 @@ export default async function ProfesionalPublicoPage({ params }: Props) {
       bio: true,
       city: true,
       websiteUrl: true,
+      linkedinUrl: true,
+      instagramUrl: true,
+      xUrl: true,
+      colegiadoNumber: true,
       avatarUrl: true,
+      updatedAt: true,
       services: {
         where: { active: true },
         orderBy: [{ isPromoted: "desc" }, { promoExpiresAt: "desc" }, { createdAt: "desc" }],
@@ -46,6 +51,10 @@ export default async function ProfesionalPublicoPage({ params }: Props) {
   if (!profile) notFound();
 
   const name = getPublicProfileName(profile);
+  const avatarSrc =
+    profile.avatarUrl && profile.updatedAt
+      ? `${profile.avatarUrl}${profile.avatarUrl.includes("?") ? "&" : "?"}v=${profile.updatedAt.getTime()}`
+      : profile.avatarUrl;
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
@@ -56,24 +65,51 @@ export default async function ProfesionalPublicoPage({ params }: Props) {
           </Link>{" "}
           / Profesional
         </p>
-        <h1 className="mt-2 text-3xl font-bold text-[var(--connectia-gray)]">{name}</h1>
-        <p className="mt-2 text-gray-600">
-          {profile.headline ? <span className="font-medium text-gray-800">{profile.headline}</span> : null}
-          {profile.city ? <span> · {profile.city}</span> : null}
-        </p>
+        <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-5">
+          {avatarSrc ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={avatarSrc}
+              alt=""
+              className="h-16 w-16 shrink-0 rounded-full object-cover ring-1 ring-gray-200"
+            />
+          ) : (
+            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-gray-100 text-xl font-semibold text-gray-500 ring-1 ring-gray-200">
+              {name.trim().slice(0, 1).toUpperCase()}
+            </div>
+          )}
+          <div className="min-w-0">
+            <h1 className="text-3xl font-bold text-[var(--connectia-gray)]">{name}</h1>
+            <p className="mt-2 text-gray-600">
+              {profile.headline ? <span className="font-medium text-gray-800">{profile.headline}</span> : null}
+              {profile.city ? <span> · {profile.city}</span> : null}
+              {profile.colegiadoNumber ? <span> · Nº colegiado {profile.colegiadoNumber}</span> : null}
+            </p>
+            <div className="mt-3 flex flex-wrap gap-3 text-sm">
+              {profile.websiteUrl ? (
+                <a href={profile.websiteUrl} target="_blank" rel="noreferrer" className="font-semibold text-[var(--connectia-gold)] hover:underline">
+                  Web
+                </a>
+              ) : null}
+              {profile.linkedinUrl ? (
+                <a href={profile.linkedinUrl} target="_blank" rel="noreferrer" className="font-semibold text-[var(--connectia-gold)] hover:underline">
+                  LinkedIn
+                </a>
+              ) : null}
+              {profile.instagramUrl ? (
+                <a href={profile.instagramUrl} target="_blank" rel="noreferrer" className="font-semibold text-[var(--connectia-gold)] hover:underline">
+                  Instagram
+                </a>
+              ) : null}
+              {profile.xUrl ? (
+                <a href={profile.xUrl} target="_blank" rel="noreferrer" className="font-semibold text-[var(--connectia-gold)] hover:underline">
+                  X
+                </a>
+              ) : null}
+            </div>
+          </div>
+        </div>
         {profile.bio ? <p className="mt-4 max-w-3xl whitespace-pre-wrap text-gray-700">{profile.bio}</p> : null}
-        {profile.websiteUrl ? (
-          <p className="mt-3 text-sm">
-            <a
-              href={profile.websiteUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="font-semibold text-[var(--connectia-gold)] hover:underline"
-            >
-              Web
-            </a>
-          </p>
-        ) : null}
       </div>
 
       <h2 className="mb-4 text-lg font-semibold text-[var(--connectia-gray)]">Servicios</h2>

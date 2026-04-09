@@ -26,6 +26,10 @@ export default async function MiPerfilPage() {
     const bio = String(formData.get("bio") ?? "").trim();
     const phone = String(formData.get("phone") ?? "").trim();
     const websiteUrl = String(formData.get("websiteUrl") ?? "").trim();
+    const linkedinUrl = String(formData.get("linkedinUrl") ?? "").trim();
+    const instagramUrl = String(formData.get("instagramUrl") ?? "").trim();
+    const xUrl = String(formData.get("xUrl") ?? "").trim();
+    const colegiadoNumber = String(formData.get("colegiadoNumber") ?? "").trim();
     const city = String(formData.get("city") ?? "").trim();
     const languages = String(formData.get("languages") ?? "").trim();
     const yearsExperienceRaw = String(formData.get("yearsExperience") ?? "").trim();
@@ -43,6 +47,10 @@ export default async function MiPerfilPage() {
         bio: bio || null,
         phone: phone || null,
         websiteUrl: websiteUrl || null,
+        linkedinUrl: linkedinUrl || null,
+        instagramUrl: instagramUrl || null,
+        xUrl: xUrl || null,
+        colegiadoNumber: colegiadoNumber || null,
         city: city || null,
         languages: languages || null,
         yearsExperience,
@@ -69,7 +77,7 @@ export default async function MiPerfilPage() {
               {profile?.avatarUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
-                  src={profile.avatarUrl}
+                  src={`${profile.avatarUrl}${profile.updatedAt ? `${profile.avatarUrl.includes("?") ? "&" : "?"}v=${profile.updatedAt.getTime()}` : ""}`}
                   alt="Avatar"
                   className="h-14 w-14 rounded-full object-cover ring-1 ring-gray-200"
                 />
@@ -207,6 +215,48 @@ export default async function MiPerfilPage() {
               className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-[var(--connectia-gold)] focus:outline-none focus:ring-1 focus:ring-[var(--connectia-gold)]"
               placeholder="https://mi-portfolio.com"
             />
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">LinkedIn (opcional)</label>
+              <input
+                name="linkedinUrl"
+                defaultValue={(profile as any)?.linkedinUrl ?? ""}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-[var(--connectia-gold)] focus:outline-none focus:ring-1 focus:ring-[var(--connectia-gold)]"
+                placeholder="https://www.linkedin.com/in/tu-perfil"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">Instagram (opcional)</label>
+              <input
+                name="instagramUrl"
+                defaultValue={(profile as any)?.instagramUrl ?? ""}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-[var(--connectia-gold)] focus:outline-none focus:ring-1 focus:ring-[var(--connectia-gold)]"
+                placeholder="https://instagram.com/tu_usuario"
+              />
+            </div>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">X / Twitter (opcional)</label>
+              <input
+                name="xUrl"
+                defaultValue={(profile as any)?.xUrl ?? ""}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-[var(--connectia-gold)] focus:outline-none focus:ring-1 focus:ring-[var(--connectia-gold)]"
+                placeholder="https://x.com/tu_usuario"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">Nº de colegiado (opcional)</label>
+              <input
+                name="colegiadoNumber"
+                defaultValue={(profile as any)?.colegiadoNumber ?? ""}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-[var(--connectia-gold)] focus:outline-none focus:ring-1 focus:ring-[var(--connectia-gold)]"
+                placeholder="Ej. 12345"
+              />
+            </div>
           </div>
 
           <AvatarUploader initialAvatarUrl={profile?.avatarUrl ?? ""} />

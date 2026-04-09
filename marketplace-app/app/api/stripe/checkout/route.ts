@@ -5,6 +5,15 @@ import { getAppBaseUrl, getStripeClient } from "@/lib/stripe";
 
 export async function POST(req: Request) {
   try {
+    return NextResponse.json(
+      {
+        ok: false,
+        message:
+          "Pagos por servicio desactivados temporalmente. Contacta con el profesional para acordar el encargo.",
+      },
+      { status: 410 },
+    );
+
     const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ ok: false, message: "Debes iniciar sesión para pagar." }, { status: 401 });
