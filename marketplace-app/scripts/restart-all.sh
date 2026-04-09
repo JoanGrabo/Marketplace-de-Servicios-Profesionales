@@ -78,6 +78,10 @@ else
   echo "Aviso: no hay .env.local en $APP_DIR — Prisma puede fallar sin DATABASE_URL."
 fi
 
+if [[ -z "${DATABASE_URL:-}" ]]; then
+  fail "DATABASE_URL no está definido. Asegúrate de tener $APP_DIR/.env.local con DATABASE_URL=... antes de ejecutar."
+fi
+
 log "4/7 prisma generate"
 npx prisma generate
 
