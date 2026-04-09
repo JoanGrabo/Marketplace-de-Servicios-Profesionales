@@ -3,6 +3,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import AvatarUploader from "../AvatarUploader";
+import LocationUpdater from "../LocationUpdater";
 
 export const dynamic = "force-dynamic";
 
@@ -264,6 +265,8 @@ export default async function MiPerfilEditarPage() {
               />
             </div>
           </div>
+
+          <LocationUpdater initialLocationLabel={String((profile as any)?.locationLabel ?? profile?.city ?? "")} />
 
           <AvatarUploader initialAvatarUrl={profile?.avatarUrl ?? ""} />
 

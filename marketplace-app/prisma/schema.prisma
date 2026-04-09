@@ -26,6 +26,9 @@ model Profile {
   xUrl String? @map("x_url")
   colegiadoNumber String? @map("colegiado_number")
   city String?
+  locationLabel String? @map("location_label")
+  locationLat Float? @map("location_lat")
+  locationLng Float? @map("location_lng")
   languages String?
   yearsExperience Int? @map("years_experience")
   emailVerifiedAt DateTime? @map("email_verified_at")
