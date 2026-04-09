@@ -110,6 +110,7 @@ model Service {
   profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
   conversations Conversation[]
   orders Order[]
+  reviews Review[]
 
   @@index([category])
   @@index([isPromoted, promoExpiresAt])
