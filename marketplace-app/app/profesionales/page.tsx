@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { getPublicProfileName } from "@/lib/publicProfile";
+import { Prisma } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
 
@@ -26,14 +27,26 @@ async function geocodeNominatim(query: string): Promise<{ label: string; lat: nu
 }
 
 type Props = {
-  searchParams?: { zona?: string };
+  searchParams?: { zona?: string; tipo?: string };
 };
 
 export default async function ProfesionalesPage({ searchParams }: Props) {
   const zona = String(searchParams?.zona ?? "").trim();
+  const tipoRaw = String(searchParams?.tipo ?? "").trim().toLowerCase();
+  const tipo = tipoRaw === "arquitectura" || tipoRaw === "legal" || tipoRaw === "destacados" ? tipoRaw : "";
   const radiusKm = 100;
 
   const geo = zona ? await geocodeNominatim(zona) : null;
+  const now = new Date();
+
+  const extraWhere =
+    tipo === "arquitectura"
+      ? Prisma.sql`EXISTS (SELECT 1 FROM services s WHERE s.profile_id = p.id AND s.active = true AND s.category = 'Arquitectura')`
+      : tipo === "legal"
+        ? Prisma.sql`EXISTS (SELECT 1 FROM services s WHERE s.profile_id = p.id AND s.active = true AND s.category = 'Legal')`
+        : tipo === "destacados"
+          ? Prisma.sql`EXISTS (SELECT 1 FROM services s WHERE s.profile_id = p.id AND s.active = true AND s.is_promoted = true AND s.promo_expires_at > ${now})`
+          : Prisma.sql`TRUE`;
 
   const professionals = geo
     ? await prisma.$queryRaw<
@@ -68,6 +81,7 @@ export default async function ProfesionalesPage({ searchParams }: Props) {
           p.role = 'profesional'
           AND p.location_lat IS NOT NULL
           AND p.location_lng IS NOT NULL
+          AND ${extraWhere}
           AND (
             6371 * 2 * asin(
               sqrt(
@@ -81,7 +95,16 @@ export default async function ProfesionalesPage({ searchParams }: Props) {
         LIMIT 100;
       `
     : await prisma.profile.findMany({
-        where: { role: "profesional" },
+        where: {
+          role: "profesional",
+          ...(tipo === "arquitectura"
+            ? { services: { some: { active: true, category: "Arquitectura" } } }
+            : tipo === "legal"
+              ? { services: { some: { active: true, category: "Legal" } } }
+              : tipo === "destacados"
+                ? { services: { some: { active: true, isPromoted: true, promoExpiresAt: { gt: now } } } }
+                : {}),
+        },
         orderBy: { updatedAt: "desc" },
         take: 60,
         select: {
@@ -104,6 +127,7 @@ export default async function ProfesionalesPage({ searchParams }: Props) {
           </p>
         </div>
         <form className="flex w-full max-w-xl gap-2 sm:w-auto">
+          {tipo ? <input type="hidden" name="tipo" value={tipo} /> : null}
           <input
             name="zona"
             defaultValue={zona}

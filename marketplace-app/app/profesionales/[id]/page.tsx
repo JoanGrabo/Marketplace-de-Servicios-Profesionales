@@ -152,7 +152,27 @@ export default async function ProfesionalPublicoPage({ params }: Props) {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {profile.services.map((s) => (
-            <article key={s.id} className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+            <article key={s.id} className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+              <Link
+                href={`/servicios/${encodeURIComponent(s.slug)}`}
+                className="block bg-gray-50"
+                aria-label={`Ver servicio: ${s.title}`}
+              >
+                {s.thumbnailUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={`${s.thumbnailUrl}${s.updatedAt ? `${s.thumbnailUrl.includes("?") ? "&" : "?"}v=${s.updatedAt.getTime()}` : ""}`}
+                    alt=""
+                    className="h-36 w-full object-cover"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="flex h-36 w-full items-center justify-center text-xs font-semibold uppercase tracking-widest text-gray-400">
+                    Sin imagen
+                  </div>
+                )}
+              </Link>
+              <div className="p-5">
               <div className="flex items-start justify-between gap-3">
                 <h3 className="min-w-0 text-base font-semibold text-[var(--connectia-gray)]">
                   <Link href={`/servicios/${encodeURIComponent(s.slug)}`} className="hover:underline">
@@ -170,6 +190,7 @@ export default async function ProfesionalPublicoPage({ params }: Props) {
               </div>
               {s.shortDescription ? <p className="mt-2 text-sm text-gray-600">{s.shortDescription}</p> : null}
               <p className="mt-3 text-xs text-gray-500">Entrega en {s.deliveryDays} días</p>
+              </div>
             </article>
           ))}
         </div>

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { isAdmin } from "@/lib/admin";
 
 type User = {
@@ -37,8 +37,11 @@ export default function SiteHeader({
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const pathname = usePathname();
+  const router = useRouter();
   const searchParams = useSearchParams();
   const qCurrent = pathname?.startsWith("/servicios") ? (searchParams?.get("q") ?? "") : "";
+  const mode = pathname?.startsWith("/profesionales") ? "profesionales" : "servicios";
+  const tipoCurrent = searchParams?.get("tipo") ?? "";
 
   const showAuthedNav = Boolean(user);
 
@@ -298,31 +301,72 @@ export default function SiteHeader({
 
       {/* Categories bar */}
       <div className="border-t border-gray-100 bg-white">
-        <nav className="mx-auto flex max-w-6xl items-center gap-6 overflow-x-auto px-4 py-2 text-sm font-semibold text-gray-700 sm:px-6">
-          <Link
-            href="/servicios?featured=1"
-            className="inline-flex shrink-0 items-center gap-1.5 text-gray-700 hover:text-[var(--connectia-gold-light)]"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path
-                d="M12 17.3 6.8 20l1-5.9L3.6 9.9l5.9-.9L12 3.6l2.5 5.4 5.9.9-4.2 4.2 1 5.9L12 17.3Z"
-                fill="currentColor"
-              />
-            </svg>
-            Destacados
-          </Link>
-          <Link
-            href={`/servicios?category=${encodeURIComponent("Arquitectura")}`}
-            className="shrink-0 text-gray-700 hover:text-[var(--connectia-gold-light)]"
-          >
-            Arquitectura
-          </Link>
-          <Link
-            href={`/servicios?category=${encodeURIComponent("Legal")}`}
-            className="shrink-0 text-gray-700 hover:text-[var(--connectia-gold-light)]"
-          >
-            Legal
-          </Link>
+        <nav className="mx-auto flex max-w-6xl items-center gap-3 overflow-x-auto px-4 py-2 text-sm font-semibold text-gray-700 sm:px-6">
+          <div className="inline-flex shrink-0 overflow-hidden rounded-full border border-gray-200 bg-white shadow-sm">
+            <Link
+              href="/servicios"
+              className={`px-3 py-1.5 text-sm font-semibold transition ${
+                mode === "servicios" ? "bg-[var(--connectia-gold)]/12 text-[var(--connectia-gold)]" : "text-gray-700 hover:bg-gray-50"
+              }`}
+            >
+              Servicios
+            </Link>
+            <Link
+              href="/profesionales"
+              className={`px-3 py-1.5 text-sm font-semibold transition ${
+                mode === "profesionales" ? "bg-[var(--connectia-gold)]/12 text-[var(--connectia-gold)]" : "text-gray-700 hover:bg-gray-50"
+              }`}
+            >
+              Profesionales
+            </Link>
+          </div>
+
+          {mode === "servicios" ? (
+            <>
+              <Link
+                href="/servicios?featured=1"
+                className="inline-flex shrink-0 items-center gap-1.5 text-gray-700 hover:text-[var(--connectia-gold-light)]"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path
+                    d="M12 17.3 6.8 20l1-5.9L3.6 9.9l5.9-.9L12 3.6l2.5 5.4 5.9.9-4.2 4.2 1 5.9L12 17.3Z"
+                    fill="currentColor"
+                  />
+                </svg>
+                Destacados
+              </Link>
+              <Link
+                href={`/servicios?category=${encodeURIComponent("Arquitectura")}`}
+                className="shrink-0 text-gray-700 hover:text-[var(--connectia-gold-light)]"
+              >
+                Arquitectura
+              </Link>
+              <Link
+                href={`/servicios?category=${encodeURIComponent("Legal")}`}
+                className="shrink-0 text-gray-700 hover:text-[var(--connectia-gold-light)]"
+              >
+                Legal
+              </Link>
+            </>
+          ) : (
+            <div className="shrink-0">
+              <select
+                value={tipoCurrent}
+                onChange={(e) => {
+                  const tipo = e.target.value;
+                  const url = tipo ? `/profesionales?tipo=${encodeURIComponent(tipo)}` : "/profesionales";
+                  router.push(url);
+                }}
+                className="rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50 focus:border-[var(--connectia-gold)] focus:outline-none focus:ring-1 focus:ring-[var(--connectia-gold)]"
+                aria-label="Tipo de profesional"
+              >
+                <option value="">Todos</option>
+                <option value="arquitectura">Arquitectos</option>
+                <option value="legal">Abogados</option>
+                <option value="destacados">Destacados</option>
+              </select>
+            </div>
+          )}
         </nav>
       </div>
 
