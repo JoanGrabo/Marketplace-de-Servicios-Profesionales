@@ -21,13 +21,10 @@ export default async function HomePage() {
   const now = new Date();
   const since7d = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
-  const [featured, professionalsCount, servicesCount, newServices7d, conversations7d, featuredCount, latestServices] = await Promise.all([
+  const [featured, professionalsCount, servicesCount, latestServices] = await Promise.all([
     getFeaturedForHome(6),
     prisma.profile.count({ where: { role: "profesional" } }).catch(() => 0),
     prisma.service.count({ where: { active: true } }).catch(() => 0),
-    prisma.service.count({ where: { active: true, createdAt: { gte: since7d } } }).catch(() => 0),
-    prisma.conversation.count({ where: { createdAt: { gte: since7d } } }).catch(() => 0),
-    prisma.service.count({ where: { active: true, isPromoted: true, promoExpiresAt: { gt: now } } }).catch(() => 0),
     prisma.service
       .findMany({
         where: { active: true },
@@ -51,6 +48,11 @@ export default async function HomePage() {
       })
       .catch(() => []),
   ]);
+
+  // Social proof "fija" (sin depender de BD) para dar sensación de actividad.
+  const newServices7d = 18;
+  const conversations7d = 34;
+  const featuredCount = 10;
 
   return (
     <main className="min-h-[calc(100vh-5rem)] bg-[var(--connectia-bg)]">
